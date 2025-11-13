@@ -27,6 +27,9 @@ public class Movimentacoes {
 	    public String getValor() {
 	        return valor;
 	    }
+	    public void setValor(String valor) {
+	    	this.valor = valor;
+	    }
 	}
 	    
 	    
@@ -44,6 +47,9 @@ public class Movimentacoes {
 		    public String getValor() {
 		        return valor;
 		    }
+		    public void setValor(String valor) {
+		    	this.valor = valor;
+		    }
 		}
 
 
@@ -52,7 +58,7 @@ public class Movimentacoes {
 			return id;
 		}
 
-
+		tipoStatus stats= tipoStatus.CONCLUIDA;
 
 		public void setId(int id) {
 			this.id = id;
@@ -96,14 +102,14 @@ public class Movimentacoes {
 
 
 
-		public TipoMov getTipo() {
-			return tipo;
+		public String getTipo() {
+			return tipo.getValor();
 		}
 
 
 
-		public void setTipo(TipoMov tipo) {
-			this.tipo = tipo;
+		public void setTipo(String tipo) {
+			this.tipo.setValor(tipo);
 		}
 
 
@@ -132,14 +138,14 @@ public class Movimentacoes {
 
 
 
-		public tipoStatus getStatus() {
-			return status;
+		public String getStatus() {
+			return status.getValor();
 		}
 
 
 
-		public void setStatus(tipoStatus status) {
-			this.status = status;
+		public void setStatus(String status) {
+			this.status.setValor(status);
 		}
 
 
@@ -156,7 +162,9 @@ public class Movimentacoes {
 			this.descricao = descricao;
 			this.status = status;
 		}
-	    
+		public Movimentacoes() {
+			
+		}
 	    
 
 }
