@@ -6,11 +6,26 @@ import java.sql.Timestamp;
 public class Conta {
 	private int id;
 	private int usuarioId;
+	private int agencia;
+	private int numero_conta;
 	private BigDecimal saldo;
 	private tiposConta tipo;
 	private statusConta status;
 	private Timestamp DataCriacao;
 	    
+	public Conta(int id, int usuarioId, int agencia, int numero_conta, BigDecimal saldo, tiposConta tipo,
+			statusConta status, Timestamp dataCriacao) {
+		super();
+		this.id = id;
+		this.usuarioId = usuarioId;
+		this.agencia = agencia;
+		this.numero_conta = numero_conta;
+		this.saldo = saldo;
+		this.tipo = tipo;
+		this.status = status;
+		DataCriacao = dataCriacao;
+	}
+	
 	    
 	    public enum tiposConta{
 	    	CORRENTE("CORRENTE"),
@@ -81,15 +96,23 @@ public class Conta {
 			DataCriacao = dataCriacao;
 		}
 		
-		public Conta(int id, int usuarioId, BigDecimal saldo, tiposConta tipo, statusConta status) {
-			super();
-			this.id = id;
-			this.usuarioId = usuarioId;
-			this.saldo = saldo;
-			this.tipo = tipo;
-			this.status = status;
-			this.DataCriacao = new Timestamp(System.currentTimeMillis());
+		public int getAgencia() {
+			return agencia;
 		}
+		public void setAgencia(int agencia) {
+			this.agencia = agencia;
+		}
+		public int getNumero_conta() {
+			return numero_conta;
+		}
+		public void setNumero_conta(int numero_conta) {
+			this.numero_conta = numero_conta;
+		}
+		
+		
+		
+		
+		
 	    
 	    
 }
