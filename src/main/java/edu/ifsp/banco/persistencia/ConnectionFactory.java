@@ -4,7 +4,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-class ConnectionFactory {
+public class ConnectionFactory {
 	static {
 		try {
 			Class.forName("oracle.jdbc.driver.OracleDriver").getDeclaredConstructor().newInstance();
@@ -15,9 +15,9 @@ class ConnectionFactory {
 	
 	public static Connection getConnection() throws SQLException {
 		Connection conn = DriverManager.getConnection(
-			"jdbc:oracle:thin:@//localhost:1521/xe",
+			"jdbc:oracle:thin:@//localhost:1539/free",
 			"system",
-			"Oracle123"
+			"root"
 		);
 		
 		return conn;
