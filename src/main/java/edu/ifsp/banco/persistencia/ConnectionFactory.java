@@ -15,9 +15,9 @@ class ConnectionFactory {
 	
 	public static Connection getConnection() throws SQLException {
 		Connection conn = DriverManager.getConnection(
-			"jdbc:oracle:thin:@//localhost:1539/free",
+			"jdbc:oracle:thin:@//localhost:1521/xe",
 			"system",
-			"root"
+			"Oracle123"
 		);
 		
 		return conn;
