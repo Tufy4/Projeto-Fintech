@@ -4,12 +4,13 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+
 import edu.ifsp.banco.persistencia.ConnectionFactory;
 import edu.ifsp.banco.web.Command;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 public class LoginCommand implements Command {
     
@@ -31,6 +32,8 @@ public class LoginCommand implements Command {
                         System.out.println("Login bem-sucedido!");
                         response.getWriter().write("Login bem-sucedido!");
                         response.setStatus(HttpServletResponse.SC_OK); // Status HTTP 200
+                        HttpSession session = request.getSession();
+                        session.setAttribute("username", user);
                     } else {
                         System.out.println("Usuário ou senha incorretos!");
                         response.getWriter().write("Usuário ou senha incorretos!");

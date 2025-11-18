@@ -102,10 +102,9 @@ public class Usuario {
 	public void setDataAtualizacao(Timestamp dataAtualizacao) {
 		DataAtualizacao = dataAtualizacao;
 	}
-	public Usuario(int id, String nome, String email, String senha, String telefone, String endereco,
+	public Usuario( String nome, String email, String senha, String telefone, String endereco,
 			tiposCliente perfil, statusCliente status) {
 		super();
-		this.id = id;
 		this.nome = nome;
 		this.email = email;
 		this.senha = senha;
@@ -116,6 +115,19 @@ public class Usuario {
 		this.DataCriacao=new Timestamp(System.currentTimeMillis());
 		this.DataAtualizacao = new Timestamp(System.currentTimeMillis());
 	}
+	
+	public Usuario( String nome, String email, String senha, String telefone, String endereco) {
+		super();
+		this.nome = nome;
+		this.email = email;
+		this.senha = senha;
+		this.telefone = telefone;
+		this.endereco = endereco;
+		this.DataCriacao=new Timestamp(System.currentTimeMillis());
+		this.DataAtualizacao = new Timestamp(System.currentTimeMillis());
+	}
+	
+	
 	
 	
 	

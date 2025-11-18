@@ -21,7 +21,7 @@
 	
 	<form action="Login" method="post">
 		<label>Usuário: </label>
-		<input type="text" name="user" required>
+		<input type="email" name="user" required>
 		<br>
 		
 		<label>Senha: </label>
@@ -39,5 +39,8 @@
 		<button type="submit">Enviar</button>
 	</form>
 	
+	
+	<h2>Não tem conta? </h2>
+	<a href="paginas/Cadastrar.jsp">Clique aqui para se cadastrar!!</a>	
 </body>
 </html>

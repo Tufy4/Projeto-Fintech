@@ -35,8 +35,7 @@ public class UsuarioDAO {
     public void atualizar(Usuario usuario) {
         String sql = """
             UPDATE USUARIOS
-               SET NOME = ?, EMAIL = ?, SENHA = ?, TELEFONE = ?, ENDERECO = ?, 
-                   PERFIL = ?, STATUS = ?, DATA_ULTIMA_ATUALIZACAO = CURRENT_TIMESTAMP
+               SET NOME = ?, EMAIL = ?, SENHA = ?, TELEFONE = ?, ENDERECO = ?, DATA_ULTIMA_ATUALIZACAO = CURRENT_TIMESTAMP
              WHERE ID = ?
         """;
 
@@ -48,8 +47,7 @@ public class UsuarioDAO {
             ps.setString(3, usuario.getSenha());
             ps.setString(4, usuario.getTelefone());
             ps.setString(5, usuario.getEndereco());
-            ps.setString(6, usuario.getPerfil().getValor());
-            ps.setString(7, usuario.getStatus().getValor());
+
             ps.setInt(8, usuario.getId());
 
             ps.executeUpdate();
