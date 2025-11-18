@@ -7,6 +7,7 @@ public class Investimento {
 	private int id;
 	private int idConta;
 	private String tipoInvestimento;
+	private statusInvestimento status;
 	private BigDecimal ValorInvestido;
 	private Timestamp DataInicio;
 	private Timestamp DataFim; 
@@ -25,6 +26,42 @@ public class Investimento {
  	    }
     	
     }
+    
+    
+    
+    
+   
+	public Investimento(int id, int idConta, String tipoInvestimento, statusInvestimento status,
+			BigDecimal valorInvestido, Timestamp dataInicio, Timestamp dataFim) {
+		super();
+		this.id = id;
+		this.idConta = idConta;
+		this.tipoInvestimento = tipoInvestimento;
+		this.status = status;
+		ValorInvestido = valorInvestido;
+		DataInicio = dataInicio;
+		DataFim = dataFim;
+	}
+	
+	
+	
+	
+
+	public statusInvestimento getStatus() {
+		return status;
+	}
+
+
+
+
+
+	public void setStatus(statusInvestimento status) {
+		this.status = status;
+	}
+
+
+
+
 
 	public int getId() {
 		return id;
@@ -74,16 +111,7 @@ public class Investimento {
 		DataFim = dataFim;
 	}
 
-	public Investimento(int id, int idConta, String tipoInvestimento, BigDecimal valorInvestido, Timestamp dataInicio,
-			Timestamp dataFim) {
-		super();
-		this.id = id;
-		this.idConta = idConta;
-		this.tipoInvestimento = tipoInvestimento;
-		ValorInvestido = valorInvestido;
-		DataInicio = dataInicio;
-		DataFim = dataFim;
-	}
+	
     
     
     
