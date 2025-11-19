@@ -24,6 +24,7 @@ public class CadastrarUsuarioController extends HttpServlet {
           
           Usuario user = new Usuario( name, email, password, telefone, endereco);
           UsuarioSERVICE Service = new UsuarioSERVICE();
+          System.out.println(user.toString());
           try {
 			Service.criarConta(user);
 			response.sendRedirect("index.jsp");
