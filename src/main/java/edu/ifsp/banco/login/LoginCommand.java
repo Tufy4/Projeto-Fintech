@@ -21,19 +21,30 @@ public class LoginCommand implements Command {
         try (Connection conn = ConnectionFactory.getConnection()) {
             String user = request.getParameter("user");
             String password = request.getParameter("password");
+            String status;
 
             String sql = "SELECT * FROM usuarios WHERE EMAIL = ? AND SENHA = ?";
             try (PreparedStatement ps = conn.prepareStatement(sql)) {
                 ps.setString(1, user);  
                 ps.setString(2, password);  
+                
 
                 try (ResultSet rs = ps.executeQuery()) {
+                	
                     if (rs.next()) {
-                        System.out.println("Login bem-sucedido!");
-                        response.getWriter().write("Login bem-sucedido!");
-                        response.setStatus(HttpServletResponse.SC_OK); // Status HTTP 200
-                        HttpSession session = request.getSession();
-                        session.setAttribute("username", user);
+                    	status = rs.getString("STATUS");
+                    		if(!status.equalsIgnoreCase("BLOQUEADO")) {
+                    			  System.out.println("Login bem-sucedido!");
+      	                        response.getWriter().write("Login bem-sucedido!");
+      	                        response.setStatus(HttpServletResponse.SC_OK); // Status HTTP 200
+      	                        HttpSession session = request.getSession();
+      	                        session.setAttribute("username", user);
+                    		}
+                    		else {
+                    			response.getWriter().write("Usuário não liberado");
+                    		}
+                    	
+	                      
                     } else {
                         System.out.println("Usuário ou senha incorretos!");
                         response.getWriter().write("Usuário ou senha incorretos!");
