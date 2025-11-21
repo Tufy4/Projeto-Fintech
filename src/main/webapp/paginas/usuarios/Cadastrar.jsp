@@ -8,7 +8,7 @@
 	<base href="<%= request.getContextPath() %>/">
 </head>
 <body>
-	<form action="Cadastrar" method="post">
+	<form action="control?command=CadastrarUsuario" method="post">
 		<label>Nome: </label>
 		<input type="text" name="name" required>
 		<br>

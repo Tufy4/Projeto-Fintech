@@ -15,9 +15,10 @@ public class Movimentacoes {
 
 	
 	public enum TipoMov {
-	    ATIVO("ATIVO"),
-	    INATIVO("INATIVO"),
-	    BLOQUEADO("BLOQUEADO");
+		DEPOSITO("DEPOSITO"),
+	    TRANSFERENCIA("TRANSFERENCIA"),
+	    INVESTIMENTO("INVESTIMENTO"),	
+	    SAQUE("SAQUE");
 
 	    private String valor;
 

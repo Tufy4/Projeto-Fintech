@@ -13,29 +13,74 @@ import edu.ifsp.banco.modelo.Movimentacoes;
 
 public class MovimentacaoDAO {
 	
-	 public void inserir(Movimentacoes movimentacao,Conta contaOrigem, Conta contaDestino, BigDecimal valorTransitado) {
-	        String sql = """
-	            INSERT INTO movimentacao (ID, CONTA_ORIGEM, CONTA_DESTINO, VALOR, TIPO, DATA_TRANSACAO, DESCRICAO, STATUS)
-	            VALUES (SEQ_MOVIMENTACOES.NEXTVAL, ?, ?, ?, ?, ?, ?, ?)
-	        """;
+	public void inserir(Movimentacoes mov, Conta contaOrigem, Conta contaDestino, BigDecimal valor) {
+	    String sql = """
+	        INSERT INTO movimentacao 
+	        (ID, CONTA_ORIGEM, CONTA_DESTINO, VALOR, TIPO, DATA_TRANSACAO, DESCRICAO, STATUS)
+	        VALUES (SEQ_MOVIMENTACOES.NEXTVAL, ?, ?, ?, ?, ?, ?, ?)
+	    """;
 
-	        try (Connection conn = ConnectionFactory.getConnection();
-	             PreparedStatement ps = conn.prepareStatement(sql)) {
+	    try (Connection conn = ConnectionFactory.getConnection();
+	         PreparedStatement ps = conn.prepareStatement(sql)) {
 
+	        if (contaOrigem == null) {
+	            ps.setNull(1, java.sql.Types.INTEGER);
+	        } else {
 	            ps.setInt(1, contaOrigem.getId());
-	            ps.setInt(2, contaDestino.getId());
-	            ps.setBigDecimal(3, valorTransitado);
-	            ps.setString(4, movimentacao.getTipo());
-	            ps.setTimestamp(5, movimentacao.getDataTransacao());
-	            ps.setString(6, movimentacao.getDescricao());
-	            ps.setString(7, movimentacao.getStatus());
-	            ps.executeUpdate();
-	            
-	        } catch (SQLException e) {
-	            throw new DataAccessException("Erro ao inserir Movimentação.");
 	        }
+
+	        ps.setInt(2, contaDestino.getId());
+	        ps.setBigDecimal(3, valor);
+	        ps.setString(4, mov.getTipo());
+	        ps.setTimestamp(5, mov.getDataTransacao());
+	        ps.setString(6, mov.getDescricao());
+	        ps.setString(7, mov.getStatus());
+	        ps.executeUpdate();
+
+	    } catch (SQLException e) {
+	        throw new DataAccessException("Erro ao inserir Movimentação.");
 	    }
+	}
+	
+	
+	
+
+	public Movimentacoes buscarPorId(int id) {
+	    String sql = """
+	        SELECT ID, CONTA_ORIGEM, CONTA_DESTINO, VALOR, TIPO, DATA_TRANSACAO, DESCRICAO, STATUS
+	        FROM movimentacao
+	        WHERE ID = ?
+	    """;
+
+	    try (Connection conn = ConnectionFactory.getConnection();
+	         PreparedStatement ps = conn.prepareStatement(sql)) {
+
+	        ps.setInt(1, id);
+
+	        try (ResultSet rs = ps.executeQuery()) {
+	            if (rs.next()) {
+	                Movimentacoes mov = new Movimentacoes();
+	                mov.setId(rs.getInt("ID"));
+	                mov.setContaOrigemId(rs.getInt("CONTA_ORIGEM"));
+	                mov.setContaDestinoId(rs.getInt("CONTA_DESTINO"));
+	                mov.setValor(rs.getBigDecimal("VALOR"));
+	                mov.setTipo(rs.getString("TIPO"));
+	                mov.setDataTransacao(rs.getTimestamp("DATA_TRANSACAO"));
+	                mov.setDescricao(rs.getString("DESCRICAO"));
+	                mov.setStatus(rs.getString("STATUS"));
+	                return mov;
+	            }
+	        }
+
+	    } catch (SQLException e) {
+	        throw new DataAccessException("Erro ao buscar movimentação por ID.");
+	    }
+
+	    return null; 
+	}
+
 	 
+	
 	 
 	 public ArrayList<Movimentacoes> listarMovimentacoes(int idConta) throws SQLException {
 		    String sql = """
@@ -89,8 +134,9 @@ public class MovimentacaoDAO {
 		        try (Connection conn = ConnectionFactory.getConnection();
 		             PreparedStatement ps = conn.prepareStatement(sql)) {
 
-		            ps.setInt(1, idMovimentacao);
-		            ps.setString(2, StatusMovimentacao);
+		        	ps.setString(1, StatusMovimentacao);
+		        	ps.setInt(2, idMovimentacao);
+
 		          
 		            
 		            ps.executeUpdate();
