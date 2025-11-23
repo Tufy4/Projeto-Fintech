@@ -27,7 +27,7 @@ public class UsuarioDAO {
 	    }
 
 	   
-	    try (Connection conn = ConnectionFactory.getConnection();
+	    try (Connection conn = ConnectionSingleton.getInstance().getConnection();
 	         PreparedStatement ps = conn.prepareStatement(sql)) {
 
 	        
@@ -56,7 +56,7 @@ public class UsuarioDAO {
              WHERE ID = ?
         """;
 
-        try (Connection conn = ConnectionFactory.getConnection();
+        try (Connection conn = ConnectionSingleton.getInstance().getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, usuario.getNome());
@@ -77,7 +77,7 @@ public class UsuarioDAO {
     public void excluir(int id) {
         String sql = "DELETE FROM USUARIOS WHERE ID = ?";
 
-        try (Connection conn = ConnectionFactory.getConnection();
+        try (Connection conn = ConnectionSingleton.getInstance().getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, id);

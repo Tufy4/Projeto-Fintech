@@ -1,7 +1,7 @@
 package edu.ifsp.banco.persistencia;
 
 import edu.ifsp.banco.modelo.Investimento;
-import edu.ifsp.banco.modelo.Investimento.statusInvestimento;
+import edu.ifsp.banco.modelo.enums.StatusInvestimento;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -9,180 +9,142 @@ import java.util.List;
 
 public class InvestimentoDAO {
 
-    public void inserir(Investimento inv) throws DataAccessException {
+	public void inserir(Investimento inv) throws DataAccessException {
 
-        String sql = "INSERT INTO investimento (id, id_conta, tipo_investimento, status, valor_investido, data_inicio, data_fim) "
-                   + "VALUES (SEQ_INVESTIMENTO.NEXTVAL, ?, ?, ?, ?, ?, ?)";
+		String sql = "INSERT INTO investimento (id, id_conta, tipo_investimento, status, valor_investido, data_inicio, data_fim) "
+				+ "VALUES (SEQ_INVESTIMENTO.NEXTVAL, ?, ?, ?, ?, ?, ?)";
 
-        try (Connection conn = ConnectionFactory.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+		try (Connection conn = ConnectionSingleton.getInstance().getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setInt(1, inv.getIdConta());
-            stmt.setString(2, inv.getTipoInvestimento());
-            stmt.setString(3, inv.getStatus().getValor());
-            stmt.setBigDecimal(4, inv.getValorInvestido());
-            stmt.setTimestamp(5, inv.getDataInicio());
-            stmt.setTimestamp(6, inv.getDataFim());
+			stmt.setInt(1, inv.getIdConta());
+			stmt.setString(2, inv.getTipoInvestimento());
+			stmt.setString(3, inv.getStatus().getValor());
+			stmt.setBigDecimal(4, inv.getValorInvestido());
+			stmt.setTimestamp(5, inv.getDataInicio());
+			stmt.setTimestamp(6, inv.getDataFim());
 
-            stmt.executeUpdate();
+			stmt.executeUpdate();
 
-        } catch (SQLException e) {
-            throw new DataAccessException("Erro ao inserir investimento");
-        }
-    }
+		} catch (SQLException e) {
+			throw new DataAccessException("Erro ao inserir investimento");
+		}
+	}
 
+	public Investimento buscarPorId(int id) throws DataAccessException {
 
+		String sql = "SELECT * FROM investimento WHERE id = ?";
+		Investimento investimento = null;
 
-    
-    
-    public Investimento buscarPorId(int id) throws DataAccessException {
+		try (Connection conn = ConnectionSingleton.getInstance().getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-        String sql = "SELECT * FROM investimento WHERE id = ?";
-        Investimento investimento = null;
+			stmt.setInt(1, id);
 
-        try (Connection conn = ConnectionFactory.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+			ResultSet rs = stmt.executeQuery();
 
-            stmt.setInt(1, id);
+			if (rs.next()) {
+				investimento = new Investimento(rs.getInt("id"), rs.getInt("id_conta"),
+						rs.getString("tipo_investimento"), StatusInvestimento.valueOf(rs.getString("status")),
+						rs.getBigDecimal("valor_investido"), rs.getTimestamp("data_inicio"),
+						rs.getTimestamp("data_fim"));
+			}
 
-            ResultSet rs = stmt.executeQuery();
+		} catch (SQLException e) {
+			throw new DataAccessException("Erro ao buscar investimento");
+		}
 
-            if (rs.next()) {
-                investimento = new Investimento(
-                        rs.getInt("id"),
-                        rs.getInt("id_conta"),
-                        rs.getString("tipo_investimento"),
-                        statusInvestimento.valueOf(rs.getString("status")),
-                        rs.getBigDecimal("valor_investido"),
-                        rs.getTimestamp("data_inicio"),
-                        rs.getTimestamp("data_fim")
-                );
-            }
+		return investimento;
+	}
 
-        } catch (SQLException e) {
-            throw new DataAccessException("Erro ao buscar investimento");
-        }
+	public List<Investimento> listarPorConta(int idConta) throws DataAccessException {
 
-        return investimento;
-    }
+		List<Investimento> lista = new ArrayList<>();
+		String sql = "SELECT * FROM investimento WHERE id_conta = ?";
 
-    
-    
+		try (Connection conn = ConnectionSingleton.getInstance().getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
 
+			stmt.setInt(1, idConta);
 
-    public List<Investimento> listarPorConta(int idConta) throws DataAccessException {
+			ResultSet rs = stmt.executeQuery();
 
-        List<Investimento> lista = new ArrayList<>();
-        String sql = "SELECT * FROM investimento WHERE id_conta = ?";
+			while (rs.next()) {
+				Investimento inv = new Investimento(rs.getInt("id"), rs.getInt("id_conta"),
+						rs.getString("tipo_investimento"), StatusInvestimento.valueOf(rs.getString("status")),
+						rs.getBigDecimal("valor_investido"), rs.getTimestamp("data_inicio"),
+						rs.getTimestamp("data_fim"));
 
-        try (Connection conn = ConnectionFactory.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+				lista.add(inv);
+			}
 
-            stmt.setInt(1, idConta);
+		} catch (SQLException e) {
+			throw new DataAccessException("Erro ao listar investimentos");
+		}
 
-            ResultSet rs = stmt.executeQuery();
+		return lista;
+	}
 
-            while (rs.next()) {
-                Investimento inv = new Investimento(
-                        rs.getInt("id"),
-                        rs.getInt("id_conta"),
-                        rs.getString("tipo_investimento"),
-                        statusInvestimento.valueOf(rs.getString("status")),
-                        rs.getBigDecimal("valor_investido"),
-                        rs.getTimestamp("data_inicio"),
-                        rs.getTimestamp("data_fim")
-                );
+	public void atualizar(Investimento inv) throws DataAccessException {
 
-                lista.add(inv);
-            }
+		String sql = "UPDATE investimento SET id_conta = ?, tipo_investimento = ?, status = ?, valor_investido = ?, data_inicio = ?, data_fim = ? "
+				+ "WHERE id = ?";
 
-        } catch (SQLException e) {
-            throw new DataAccessException("Erro ao listar investimentos");
-        }
+		try (Connection conn = ConnectionSingleton.getInstance().getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-        return lista;
-    }
+			stmt.setInt(1, inv.getIdConta());
+			stmt.setString(2, inv.getTipoInvestimento());
+			stmt.setString(3, inv.getStatus().getValor());
+			stmt.setBigDecimal(4, inv.getValorInvestido());
+			stmt.setTimestamp(5, inv.getDataInicio());
+			stmt.setTimestamp(6, inv.getDataFim());
+			stmt.setInt(7, inv.getId());
 
+			int linhas = stmt.executeUpdate();
 
+			if (linhas == 0) {
+				throw new DataAccessException("Nenhum investimento atualizado");
+			}
 
-    
-    
-    public void atualizar(Investimento inv) throws DataAccessException {
+		} catch (SQLException e) {
+			throw new DataAccessException("Erro ao atualizar investimento");
+		}
+	}
 
-        String sql = "UPDATE investimento SET id_conta = ?, tipo_investimento = ?, status = ?, valor_investido = ?, data_inicio = ?, data_fim = ? "
-                   + "WHERE id = ?";
+	public void encerrar(int id, Timestamp dataFim) throws DataAccessException {
 
-        try (Connection conn = ConnectionFactory.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+		String sql = "UPDATE investimento SET status = ?, data_fim = ? WHERE id = ?";
 
-            stmt.setInt(1, inv.getIdConta());
-            stmt.setString(2, inv.getTipoInvestimento());
-            stmt.setString(3, inv.getStatus().getValor());
-            stmt.setBigDecimal(4, inv.getValorInvestido());
-            stmt.setTimestamp(5, inv.getDataInicio());
-            stmt.setTimestamp(6, inv.getDataFim());
-            stmt.setInt(7, inv.getId());
+		try (Connection conn = ConnectionSingleton.getInstance().getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            int linhas = stmt.executeUpdate();
+			stmt.setString(1, StatusInvestimento.ENCERRADO.getValor());
+			stmt.setTimestamp(2, dataFim);
+			stmt.setInt(3, id);
 
-            if (linhas == 0) {
-                throw new DataAccessException("Nenhum investimento atualizado");
-            }
+			int linhas = stmt.executeUpdate();
 
-        } catch (SQLException e) {
-            throw new DataAccessException("Erro ao atualizar investimento");
-        }
-    }
-    
-    
-    
+			if (linhas == 0) {
+				throw new DataAccessException("Nenhum investimento encerrado");
+			}
 
+		} catch (SQLException e) {
+			throw new DataAccessException("Erro ao encerrar investimento");
+		}
+	}
 
+	public void remover(int id) throws DataAccessException {
 
-    public void encerrar(int id, Timestamp dataFim) throws DataAccessException {
+		String sql = "DELETE FROM investimento WHERE id = ?";
 
-        String sql = "UPDATE investimento SET status = ?, data_fim = ? WHERE id = ?";
+		try (Connection conn = ConnectionSingleton.getInstance().getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-        try (Connection conn = ConnectionFactory.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+			stmt.setInt(1, id);
 
-            stmt.setString(1, statusInvestimento.ENCERRADO.getValor());
-            stmt.setTimestamp(2, dataFim);
-            stmt.setInt(3, id);
+			int linhas = stmt.executeUpdate();
 
-            int linhas = stmt.executeUpdate();
+			if (linhas == 0) {
+				throw new DataAccessException("Nenhum investimento removido");
+			}
 
-            if (linhas == 0) {
-                throw new DataAccessException("Nenhum investimento encerrado");
-            }
-
-        } catch (SQLException e) {
-            throw new DataAccessException("Erro ao encerrar investimento");
-        }
-    }
-
-    
-    
-    
-
-
-    public void remover(int id) throws DataAccessException {
-
-        String sql = "DELETE FROM investimento WHERE id = ?";
-
-        try (Connection conn = ConnectionFactory.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setInt(1, id);
-
-            int linhas = stmt.executeUpdate();
-
-            if (linhas == 0) {
-                throw new DataAccessException("Nenhum investimento removido");
-            }
-
-        } catch (SQLException e) {
-            throw new DataAccessException("Erro ao remover investimento");
-        }
-    }
+		} catch (SQLException e) {
+			throw new DataAccessException("Erro ao remover investimento");
+		}
+	}
 }
