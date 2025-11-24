@@ -8,6 +8,6 @@
 <body>
 	<h2>Depósito realizado com sucesso</h2>
 	<p>${msg}</p>
-	<a href="/paginas/movimentacao/deposito.jsp">Voltar</a>
+	<a href="/app/movimentacao/deposito.jsp">Voltar</a>
 </body>
 </html>

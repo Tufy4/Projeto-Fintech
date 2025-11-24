@@ -24,10 +24,10 @@ public class DepositoCommand implements Command {
 
 			request.setAttribute("msg", "Depósito realizado com sucesso!");
 
-			rd = request.getRequestDispatcher("/paginas/movimentacao/sucesso.jsp");
+			rd = request.getRequestDispatcher("/app/movimentacao/sucesso.jsp");
 		} catch (Exception e) {
 			request.setAttribute("erro", e.getMessage());
-			rd = request.getRequestDispatcher("/paginas/movimentacao/erro.jsp");
+			rd = request.getRequestDispatcher("/app/movimentacao/erro.jsp");
 		}
 
 		try {

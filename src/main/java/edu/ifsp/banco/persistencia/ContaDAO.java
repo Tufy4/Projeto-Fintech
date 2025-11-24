@@ -11,7 +11,7 @@ import java.util.List;
 public class ContaDAO {
 
 	public void inserir(Conta conta) throws DataAccessException {
-		String sql = "INSERT INTO conta (id, usuarioId, agencia, numero_conta, saldo, tipo, status, DataCriacao) "
+		String sql = "INSERT INTO contas (id, usuarioId, agencia, numero_conta, saldo, tipo, status, DataCriacao) "
 				+ "VALUES (SEQ_CONTAS.NEXTVAL, ?, ?, SEQ_NUM_CONTA.NEXTVAL, ?, ?, ?, ?)";
 
 		try (Connection conn = ConnectionSingleton.getInstance().getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -31,7 +31,7 @@ public class ContaDAO {
 	}
 
 	public Conta buscarPorNumero(int numeroConta) throws DataAccessException {
-		String sql = "SELECT * FROM conta WHERE numero_conta = ?";
+		String sql = "SELECT * FROM contas WHERE NUMERO_CONTA = ?";
 		Conta conta = null;
 
 		try (Connection conn = ConnectionSingleton.getInstance().getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -40,12 +40,13 @@ public class ContaDAO {
 			ResultSet rs = stmt.executeQuery();
 
 			if (rs.next()) {
-				conta = new Conta(rs.getInt("id"), rs.getInt("usuarioId"), rs.getInt("agencia"),
-						rs.getInt("numero_conta"), rs.getBigDecimal("saldo"), TiposConta.valueOf(rs.getString("tipo")),
-						StatusConta.valueOf(rs.getString("status")), rs.getTimestamp("DataCriacao"));
+				conta = new Conta(rs.getInt("ID"), rs.getInt("USUARIO_ID"), rs.getInt("AGENCIA"),
+						rs.getInt("NUMERO_CONTA"), rs.getBigDecimal("SALDO"), TiposConta.valueOf(rs.getString("TIPO")),
+						StatusConta.valueOf(rs.getString("STATUS")), rs.getTimestamp("DATA_CRIACAO"));
 			}
 
 		} catch (SQLException e) {
+			e.printStackTrace();
 			throw new DataAccessException("Erro ao buscar conta");
 		}
 
@@ -75,7 +76,7 @@ public class ContaDAO {
 	}
 
 	public void atualizarSaldo(int idConta, double novoSaldo) throws DataAccessException {
-		String sql = "UPDATE conta SET saldo = ? WHERE id = ?";
+		String sql = "UPDATE contas SET saldo = ? WHERE id = ?";
 
 		try (Connection conn = ConnectionSingleton.getInstance().getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
 
