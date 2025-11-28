@@ -8,6 +8,6 @@
 <body>
 	<h2>Erro</h2>
 	<p style="color: red">${erro}</p>
-	<a href="/app/movimentacao/deposito.jsp">Tentar novamente</a>
+	<a href="${pageContext.request.contextPath}/app/movimentacao/deposito.jsp">Tentar novamente</a>
 </body>
 </html>

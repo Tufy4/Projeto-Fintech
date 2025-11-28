@@ -64,7 +64,7 @@
         <div class="row g-4 py-5 row-cols-1 row-cols-lg-3">
             
             <div class="col">
-                <a href="${pageContext.request.contextPath}/app?command=deposito" class="text-decoration-none text-dark">
+                <a href="${pageContext.request.contextPath}/app?command=redirect&url=app/movimentacao/deposito.jsp" class="text-decoration-none text-dark">
                     <div class="feature-col text-center p-4 border rounded shadow-sm h-100 bg-white">
                         <div class="feature-icon">💰</div>
                         <h3 class="fs-4">Depositar</h3>

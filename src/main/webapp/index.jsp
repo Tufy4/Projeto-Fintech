@@ -45,7 +45,7 @@
 						href="${pageContext.request.contextPath}/app?command=redirect&url=auth/login.jsp">Entrar</a>
 					</li>
 					<li class="nav-item"><a class="btn btn-primary btn-sm"
-						href="${pageContext.request.contextPath}/app?command=cadastro">Abra
+						href="${pageContext.request.contextPath}/app?command=redirect&url=auth/cadastro.jsp">Abra
 							sua Conta</a></li>
 				</ul>
 			</div>
@@ -61,9 +61,9 @@
 				seus ativos com a inteligência da BitPay.
 			</p>
 			<div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
-				<a href="${pageContext.request.contextPath}/app?command=cadastro"
+				<a href="${pageContext.request.contextPath}/app?command=redirect&url=auth/cadastro.jsp"
 					class="btn btn-primary btn-lg px-4 gap-3">Começar Agora</a> <a
-					href="${pageContext.request.contextPath}/app?command=login"
+					href="${pageContext.request.contextPath}/app?command=redirect&url=auth/login.jsp"
 					class="btn btn-outline-light btn-lg px-4">Já sou cliente</a>
 			</div>
 		</div>

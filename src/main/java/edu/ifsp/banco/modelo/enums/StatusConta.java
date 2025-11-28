@@ -1,7 +1,7 @@
 package edu.ifsp.banco.modelo.enums;
 
 public enum StatusConta {
-	ATIVO("ATIVA"), BLOQUEADO("BLOQUEADA");
+	ATIVA("ATIVA"), BLOQUEADA("BLOQUEADA");
 
 	private String valor;
 

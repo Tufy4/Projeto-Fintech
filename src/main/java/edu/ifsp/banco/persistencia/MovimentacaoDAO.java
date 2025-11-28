@@ -14,28 +14,29 @@ public class MovimentacaoDAO {
 
 	public void inserir(Movimentacoes mov, Conta contaOrigem, Conta contaDestino, BigDecimal valor) {
 		String sql = """
-				    INSERT INTO movimentacao
-				    (ID, CONTA_ORIGEM, CONTA_DESTINO, VALOR, TIPO, DATA_TRANSACAO, DESCRICAO, STATUS)
+				    INSERT INTO MOVIMENTACOES
+				    (ID, CONTA_ORIGEM_ID, CONTA_DESTINO_ID, VALOR, TIPO, DATA_TRANSACAO, DESCRICAO, STATUS)
 				    VALUES (SEQ_MOVIMENTACOES.NEXTVAL, ?, ?, ?, ?, ?, ?, ?)
 				""";
 
 		try (Connection conn = ConnectionSingleton.getInstance().getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
 			if (contaOrigem == null) {
-				ps.setNull(1, java.sql.Types.INTEGER);
+				ps.setInt(1, 1);
 			} else {
 				ps.setInt(1, contaOrigem.getId());
 			}
 
 			ps.setInt(2, contaDestino.getId());
 			ps.setBigDecimal(3, valor);
-			ps.setString(4, mov.getTipo());
+			ps.setString(4, "DEPOSITO");
 			ps.setTimestamp(5, mov.getDataTransacao());
 			ps.setString(6, mov.getDescricao());
-			ps.setString(7, mov.getStatus());
+			ps.setString(7, "CONCLUIDA");
 			ps.executeUpdate();
 
 		} catch (SQLException e) {
+			e.printStackTrace();
 			throw new DataAccessException("Erro ao inserir Movimentação.");
 		}
 	}
@@ -43,7 +44,7 @@ public class MovimentacaoDAO {
 	public Movimentacoes buscarPorId(int id) {
 		String sql = """
 				    SELECT ID, CONTA_ORIGEM, CONTA_DESTINO, VALOR, TIPO, DATA_TRANSACAO, DESCRICAO, STATUS
-				    FROM movimentacao
+				    FROM MOVIMENTACOES
 				    WHERE ID = ?
 				""";
 
@@ -76,7 +77,7 @@ public class MovimentacaoDAO {
 	public ArrayList<Movimentacoes> listarMovimentacoes(int idConta) throws SQLException {
 		String sql = """
 				    SELECT m.ID, m.CONTA_ORIGEM, m.CONTA_DESTINO, m.VALOR, m.TIPO, m.DATA_TRANSACAO, m.DESCRICAO, m.STATUS
-				    FROM movimentacao m
+				    FROM MOVIMENTACOES m
 				    WHERE m.CONTA_ORIGEM = ? OR m.CONTA_DESTINO = ?
 				    ORDER BY m.DATA_TRANSACAO DESC
 				""";
@@ -113,7 +114,7 @@ public class MovimentacaoDAO {
 
 	public void AtualizarStatus(String StatusMovimentacao, int idMovimentacao) {
 		String sql = """
-				    UPDATE movimentacao
+				    UPDATE MOVIMENTACOES
 				    SET STATUS = ?
 				    WHERE ID = ?
 				""";

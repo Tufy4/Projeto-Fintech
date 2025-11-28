@@ -42,8 +42,8 @@ public class MovimentacaoSERVICE {
 		mov.setContaDestinoId(idContaDestino);
 		mov.setValor(valor);
 		mov.setDescricao("Depósito bancário");
-		mov.setTipo("DEPOSITO");
-		mov.setStatus("CONCLUIDA");
+//		mov.setTipo("DEPOSITO");
+//		mov.setStatus("CONCLUIDA");
 		mov.setDataTransacao(new Timestamp(System.currentTimeMillis()));
 
 		movimentacaoDAO.inserir(mov, null, destino, valor);
