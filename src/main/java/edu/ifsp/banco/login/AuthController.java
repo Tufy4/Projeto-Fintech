@@ -12,28 +12,28 @@ import jakarta.servlet.http.HttpServletResponse;
 
 @WebServlet(urlPatterns = { "/Login", "/logout" })
 public class AuthController extends HttpServlet {
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        Command cmd = switch (request.getServletPath()) {
-            case "/Login" -> new ViewCommand("forward:/index.html");  // Página de login
+	@Override
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		Command cmd = switch (request.getServletPath()) {
+		case "/Login" -> new ViewCommand("forward:/index.html"); // Página de login
 //            case "/logout" -> new LogoutCommand(); // Redireciona para logout
-            default -> PageNotFound.getInstance(); // Página não encontrada
-        };
-        
-        cmd.execute(request, response);
-    }
+		default -> PageNotFound.getInstance(); // Página não encontrada
+		};
 
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        Command cmd = switch (request.getServletPath()) {
-            case "/Login" -> new LoginCommand(); // Processa o login
-            default -> PageNotFound.getInstance(); // Página não encontrada
-        };
-        
-        cmd.execute(request, response);
-    }
+		cmd.execute(request, response);
+	}
+
+	@Override
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		Command cmd = switch (request.getServletPath()) {
+		case "/Login" -> new LoginCommand(); // Processa o login
+		default -> PageNotFound.getInstance(); // Página não encontrada
+		};
+
+		cmd.execute(request, response);
+	}
 }

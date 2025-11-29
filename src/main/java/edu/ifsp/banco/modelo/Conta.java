@@ -3,18 +3,20 @@ package edu.ifsp.banco.modelo;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 
+import edu.ifsp.banco.modelo.enums.*;
+
 public class Conta {
 	private int id;
 	private int usuarioId;
 	private int agencia;
 	private int numero_conta;
 	private BigDecimal saldo;
-	private tiposConta tipo;
-	private statusConta status;
+	private TiposConta tipo;
+	private StatusConta status;
 	private Timestamp DataCriacao;
 	    
-	public Conta(int id, int usuarioId, int agencia, int numero_conta, BigDecimal saldo, tiposConta tipo,
-			statusConta status, Timestamp dataCriacao) {
+	public Conta(int id, int usuarioId, int agencia, int numero_conta, BigDecimal saldo, TiposConta tipo,
+			StatusConta status, Timestamp dataCriacao) {
 		super();
 		this.id = id;
 		this.usuarioId = usuarioId;
@@ -26,39 +28,7 @@ public class Conta {
 		DataCriacao = dataCriacao;
 	}
 	
-	    
-	    public enum tiposConta{
-	    	CORRENTE("CORRENTE"),
-	    	POUPANCA("POUPANCA");
-	    	
-	    	 private String valor;
 
-	    	 tiposConta(String valor) {
-	 	        this.valor = valor;
-	 	    }
-	 	    public String getValor() {
-	 	        return valor;
-	 	    }
-	    }
-	    
-	    
-	    public enum statusConta{
-	    	ATIVO("ATIVO"),
-	    	BLOQUEADO("BLOQUEADO");
-	    	
-	    	 private String valor;
-
-	    	statusConta(String valor) {
-	 	        this.valor = valor;
-	 	    }
-	 	    public String getValor() {
-	 	        return valor;
-	 	    }
-	    	
-	    }
-	    
-	    
-	    
 		public int getId() {
 			return id;
 		}
@@ -77,16 +47,16 @@ public class Conta {
 		public void setSaldo(BigDecimal saldo) {
 			this.saldo = saldo;
 		}
-		public tiposConta getTipo() {
+		public TiposConta getTipo() {
 			return tipo;
 		}
-		public void setTipo(tiposConta tipo) {
+		public void setTipo(TiposConta tipo) {
 			this.tipo = tipo;
 		}
-		public statusConta getStatus() {
+		public StatusConta getStatus() {
 			return status;
 		}
-		public void setStatus(statusConta status) {
+		public void setStatus(StatusConta status) {
 			this.status = status;
 		}
 		public Timestamp getDataCriacao() {

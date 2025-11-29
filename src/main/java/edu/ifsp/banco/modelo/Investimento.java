@@ -3,35 +3,18 @@ package edu.ifsp.banco.modelo;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 
+import edu.ifsp.banco.modelo.enums.StatusInvestimento;
+
 public class Investimento {
 	private int id;
 	private int idConta;
 	private String tipoInvestimento;
-	private statusInvestimento status;
+	private StatusInvestimento status;
 	private BigDecimal ValorInvestido;
 	private Timestamp DataInicio;
-	private Timestamp DataFim; 
-    
-    public enum statusInvestimento{
-    	ATIVO("ATIVO"),
-    	ENCERRADO("ENCERRADO");
-    	
-    	 private String valor;
+	private Timestamp DataFim;
 
-    	 statusInvestimento(String valor) {
- 	        this.valor = valor;
- 	    }
- 	    public String getValor() {
- 	        return valor;
- 	    }
-    	
-    }
-    
-    
-    
-    
-   
-	public Investimento(int id, int idConta, String tipoInvestimento, statusInvestimento status,
+	public Investimento(int id, int idConta, String tipoInvestimento, StatusInvestimento status,
 			BigDecimal valorInvestido, Timestamp dataInicio, Timestamp dataFim) {
 		super();
 		this.id = id;
@@ -42,26 +25,14 @@ public class Investimento {
 		DataInicio = dataInicio;
 		DataFim = dataFim;
 	}
-	
-	
-	
-	
 
-	public statusInvestimento getStatus() {
+	public StatusInvestimento getStatus() {
 		return status;
 	}
 
-
-
-
-
-	public void setStatus(statusInvestimento status) {
+	public void setStatus(StatusInvestimento status) {
 		this.status = status;
 	}
-
-
-
-
 
 	public int getId() {
 		return id;
@@ -111,9 +82,4 @@ public class Investimento {
 		DataFim = dataFim;
 	}
 
-	
-    
-    
-    
-    
 }

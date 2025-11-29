@@ -2,11 +2,54 @@ package edu.ifsp.banco.persistencia;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import edu.ifsp.banco.modelo.Usuario;
+import edu.ifsp.banco.modelo.enums.StatusUsuario;
+import edu.ifsp.banco.modelo.enums.TipoUsuario;
 
 public class UsuarioDAO {
+	
+	public Usuario buscarPorEmail(String email) throws DataAccessException {
+        String sql = "SELECT * FROM USUARIOS WHERE EMAIL = ?";
+        
+        try (Connection conn = ConnectionSingleton.getInstance().getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            
+            ps.setString(1, email);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    TipoUsuario perfil = TipoUsuario.valueOf(rs.getString("PERFIL"));
+                    StatusUsuario status = StatusUsuario.valueOf(rs.getString("STATUS"));
+
+                    Usuario usuario = new Usuario(
+                        rs.getString("NOME"),
+                        rs.getString("EMAIL"),
+                        rs.getString("SENHA"),
+                        rs.getString("TELEFONE"),
+                        rs.getString("ENDERECO"),
+                        perfil,
+                        status
+                    );
+                    
+                    usuario.setId(rs.getInt("ID"));
+                    usuario.setDataCriacao(rs.getTimestamp("DATA_CRIACAO"));
+                    usuario.setDataAtualizacao(rs.getTimestamp("DATA_ULTIMA_ATUALIZACAO"));
+                    
+                    return usuario;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new DataAccessException("Erro ao buscar usuário por email.");
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+            throw new DataAccessException("Erro de consistência: Enum inválido no banco de dados.");
+        }
+        return null;
+    }
 	
 	public void inserir(Usuario usuario) throws Exception {
 	    
@@ -27,7 +70,7 @@ public class UsuarioDAO {
 	    }
 
 	   
-	    try (Connection conn = ConnectionFactory.getConnection();
+	    try (Connection conn = ConnectionSingleton.getInstance().getConnection();
 	         PreparedStatement ps = conn.prepareStatement(sql)) {
 
 	        
@@ -56,7 +99,7 @@ public class UsuarioDAO {
              WHERE ID = ?
         """;
 
-        try (Connection conn = ConnectionFactory.getConnection();
+        try (Connection conn = ConnectionSingleton.getInstance().getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, usuario.getNome());
@@ -77,7 +120,7 @@ public class UsuarioDAO {
     public void excluir(int id) {
         String sql = "DELETE FROM USUARIOS WHERE ID = ?";
 
-        try (Connection conn = ConnectionFactory.getConnection();
+        try (Connection conn = ConnectionSingleton.getInstance().getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, id);
