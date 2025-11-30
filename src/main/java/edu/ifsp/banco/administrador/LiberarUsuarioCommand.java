@@ -20,7 +20,7 @@ public class LiberarUsuarioCommand implements Command {
         int id = Integer.parseInt(request.getParameter("id"));
         try {
             service.liberar(id);
-
+            response.sendRedirect(request.getContextPath() + "/app/admin/home.jsp");
         } catch (Exception e) {
             System.out.println(e.getMessage());
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);

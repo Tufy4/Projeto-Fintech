@@ -29,6 +29,6 @@ public class LogoutCommand implements Command {
 	    }
 
 	    // Redireciona para a página de login ou home
-	    response.sendRedirect(request.getContextPath() +"/app/home.jsp");
+	    response.sendRedirect(request.getContextPath() +"/index.jsp");
     }
 }
