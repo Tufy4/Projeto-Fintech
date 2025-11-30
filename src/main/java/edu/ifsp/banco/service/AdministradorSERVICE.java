@@ -17,4 +17,13 @@ public class AdministradorSERVICE {
 		return usuarios;
 		
 	}
+	
+	
+	public void liberar(int id) throws Exception {
+		AdministradorDAO dao = new AdministradorDAO();
+		List<Usuario> usuarios = dao.listarUsuariosBloqueados();
+		if(dao.liberarUsuario(id)==false) {
+			throw new Exception("Deu problema na liberação do usuario");
+		}
+	}
 }

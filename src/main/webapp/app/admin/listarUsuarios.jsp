@@ -50,6 +50,7 @@
             <th>Endereço</th>
             <th>Perfil</th>
             <th>Status</th>
+            <th></th>
         </tr>
 <%
         for (Usuario u : lista) {
@@ -62,6 +63,12 @@
             <td><%= u.getEndereco() %></td>
             <td><%= u.getPerfil() %></td>
             <td><%= u.getStatus() %></td>
+           <td>
+    <a href="${pageContext.request.contextPath}/app?command=liberarUsuario&id=<%= u.getId() %>">
+        liberar
+    </a>
+</td>
+
         </tr>
 <%
         }
