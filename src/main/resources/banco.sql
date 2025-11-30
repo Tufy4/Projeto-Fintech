@@ -177,4 +177,30 @@ INSERT INTO CONTAS (
     CURRENT_TIMESTAMP
 );
 
-commit;
+
+
+INSERT INTO USUARIOS (
+    ID,
+    NOME,
+    EMAIL,
+    SENHA,
+    TELEFONE,
+    ENDERECO,
+    PERFIL,
+    STATUS,
+    DATA_CRIACAO,
+    DATA_ULTIMA_ATUALIZACAO
+) VALUES (
+    SEQ_USUARIOS.NEXTVAL,
+    'Miguel Batista',
+    '123@123',
+    '123',
+    '(11) 98765-4321',
+    'Rua Exemplo, 123, São Paulo, SP',
+    'GERENTE',
+    'ATIVO',
+    CURRENT_TIMESTAMP,
+    CURRENT_TIMESTAMP
+);
+
+commit

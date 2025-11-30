@@ -7,6 +7,7 @@
 <title>Insert title here</title>
 </head>
 <body>
-
+<a href="${pageContext.request.contextPath}/app?command=consultarBloqueados" >
+		testar</a>
 </body>
 </html>
