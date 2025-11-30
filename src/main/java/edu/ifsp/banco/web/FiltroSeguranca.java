@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
+import edu.ifsp.banco.modelo.Usuario;
+import edu.ifsp.banco.modelo.enums.TipoUsuario;
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -67,6 +69,23 @@ public class FiltroSeguranca extends HttpFilter implements Filter {
                 return;
             }
         }
+        
+        if (path.startsWith("/app/admin/")) {
+
+            if (!isLogado)   {
+                res.sendRedirect(contextPath + "/auth/login.jsp");
+                return;
+            }else {
+            	Usuario user = (Usuario) session.getAttribute("usuarioLogado");
+            	if(user.getPerfil()!=TipoUsuario.GERENTE){
+            		 res.sendRedirect(contextPath + "/auth/login.jsp");
+            	}
+            	 
+            	
+            }
+        }
+
+        
 
         if (isLogado) {
             chain.doFilter(request, response);

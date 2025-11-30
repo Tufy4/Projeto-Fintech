@@ -6,6 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
 import edu.ifsp.banco.modelo.Usuario;
+import edu.ifsp.banco.modelo.enums.TipoUsuario;
 import edu.ifsp.banco.persistencia.ConnectionSingleton;
 import edu.ifsp.banco.service.UsuarioSERVICE;
 import edu.ifsp.banco.web.Command;
@@ -33,7 +34,13 @@ public class LoginCommand implements Command {
             
             System.out.println("Login efetuado: " + usuario.getEmail() + " - " + usuario.getPerfil());
             
-            response.sendRedirect("app/home.jsp");
+            if(usuario.getPerfil().equals(TipoUsuario.GERENTE)) {
+            	response.sendRedirect("app/admin/home.jsp");
+            }
+            else {
+            	response.sendRedirect("app/home.jsp");
+            }
+            
 
         } catch (Exception e) {
             System.out.println("Falha no login: " + e.getMessage());

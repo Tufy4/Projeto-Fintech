@@ -21,6 +21,13 @@ public class Usuario {
 		return id;
 	}
 
+	@Override
+	public String toString() {
+		return "Usuario [id=" + id + ", nome=" + nome + ", email=" + email + ", senha=" + senha + ", telefone="
+				+ telefone + ", endereco=" + endereco + ", perfil=" + perfil + ", status=" + status + ", DataCriacao="
+				+ DataCriacao + ", DataAtualizacao=" + DataAtualizacao + "]";
+	}
+
 	public void setId(int id) {
 		this.id = id;
 	}
@@ -120,6 +127,10 @@ public class Usuario {
 		this.endereco = endereco;
 		this.DataCriacao = new Timestamp(System.currentTimeMillis());
 		this.DataAtualizacao = new Timestamp(System.currentTimeMillis());
+	}
+	
+	public Usuario() {
+		
 	}
 
 }

@@ -4,7 +4,10 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import edu.ifsp.banco.administrador.ConsultarUsuariosCommand;
+import edu.ifsp.banco.administrador.LiberarUsuarioCommand;
 import edu.ifsp.banco.login.LoginCommand;
+import edu.ifsp.banco.login.LogoutCommand;
 import edu.ifsp.banco.web.helpers.RedirectCommand;
 import edu.ifsp.banco.web.movimentacao.DepositoCommand;
 import edu.ifsp.banco.web.usuario.CadastrarUsuarioCommand;
@@ -26,6 +29,9 @@ public class FrontController extends HttpServlet {
 		commands.put("depositar", new DepositoCommand());
 		commands.put("login", new LoginCommand());
 		commands.put("redirect", new RedirectCommand());
+		commands.put("consultarBloqueados", new ConsultarUsuariosCommand());
+		commands.put("liberarUsuario", new LiberarUsuarioCommand());
+		commands.put("logout", new LogoutCommand());
 		// coloquem commands aqui
 	}
 
