@@ -1,11 +1,11 @@
 package edu.ifsp.banco.service;
 
+import java.math.BigDecimal;
+import java.util.List;
+
 import edu.ifsp.banco.modelo.Conta;
 import edu.ifsp.banco.persistencia.ContaDAO;
 import edu.ifsp.banco.persistencia.DataAccessException;
-
-import java.util.List;
-import java.math.BigDecimal;
 
 public class ContaSERVICE {
 
@@ -19,16 +19,10 @@ public class ContaSERVICE {
 
     public void criarConta(Conta conta) throws Exception {
         if (conta == null) {
-            throw new Exception("Conta inválida");
+            throw new Exception("Conta invalida");
         }
 
-        if (conta.getUsuarioId() <= 0) {
-            throw new Exception("Usuário inválido");
-        }
-
-        if (conta.getSaldo().compareTo(BigDecimal.ZERO) < 0) {
-            throw new Exception("Saldo inicial não pode ser negativo");
-        }
+        
 
         try {
             contaDAO.inserir(conta);

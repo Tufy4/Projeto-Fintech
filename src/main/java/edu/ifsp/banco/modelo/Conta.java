@@ -27,7 +27,9 @@ public class Conta {
 		this.status = status;
 		DataCriacao = dataCriacao;
 	}
-	
+	public Conta() {
+		
+	}
 
 		public int getId() {
 			return id;
@@ -77,6 +79,12 @@ public class Conta {
 		}
 		public void setNumero_conta(int numero_conta) {
 			this.numero_conta = numero_conta;
+		}
+		@Override
+		public String toString() {
+			return "Conta [id=" + id + ", usuarioId=" + usuarioId + ", agencia=" + agencia + ", numero_conta="
+					+ numero_conta + ", saldo=" + saldo + ", tipo=" + tipo + ", status=" + status + ", DataCriacao="
+					+ DataCriacao + "]";
 		}
 		
 		

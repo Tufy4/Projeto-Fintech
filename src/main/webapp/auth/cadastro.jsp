@@ -80,6 +80,12 @@ background-color: rgb(210,210,210)}
                 <label class="form-label">Endereço:</label>
                 <input type="text" name="endereco" class="form-control form-control-lg" required>
             </div>
+            
+            
+             <div class="mb-4">
+                <label class="form-label">Tipo da conta: </label>
+                <input type="text" placeholder="Corrente/Poupança" name="typeAccount" class="form-control form-control-lg" required>
+            </div>
 
             <button type="submit" class="btn btn-primary w-100 btn-lg">
                 Criar Conta
