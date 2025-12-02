@@ -7,7 +7,7 @@
               maxIdle="5"
               maxWaitMillis="-1"
               username="system" 
-              password="Oracle123"
+              password="root"
               driverClassName="oracle.jdbc.OracleDriver"
-              url="jdbc:oracle:thin:@localhost:1521:XE"/>
+              url="jdbc:oracle:thin:@localhost:1539:FREE"/>
 </Context>
