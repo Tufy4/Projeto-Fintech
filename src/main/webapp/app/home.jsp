@@ -53,7 +53,7 @@
     <header class="hero-section text-center">
         <div class="container">
             <p class="lead mb-0 text-white-50">Saldo Disponível</p>
-            <h1 class="display-1 fw-bold mb-4">R$ 0,00</h1>
+            <h1 class="display-1 fw-bold mb-4">R$ ${sessionScope.saldoConta}</h1>
             <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
                 <a href="${pageContext.request.contextPath}/app?command=redirect&url=app/movimentacao/deposito.jsp" class="btn btn-primary btn-lg px-4 gap-3">Fazer Depósito</a>
             </div>
