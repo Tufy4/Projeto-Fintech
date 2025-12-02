@@ -61,7 +61,8 @@
 				seus ativos com a inteligência da BitPay.
 			</p>
 			<div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
-				<a href="${pageContext.request.contextPath}/app?command=redirect&url=auth/cadastro.jsp"
+				<a
+					href="${pageContext.request.contextPath}/app?command=redirect&url=auth/cadastro.jsp"
 					class="btn btn-primary btn-lg px-4 gap-3">Começar Agora</a> <a
 					href="${pageContext.request.contextPath}/app?command=redirect&url=auth/login.jsp"
 					class="btn btn-outline-light btn-lg px-4">Já sou cliente</a>
@@ -82,13 +83,21 @@
 				</div>
 			</div>
 			<div class="col">
-				<div
-					class="feature-col text-center p-4 border rounded shadow-sm h-100">
-					<div class="feature-icon">📈</div>
-					<h3 class="fs-2">Investimentos</h3>
-					<p>Diversifique sua carteira com opções de renda fixa e
-						variável. Rentabilidade calculada em tempo real.</p>
-				</div>
+				<a class="btn btn-outline-light btn-sm"
+					href="${pageContext.request.contextPath}/app?command=redirect&url=app/movimentacao/investir.jsp"
+					style="text-decoration: none;">
+					<div
+						class="feature-col text-center p-4 border rounded shadow-sm h-100"
+						style="color: inherit;">
+						<div class="feature-icon">📈</div>
+						<h3 class="fs-2">Investimentos</h3>
+						<p>Diversifique sua carteira com opções de renda fixa e
+							variável. Rentabilidade calculada em tempo real.</p>
+					</div>
+				</a>
+
+
+
 			</div>
 			<div class="col">
 				<div

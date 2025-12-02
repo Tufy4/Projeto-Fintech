@@ -10,6 +10,7 @@ import edu.ifsp.banco.login.LoginCommand;
 import edu.ifsp.banco.login.LogoutCommand;
 import edu.ifsp.banco.web.helpers.RedirectCommand;
 import edu.ifsp.banco.web.movimentacao.DepositoCommand;
+import edu.ifsp.banco.web.movimentacao.InvestimentoCommand;
 import edu.ifsp.banco.web.usuario.CadastrarUsuarioCommand;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -32,6 +33,7 @@ public class FrontController extends HttpServlet {
 		commands.put("consultarBloqueados", new ConsultarUsuariosCommand());
 		commands.put("liberarUsuario", new LiberarUsuarioCommand());
 		commands.put("logout", new LogoutCommand());
+		commands.put("investimento", new InvestimentoCommand());
 		// coloquem commands aqui
 	}
 
