@@ -108,9 +108,10 @@
 				id="navbarNav">
 				<ul class="navbar-nav gap-2 align-items-center">
 					<li class="nav-item"><a class="btn btn-outline-primary btn-sm"
-						href="app/home.jsp">HOME</a></li>
+						href="${pageContext.request.contextPath}/app/home.jsp">HOME</a></li>
 					<li class="nav-item"><span class="nav-link text-white">Olá,
-							<strong>${sessionScope.usuarioLogado != null ? sessionScope.usuarioLogado.getNome() : 'Cliente'}</strong>
+							<strong>${sessionScope.usuarioLogado != null ?
+sessionScope.usuarioLogado.getNome() : 'Cliente'}</strong>
 					</span></li>
 					<li class="nav-item"><a class="btn btn-outline-danger btn-sm"
 						href="${pageContext.request.contextPath}/app?command=logout">Sair</a>
@@ -123,8 +124,9 @@
 	<section id="deposito" class="container center-wrapper">
 
 		<h2>
-			Seja Bem-vindo, <strong>${sessionScope.usuarioLogado != null ? sessionScope.usuarioLogado.getNome() : 'Cliente'}</strong>
-			<br> Saldo atual: <strong>${sessionScope.usuarioLogado != null ? sessionScope.usuarioLogado.getNome() : 'Cliente'}</strong>
+			Seja Bem-vindo, <strong>${sessionScope.usuarioLogado != null ?
+sessionScope.usuarioLogado.getNome() : 'Cliente'}</strong>
+			<br> Saldo atual: R$ <strong>${sessionScope.saldoConta != null ? sessionScope.saldoConta : '0.00'}</strong>
 		</h2>
 
 		<div class="deposit-form">
@@ -146,8 +148,6 @@
 		</div>
 
 	</section>
-
-
 
 </body>
 </html>

@@ -11,8 +11,8 @@ public class InvestimentoDAO {
 
 	public void inserir(Investimento inv) throws DataAccessException {
 
-		String sql = "INSERT INTO investimento (id, id_conta, tipo_investimento, status, valor_investido, data_inicio, data_fim) "
-				+ "VALUES (SEQ_INVESTIMENTO.NEXTVAL, ?, ?, ?, ?, ?, ?)";
+		String sql = "INSERT INTO INVESTIMENTOS (id, conta_id, tipo_investimento, status, valor_investido, data_inicio, data_fim) "
+				+ "VALUES (SEQ_INVESTIMENTOS.NEXTVAL, ?, ?, ?, ?, ?, ?)";
 
 		try (Connection conn = ConnectionSingleton.getInstance().getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
 
@@ -26,13 +26,14 @@ public class InvestimentoDAO {
 			stmt.executeUpdate();
 
 		} catch (SQLException e) {
-			throw new DataAccessException("Erro ao inserir investimento");
+			e.printStackTrace();
+			throw new DataAccessException("Erro ao inserir investimento: " + e.getMessage());
 		}
 	}
 
 	public Investimento buscarPorId(int id) throws DataAccessException {
 
-		String sql = "SELECT * FROM investimento WHERE id = ?";
+		String sql = "SELECT * FROM INVESTIMENTOS WHERE id = ?";
 		Investimento investimento = null;
 
 		try (Connection conn = ConnectionSingleton.getInstance().getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -42,13 +43,14 @@ public class InvestimentoDAO {
 			ResultSet rs = stmt.executeQuery();
 
 			if (rs.next()) {
-				investimento = new Investimento(rs.getInt("id"), rs.getInt("id_conta"),
+				investimento = new Investimento(rs.getInt("id"), rs.getInt("conta_id"),
 						rs.getString("tipo_investimento"), StatusInvestimento.valueOf(rs.getString("status")),
 						rs.getBigDecimal("valor_investido"), rs.getTimestamp("data_inicio"),
 						rs.getTimestamp("data_fim"));
 			}
 
 		} catch (SQLException e) {
+			e.printStackTrace();
 			throw new DataAccessException("Erro ao buscar investimento");
 		}
 
@@ -58,7 +60,7 @@ public class InvestimentoDAO {
 	public List<Investimento> listarPorConta(int idConta) throws DataAccessException {
 
 		List<Investimento> lista = new ArrayList<>();
-		String sql = "SELECT * FROM investimento WHERE id_conta = ?";
+		String sql = "SELECT * FROM INVESTIMENTOS WHERE conta_id = ?";
 
 		try (Connection conn = ConnectionSingleton.getInstance().getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
 
@@ -67,7 +69,7 @@ public class InvestimentoDAO {
 			ResultSet rs = stmt.executeQuery();
 
 			while (rs.next()) {
-				Investimento inv = new Investimento(rs.getInt("id"), rs.getInt("id_conta"),
+				Investimento inv = new Investimento(rs.getInt("id"), rs.getInt("conta_id"),
 						rs.getString("tipo_investimento"), StatusInvestimento.valueOf(rs.getString("status")),
 						rs.getBigDecimal("valor_investido"), rs.getTimestamp("data_inicio"),
 						rs.getTimestamp("data_fim"));
@@ -76,6 +78,7 @@ public class InvestimentoDAO {
 			}
 
 		} catch (SQLException e) {
+			e.printStackTrace();
 			throw new DataAccessException("Erro ao listar investimentos");
 		}
 
@@ -84,7 +87,7 @@ public class InvestimentoDAO {
 
 	public void atualizar(Investimento inv) throws DataAccessException {
 
-		String sql = "UPDATE investimento SET id_conta = ?, tipo_investimento = ?, status = ?, valor_investido = ?, data_inicio = ?, data_fim = ? "
+		String sql = "UPDATE INVESTIMENTOS SET conta_id = ?, tipo_investimento = ?, status = ?, valor_investido = ?, data_inicio = ?, data_fim = ? "
 				+ "WHERE id = ?";
 
 		try (Connection conn = ConnectionSingleton.getInstance().getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -104,13 +107,14 @@ public class InvestimentoDAO {
 			}
 
 		} catch (SQLException e) {
+			e.printStackTrace();
 			throw new DataAccessException("Erro ao atualizar investimento");
 		}
 	}
 
 	public void encerrar(int id, Timestamp dataFim) throws DataAccessException {
 
-		String sql = "UPDATE investimento SET status = ?, data_fim = ? WHERE id = ?";
+		String sql = "UPDATE INVESTIMENTOS SET status = ?, data_fim = ? WHERE id = ?";
 
 		try (Connection conn = ConnectionSingleton.getInstance().getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
 
@@ -125,13 +129,14 @@ public class InvestimentoDAO {
 			}
 
 		} catch (SQLException e) {
+			e.printStackTrace();
 			throw new DataAccessException("Erro ao encerrar investimento");
 		}
 	}
 
 	public void remover(int id) throws DataAccessException {
 
-		String sql = "DELETE FROM investimento WHERE id = ?";
+		String sql = "DELETE FROM INVESTIMENTOS WHERE id = ?";
 
 		try (Connection conn = ConnectionSingleton.getInstance().getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
 
@@ -144,6 +149,7 @@ public class InvestimentoDAO {
 			}
 
 		} catch (SQLException e) {
+			e.printStackTrace();
 			throw new DataAccessException("Erro ao remover investimento");
 		}
 	}

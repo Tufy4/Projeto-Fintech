@@ -9,69 +9,59 @@ import edu.ifsp.banco.persistencia.DataAccessException;
 
 public class ContaSERVICE {
 
-    private ContaDAO contaDAO;
+	private ContaDAO contaDAO;
 
-    public ContaSERVICE() {
-        this.contaDAO = new ContaDAO();
-    }
+	public ContaSERVICE() {
+		this.contaDAO = new ContaDAO();
+	}
 
+	public void criarConta(Conta conta) throws Exception {
+		if (conta == null) {
+			throw new Exception("Conta inválida");
+		}
 
+		try {
+			contaDAO.inserir(conta);
+		} catch (DataAccessException e) {
+			throw new Exception("Erro ao criar conta: " + e.getMessage());
+		}
+	}
 
-    public void criarConta(Conta conta) throws Exception {
-        if (conta == null) {
-            throw new Exception("Conta invalida");
-        }
+	public Conta buscarPorNumero(int numeroConta) throws Exception {
+		if (numeroConta <= 0) {
+			throw new Exception("Número de conta inválido");
+		}
 
-        
+		try {
+			return contaDAO.buscarPorNumero(numeroConta);
+		} catch (DataAccessException e) {
+			throw new Exception("Erro ao buscar conta: " + e.getMessage());
+		}
+	}
 
-        try {
-            contaDAO.inserir(conta);
-        } catch (DataAccessException e) {
-            throw new Exception("Erro ao criar conta: " + e.getMessage());
-        }
-    }
+	public List<Conta> listarContas() throws Exception {
 
+		try {
+			return contaDAO.listar();
+		} catch (DataAccessException e) {
+			throw new Exception("Erro ao listar contas: " + e.getMessage());
+		}
+	}
 
+	public void atualizarSaldo(int idConta, BigDecimal novoSaldo) throws Exception {
 
-    public Conta buscarPorNumero(int numeroConta) throws Exception {
-        if (numeroConta <= 0) {
-            throw new Exception("Número de conta inválido");
-        }
+		if (idConta <= 0) {
+			throw new Exception("Conta inválida");
+		}
 
-        try {
-            return contaDAO.buscarPorNumero(numeroConta);
-        } catch (DataAccessException e) {
-            throw new Exception("Erro ao buscar conta: " + e.getMessage());
-        }
-    }
+		if (novoSaldo == null) {
+			throw new Exception("Saldo inválido");
+		}
 
-
-
-    public List<Conta> listarContas() throws Exception {
-
-        try {
-            return contaDAO.listar();
-        } catch (DataAccessException e) {
-            throw new Exception("Erro ao listar contas: " + e.getMessage());
-        }
-    }
-
-
-
-    public void atualizarSaldo(int idConta, BigDecimal novoSaldo) throws Exception {
-
-        if (idConta <= 0) {
-            throw new Exception("Conta inválida");
-        }
-
-        if (novoSaldo == null) {
-            throw new Exception("Saldo inválido");
-        }
-
-        try {
-            contaDAO.atualizarSaldo(idConta, novoSaldo.doubleValue());
-        } catch (DataAccessException e) {
-            throw new Exception("Erro ao atualizar saldo: " + e.getMessage());
-        }
-    }
+		try {
+			contaDAO.atualizarSaldo(idConta, novoSaldo.doubleValue());
+		} catch (DataAccessException e) {
+			throw new Exception("Erro ao atualizar saldo: " + e.getMessage());
+		}
+	}
 }

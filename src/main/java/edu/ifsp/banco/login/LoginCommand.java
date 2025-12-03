@@ -1,7 +1,6 @@
 package edu.ifsp.banco.login;
 
 import java.io.IOException;
-import java.math.BigDecimal;
 
 import edu.ifsp.banco.modelo.Conta;
 import edu.ifsp.banco.modelo.Usuario;
@@ -27,16 +26,19 @@ public class LoginCommand implements Command {
 
         try {
             Usuario usuario = service.login(userEmail, password);
-            Conta conta = new Conta();
             ContaDAO dao = new ContaDAO();
             
             HttpSession session = request.getSession();
             session.setAttribute("usuarioLogado", usuario);
             
             System.out.println("Login efetuado: " + usuario.getEmail() + " - " + usuario.getPerfil());
-            conta = dao.buscarPorIdUsuario(usuario.getId());
-            BigDecimal saldo = conta.getSaldo();
-            session.setAttribute("saldoConta", conta.getSaldo());
+            
+            Conta conta = dao.buscarPorIdUsuario(usuario.getId());
+            
+            if (conta != null) {
+                session.setAttribute("conta", conta);
+                session.setAttribute("saldoConta", conta.getSaldo());
+            }
             
             if(usuario.getPerfil().equals(TipoUsuario.GERENTE)) {
             	response.sendRedirect("app/admin/home.jsp");
@@ -44,7 +46,6 @@ public class LoginCommand implements Command {
             else {
             	response.sendRedirect("app/home.jsp");
             }
-            
 
         } catch (Exception e) {
             System.out.println("Falha no login: " + e.getMessage());

@@ -12,16 +12,28 @@ public class Movimentacoes {
 	private int contaDestinoId;
 	private BigDecimal valor;
 	private TipoMovimentacao tipo;
-	private Timestamp dataTransacao; // ALTERAR TRANSAÇÃO, REPRESENTAÇÃO DO DB VAI SER ALTERANDO TENDO A DATA DE
-										// INICIO E FIM DA TRANSAÇÃO.
+	private Timestamp dataTransacao;
 	private String descricao;
 	private StatusMovimentacao status;
+
+	public Movimentacoes() {
+	}
+
+	public Movimentacoes(int id, int contaOrigemId, int contaDestinoId, BigDecimal valor, TipoMovimentacao tipo,
+			Timestamp dataTransacao, String descricao, StatusMovimentacao status) {
+		this.id = id;
+		this.contaOrigemId = contaOrigemId;
+		this.contaDestinoId = contaDestinoId;
+		this.valor = valor;
+		this.tipo = tipo;
+		this.dataTransacao = dataTransacao;
+		this.descricao = descricao;
+		this.status = status;
+	}
 
 	public int getId() {
 		return id;
 	}
-
-	StatusMovimentacao stats = StatusMovimentacao.CONCLUIDA;
 
 	public void setId(int id) {
 		this.id = id;
@@ -51,12 +63,13 @@ public class Movimentacoes {
 		this.valor = valor;
 	}
 
-	public String getTipo() {
-		return tipo.getValor();
+    
+	public TipoMovimentacao getTipo() {
+		return tipo;
 	}
 
-	public void setTipo(String tipo) {
-		this.tipo.setValor(tipo);
+	public void setTipo(TipoMovimentacao tipo) {
+		this.tipo = tipo;
 	}
 
 	public Timestamp getDataTransacao() {
@@ -75,29 +88,11 @@ public class Movimentacoes {
 		this.descricao = descricao;
 	}
 
-	public String getStatus() {
-		return status.getValor();
+	public StatusMovimentacao getStatus() {
+		return status;
 	}
 
-	public void setStatus(String status) {
-		this.status.setValor(status);
-	}
-
-	public Movimentacoes(int id, int contaOrigemId, int contaDestinoId, BigDecimal valor, TipoMovimentacao tipo,
-			Timestamp dataTransacao, String descricao, StatusMovimentacao status) {
-		super();
-		this.id = id;
-		this.contaOrigemId = contaOrigemId;
-		this.contaDestinoId = contaDestinoId;
-		this.valor = valor;
-		this.tipo = tipo;
-		this.dataTransacao = new Timestamp(System.currentTimeMillis());
-		this.descricao = descricao;
+	public void setStatus(StatusMovimentacao status) {
 		this.status = status;
 	}
-
-	public Movimentacoes() {
-
-	}
-
 }

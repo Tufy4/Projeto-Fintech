@@ -1,134 +1,144 @@
 package edu.ifsp.banco.persistencia;
 
-import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.ArrayList;
 
-import edu.ifsp.banco.modelo.Conta;
 import edu.ifsp.banco.modelo.Movimentacoes;
 
 public class MovimentacaoDAO {
 
-	public void inserir(Movimentacoes mov, Conta contaOrigem, Conta contaDestino, BigDecimal valor) {
-		String sql = """
-				    INSERT INTO MOVIMENTACOES
-				    (ID, CONTA_ORIGEM_ID, CONTA_DESTINO_ID, VALOR, TIPO, DATA_TRANSACAO, DESCRICAO, STATUS)
-				    VALUES (SEQ_MOVIMENTACOES.NEXTVAL, ?, ?, ?, ?, ?, ?, ?)
-				""";
+    public void inserir(Movimentacoes mov) throws DataAccessException {
+        String sql = """
+                   INSERT INTO MOVIMENTACOES
+                   (ID, CONTA_ORIGEM_ID, CONTA_DESTINO_ID, VALOR, TIPO, DATA_TRANSACAO, DESCRICAO, STATUS)
+                   VALUES (SEQ_MOVIMENTACOES.NEXTVAL, ?, ?, ?, ?, ?, ?, ?)
+                """;
 
-		try (Connection conn = ConnectionSingleton.getInstance().getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = ConnectionSingleton.getInstance().getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
-			if (contaOrigem == null) {
-				ps.setInt(1, 1);
-			} else {
-				ps.setInt(1, contaOrigem.getId());
-			}
+            if (mov.getContaOrigemId() == 0) {
+                ps.setNull(1, Types.INTEGER);
+            } else {
+                ps.setInt(1, mov.getContaOrigemId());
+            }
 
-			ps.setInt(2, contaDestino.getId());
-			ps.setBigDecimal(3, valor);
-			ps.setString(4, "DEPOSITO");
-			ps.setTimestamp(5, mov.getDataTransacao());
-			ps.setString(6, mov.getDescricao());
-			ps.setString(7, "CONCLUIDA");
-			ps.executeUpdate();
+            if (mov.getContaDestinoId() == 0) {
+                ps.setNull(2, Types.INTEGER);
+            } else {
+                ps.setInt(2, mov.getContaDestinoId());
+            }
 
-		} catch (SQLException e) {
-			e.printStackTrace();
-			throw new DataAccessException("Erro ao inserir Movimentação.");
-		}
-	}
+            ps.setBigDecimal(3, mov.getValor());
+            ps.setString(4, mov.getTipo().toString()); 
+            ps.setTimestamp(5, mov.getDataTransacao());
+            ps.setString(6, mov.getDescricao());
+            ps.setString(7, mov.getStatus().toString());
+            
+            ps.executeUpdate();
 
-	public Movimentacoes buscarPorId(int id) {
-		String sql = """
-				    SELECT ID, CONTA_ORIGEM, CONTA_DESTINO, VALOR, TIPO, DATA_TRANSACAO, DESCRICAO, STATUS
-				    FROM MOVIMENTACOES
-				    WHERE ID = ?
-				""";
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new DataAccessException("Erro ao inserir Movimentação: " + e.getMessage());
+        }
+    }
 
-		try (Connection conn = ConnectionSingleton.getInstance().getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+    public Movimentacoes buscarPorId(int id) throws DataAccessException {
+        String sql = """
+                   SELECT ID, CONTA_ORIGEM_ID, CONTA_DESTINO_ID, VALOR, TIPO, DATA_TRANSACAO, DESCRICAO, STATUS
+                   FROM MOVIMENTACOES
+                   WHERE ID = ?
+                """;
 
-			ps.setInt(1, id);
+        try (Connection conn = ConnectionSingleton.getInstance().getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
-			try (ResultSet rs = ps.executeQuery()) {
-				if (rs.next()) {
-					Movimentacoes mov = new Movimentacoes();
-					mov.setId(rs.getInt("ID"));
-					mov.setContaOrigemId(rs.getInt("CONTA_ORIGEM"));
-					mov.setContaDestinoId(rs.getInt("CONTA_DESTINO"));
-					mov.setValor(rs.getBigDecimal("VALOR"));
-					mov.setTipo(rs.getString("TIPO"));
-					mov.setDataTransacao(rs.getTimestamp("DATA_TRANSACAO"));
-					mov.setDescricao(rs.getString("DESCRICAO"));
-					mov.setStatus(rs.getString("STATUS"));
-					return mov;
-				}
-			}
+            ps.setInt(1, id);
 
-		} catch (SQLException e) {
-			throw new DataAccessException("Erro ao buscar movimentação por ID.");
-		}
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    Movimentacoes mov = new Movimentacoes();
+                    mov.setId(rs.getInt("ID"));
+                    mov.setContaOrigemId(rs.getInt("CONTA_ORIGEM_ID"));
+                    mov.setContaDestinoId(rs.getInt("CONTA_DESTINO_ID"));
+                    mov.setValor(rs.getBigDecimal("VALOR"));
+                   
+                     mov.setTipo(edu.ifsp.banco.modelo.enums.TipoMovimentacao.valueOf(rs.getString("TIPO")));
+                     mov.setStatus(edu.ifsp.banco.modelo.enums.StatusMovimentacao.valueOf(rs.getString("STATUS")));
+                    
+                    mov.setDataTransacao(rs.getTimestamp("DATA_TRANSACAO"));
+                    mov.setDescricao(rs.getString("DESCRICAO"));
+                    
+                    return mov;
+                }
+            }
 
-		return null;
-	}
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new DataAccessException("Erro ao buscar movimentação por ID.");
+        }
 
-	public ArrayList<Movimentacoes> listarMovimentacoes(int idConta) throws SQLException {
-		String sql = """
-				    SELECT m.ID, m.CONTA_ORIGEM, m.CONTA_DESTINO, m.VALOR, m.TIPO, m.DATA_TRANSACAO, m.DESCRICAO, m.STATUS
-				    FROM MOVIMENTACOES m
-				    WHERE m.CONTA_ORIGEM = ? OR m.CONTA_DESTINO = ?
-				    ORDER BY m.DATA_TRANSACAO DESC
-				""";
+        return null;
+    }
 
-		ArrayList<Movimentacoes> movimentacoesList = new ArrayList<>();
+    public ArrayList<Movimentacoes> listarMovimentacoes(int idConta) throws SQLException {
+        String sql = """
+                   SELECT m.ID, m.CONTA_ORIGEM_ID, m.CONTA_DESTINO_ID, m.VALOR, m.TIPO, m.DATA_TRANSACAO, m.DESCRICAO, m.STATUS
+                   FROM MOVIMENTACOES m
+                   WHERE m.CONTA_ORIGEM_ID = ? OR m.CONTA_DESTINO_ID = ?
+                   ORDER BY m.DATA_TRANSACAO DESC
+                """;
 
-		try (Connection conn = ConnectionSingleton.getInstance().getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+        ArrayList<Movimentacoes> movimentacoesList = new ArrayList<>();
 
-			ps.setInt(1, idConta);
-			ps.setInt(2, idConta);
+        try (Connection conn = ConnectionSingleton.getInstance().getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
-			try (ResultSet rs = ps.executeQuery()) {
-				while (rs.next()) {
-					Movimentacoes movimentacao = new Movimentacoes();
-					movimentacao.setId(rs.getInt("ID"));
-					movimentacao.setContaOrigemId(rs.getInt("CONTA_ORIGEM"));
-					movimentacao.setContaDestinoId(rs.getInt("CONTA_DESTINO"));
-					movimentacao.setValor(rs.getBigDecimal("VALOR"));
-					movimentacao.setTipo(rs.getString("TIPO"));
-					movimentacao.setDataTransacao(rs.getTimestamp("DATA_TRANSACAO"));
-					movimentacao.setDescricao(rs.getString("DESCRICAO"));
-					movimentacao.setStatus(rs.getString("STATUS"));
+            ps.setInt(1, idConta);
+            ps.setInt(2, idConta);
 
-					movimentacoesList.add(movimentacao);
-				}
-			}
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Movimentacoes mov = new Movimentacoes();
+                    mov.setId(rs.getInt("ID"));
+                    mov.setContaOrigemId(rs.getInt("CONTA_ORIGEM_ID"));
+                    mov.setContaDestinoId(rs.getInt("CONTA_DESTINO_ID"));
+                    mov.setValor(rs.getBigDecimal("VALOR"));
+                    
+                    mov.setTipo(edu.ifsp.banco.modelo.enums.TipoMovimentacao.valueOf(rs.getString("TIPO")));
+                    mov.setStatus(edu.ifsp.banco.modelo.enums.StatusMovimentacao.valueOf(rs.getString("STATUS")));
 
-		} catch (SQLException e) {
-			throw new SQLException("Erro ao listar movimentações.", e);
-		}
+                    mov.setDataTransacao(rs.getTimestamp("DATA_TRANSACAO"));
+                    mov.setDescricao(rs.getString("DESCRICAO"));
 
-		return movimentacoesList;
-	}
+                    movimentacoesList.add(mov);
+                }
+            }
 
-	public void AtualizarStatus(String StatusMovimentacao, int idMovimentacao) {
-		String sql = """
-				    UPDATE MOVIMENTACOES
-				    SET STATUS = ?
-				    WHERE ID = ?
-				""";
+        } catch (SQLException e) {
+            throw new SQLException("Erro ao listar movimentações.", e);
+        }
 
-		try (Connection conn = ConnectionSingleton.getInstance().getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+        return movimentacoesList;
+    }
 
-			ps.setString(1, StatusMovimentacao);
-			ps.setInt(2, idMovimentacao);
+    public void AtualizarStatus(String StatusMovimentacao, int idMovimentacao) throws DataAccessException {
+        String sql = """
+                   UPDATE MOVIMENTACOES
+                   SET STATUS = ?
+                   WHERE ID = ?
+                """;
 
-			ps.executeUpdate();
+        try (Connection conn = ConnectionSingleton.getInstance().getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
-		} catch (SQLException e) {
-			throw new DataAccessException("Erro ao atualizar Movimentação.");
-		}
-	}
+            ps.setString(1, StatusMovimentacao);
+            ps.setInt(2, idMovimentacao);
 
+            ps.executeUpdate();
+
+        } catch (SQLException e) {
+            throw new DataAccessException("Erro ao atualizar Movimentação.");
+        }
+    }
 }

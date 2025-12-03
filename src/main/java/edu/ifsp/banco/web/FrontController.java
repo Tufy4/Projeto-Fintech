@@ -3,14 +3,17 @@ package edu.ifsp.banco.web;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-
 import edu.ifsp.banco.administrador.ConsultarUsuariosCommand;
 import edu.ifsp.banco.administrador.LiberarUsuarioCommand;
 import edu.ifsp.banco.login.LoginCommand;
 import edu.ifsp.banco.login.LogoutCommand;
 import edu.ifsp.banco.web.helpers.RedirectCommand;
 import edu.ifsp.banco.web.movimentacao.DepositoCommand;
+import edu.ifsp.banco.web.movimentacao.EscolherInvestimentoCommand;
+import edu.ifsp.banco.web.movimentacao.FinalizarInvestimentoCommand;
 import edu.ifsp.banco.web.movimentacao.InvestimentoCommand;
+import edu.ifsp.banco.web.movimentacao.MeusInvestimentosCommand;
+import edu.ifsp.banco.web.movimentacao.TransferenciaCommand;
 import edu.ifsp.banco.web.usuario.CadastrarUsuarioCommand;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -34,7 +37,11 @@ public class FrontController extends HttpServlet {
 		commands.put("liberarUsuario", new LiberarUsuarioCommand());
 		commands.put("logout", new LogoutCommand());
 		commands.put("investimento", new InvestimentoCommand());
-		// coloquem commands aqui
+		commands.put("escolherInvestimento", new EscolherInvestimentoCommand());
+		commands.put("finalizarInvestimento", new FinalizarInvestimentoCommand());
+		commands.put("meusInvestimentos", new MeusInvestimentosCommand());
+		commands.put("transferir", new TransferenciaCommand());
+		//coloquem aqui
 	}
 
 	@Override
