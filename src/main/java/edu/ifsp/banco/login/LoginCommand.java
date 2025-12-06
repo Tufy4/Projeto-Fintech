@@ -34,11 +34,8 @@ public class LoginCommand implements Command {
             System.out.println("Login efetuado: " + usuario.getEmail() + " - " + usuario.getPerfil());
             
             Conta conta = dao.buscarPorIdUsuario(usuario.getId());
-            
-            if (conta != null) {
-                session.setAttribute("conta", conta);
-                session.setAttribute("saldoConta", conta.getSaldo());
-            }
+            session.setAttribute("contaLogado", conta);
+           
             
             if(usuario.getPerfil().equals(TipoUsuario.GERENTE)) {
             	response.sendRedirect("app/admin/home.jsp");

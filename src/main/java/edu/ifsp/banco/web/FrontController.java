@@ -14,7 +14,9 @@ import edu.ifsp.banco.web.movimentacao.FinalizarInvestimentoCommand;
 import edu.ifsp.banco.web.movimentacao.InvestimentoCommand;
 import edu.ifsp.banco.web.movimentacao.MeusInvestimentosCommand;
 import edu.ifsp.banco.web.movimentacao.TransferenciaCommand;
+import edu.ifsp.banco.web.usuario.AtualizarUsuarioCommand;
 import edu.ifsp.banco.web.usuario.CadastrarUsuarioCommand;
+import edu.ifsp.banco.web.usuario.DadosUsuarioCommand;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -41,6 +43,8 @@ public class FrontController extends HttpServlet {
 		commands.put("finalizarInvestimento", new FinalizarInvestimentoCommand());
 		commands.put("meusInvestimentos", new MeusInvestimentosCommand());
 		commands.put("transferir", new TransferenciaCommand());
+		commands.put("atualizarUsuario", new AtualizarUsuarioCommand());
+		commands.put("mostrarDadosUsuario", new DadosUsuarioCommand());
 		//coloquem aqui
 	}
 

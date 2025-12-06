@@ -2,11 +2,16 @@
 <%@ page import="java.text.NumberFormat" %>
 <%@ page import="java.util.Locale" %>
 <%@ page import="java.math.BigDecimal" %>
+<%@page import="edu.ifsp.banco.persistencia.ContaDAO" %>
+<%@page import="edu.ifsp.banco.modelo.Usuario" %>
+<%@page import="edu.ifsp.banco.modelo.Conta" %>
 <%
-    Locale localeBR = new Locale("pt", "BR");
-    NumberFormat dinheiro = NumberFormat.getCurrencyInstance(localeBR);
-    BigDecimal saldo = (BigDecimal) session.getAttribute("saldoConta");
-    if(saldo == null) saldo = BigDecimal.ZERO;
+	Usuario user = (Usuario) session.getAttribute("usuarioLogado");
+	Conta conta = (Conta) session.getAttribute("contaLogado");
+	ContaDAO dao = new ContaDAO();
+	
+	BigDecimal valor = conta.getSaldo();
+	
 %>
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -97,7 +102,7 @@
     <header class="hero-dashboard text-center">
         <div class="container">
             <p class="lead mb-1 text-white-50 text-uppercase small ls-1">Saldo Disponível</p>
-            <h1 class="display-1 fw-bold mb-4"><%= dinheiro.format(saldo) %></h1>
+            <h1 class="display-1 fw-bold mb-4">R$ <%= valor%></h1>
             
             <div class="d-flex justify-content-center">
                 <a href="${pageContext.request.contextPath}/app?command=redirect&url=app/movimentacao/deposito.jsp" 
@@ -136,13 +141,33 @@
             </div>
 
             <div class="col">
-                <div class="op-card disabled">
-                    <div class="op-icon"><i class="bi bi-house-door"></i></div>
-                    <h3 class="h4 fw-bold text-muted">Empréstimos</h3>
-                    <p class="small text-muted mb-0">Simulação de crédito SAC (Em breve).</p>
-                </div>
+            	<a href="${pageContext.request.contextPath}/app">
+	                <div class="op-card disabled">
+	                    <div class="op-icon"><i class="bi bi-house-door"></i></div>
+	                    <h3 class="h4 fw-bold text-muted">Empréstimos</h3>
+	                    <p class="small text-muted mb-0">Simulação de crédito SAC (Em breve).</p>
+	                </div>
+                </a>
             </div>
-
+            
+            
+            <div class="col">
+            	<a href="${pageContext.request.contextPath}/app?command=mostrarDadosUsuario&id=<%=conta.getUsuarioId() %>">
+	                <div class="op-card ">
+	                    <div class="op-icon"><i class="bi bi-house-door"></i></div>
+	                    <h3 class="h4 fw-bold text-muted">Editar usuario</h3>
+	                    <p class="small text-muted mb-0">Altere dados do usuario.</p>
+	                </div>
+                </a>
+            </div>
+            
+            
+            
+            
+		
+			<p>Conta: <%=conta.getNumero_conta() %></p>
+			<p>Agencia: <%=conta.getAgencia() %></p>
+		
         </div>
     </section>
 
