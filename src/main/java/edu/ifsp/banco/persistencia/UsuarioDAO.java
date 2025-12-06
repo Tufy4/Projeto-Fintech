@@ -51,6 +51,48 @@ public class UsuarioDAO {
         return null;
     }
 	
+	
+	
+	public Usuario buscarPorId(int id) throws DataAccessException {
+        String sql = "SELECT * FROM USUARIOS WHERE ID = ?";
+        
+        try (Connection conn = ConnectionSingleton.getInstance().getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            
+            ps.setInt(1, id);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    TipoUsuario perfil = TipoUsuario.valueOf(rs.getString("PERFIL"));
+                    StatusUsuario status = StatusUsuario.valueOf(rs.getString("STATUS"));
+
+                    Usuario usuario = new Usuario(
+                        rs.getString("NOME"),
+                        rs.getString("EMAIL"),
+                        rs.getString("SENHA"),
+                        rs.getString("TELEFONE"),
+                        rs.getString("ENDERECO"),
+                        perfil,
+                        status
+                    );
+                    
+                    usuario.setId(rs.getInt("ID"));
+                    usuario.setDataCriacao(rs.getTimestamp("DATA_CRIACAO"));
+                    usuario.setDataAtualizacao(rs.getTimestamp("DATA_ULTIMA_ATUALIZACAO"));
+                    
+                    return usuario;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new DataAccessException("Erro ao buscar usuário por email.");
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+            throw new DataAccessException("Erro de consistência: Enum inválido no banco de dados.");
+        }
+        return null;
+    }
+	
 	public void inserir(Usuario usuario) throws Exception {
 	    
 	    String sql = """
