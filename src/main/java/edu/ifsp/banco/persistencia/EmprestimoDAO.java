@@ -88,6 +88,25 @@ public class EmprestimoDAO {
 
 		return lista;
 	}
+	
+	public List<Emprestimo> listarPorConta(int idConta) throws DataAccessException {
+	    List<Emprestimo> lista = new ArrayList<>();
+	    String sql = "SELECT * FROM emprestimos WHERE conta_id = ? ORDER BY id DESC";
+
+	    try (Connection conn = ConnectionSingleton.getInstance().getConnection();
+	            PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+	        stmt.setInt(1, idConta);
+	        ResultSet rs = stmt.executeQuery();
+
+	        while (rs.next()) {
+	            lista.add(mapResultSetToEmprestimo(rs));
+	        }
+	    } catch (SQLException ex) {
+	        throw new DataAccessException("Erro ao listar empréstimos da conta: " + ex.getMessage());
+	    }
+	    return lista;
+	}
 
 	public List<Emprestimo> listarPorStatus(StatusEmprestimo status) throws DataAccessException {
 		List<Emprestimo> lista = new ArrayList<>();

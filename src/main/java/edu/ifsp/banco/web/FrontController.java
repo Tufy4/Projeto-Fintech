@@ -9,6 +9,7 @@ import edu.ifsp.banco.login.LoginCommand;
 import edu.ifsp.banco.login.LogoutCommand;
 import edu.ifsp.banco.web.emprestimo.AprovarEmprestimoCommand;
 import edu.ifsp.banco.web.emprestimo.ListarSolicitacoesCommand;
+import edu.ifsp.banco.web.emprestimo.MeusEmprestimosCommand;
 import edu.ifsp.banco.web.emprestimo.PagarParcelaCommand;
 import edu.ifsp.banco.web.emprestimo.PrepararSimulacaoCommand;
 import edu.ifsp.banco.web.emprestimo.SimularEmprestimoCommand;
@@ -16,6 +17,7 @@ import edu.ifsp.banco.web.emprestimo.SolicitarEmprestimoCommand;
 import edu.ifsp.banco.web.helpers.RedirectCommand;
 import edu.ifsp.banco.web.movimentacao.DepositoCommand;
 import edu.ifsp.banco.web.movimentacao.EscolherInvestimentoCommand;
+import edu.ifsp.banco.web.movimentacao.ExtratoCommand;
 import edu.ifsp.banco.web.movimentacao.FinalizarInvestimentoCommand;
 import edu.ifsp.banco.web.movimentacao.InvestimentoCommand;
 import edu.ifsp.banco.web.movimentacao.MeusInvestimentosCommand;
@@ -58,7 +60,9 @@ public class FrontController extends HttpServlet {
 		commands.put("pagarParcela", new PagarParcelaCommand());
 		commands.put("dashboardCliente", new DashboardCommand());
 		commands.put("prepararSimulacao", new PrepararSimulacaoCommand());
-		commands.put("listarEmprestimosGerente", new ListarSolicitacoesCommand()); 
+		commands.put("listarEmprestimosGerente", new ListarSolicitacoesCommand());
+		commands.put("meusEmprestimos", new MeusEmprestimosCommand());
+		commands.put("extrato", new ExtratoCommand());
 		//coloquem aqui
 	}
 

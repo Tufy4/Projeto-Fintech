@@ -12,7 +12,7 @@
 List<ParcelaEmprestimo> lista = (List<ParcelaEmprestimo>) request.getAttribute("listaSimulacao");
 BigDecimal valorSolicitado = (BigDecimal) request.getAttribute("valorSolicitado");
 Integer qtdParcelas = (Integer) request.getAttribute("qtdParcelas");
-BigDecimal taxaJuros = (BigDecimal) request.getAttribute("taxaJuros");
+BigDecimal taxaJuros = (BigDecimal) request.getSession().getAttribute("taxaPadrao");
 Conta conta = (Conta) session.getAttribute("contaLogado");
 
 NumberFormat nf = NumberFormat.getCurrencyInstance(new Locale("pt", "BR"));
