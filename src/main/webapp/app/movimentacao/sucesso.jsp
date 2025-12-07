@@ -43,7 +43,7 @@
 						<h4 class="card-title text-success">Depósito realizado com
 							sucesso!</h4>
 						<p class="card-text">${msg}</p>
-						<a href="${pageContext.request.contextPath}/app/home.jsp"
+						<a href="${pageContext.request.contextPath}/app?command=dashboardCliente"
 							class="btn btn-primary w-100">Voltar para a Home</a>
 					</div>
 				</div>

@@ -16,48 +16,46 @@ import jakarta.servlet.http.HttpSession;
 
 public class FinalizarInvestimentoCommand implements Command {
 
-    @Override
-    public void execute(HttpServletRequest req, HttpServletResponse resp) {
+	@Override
+	public void execute(HttpServletRequest req, HttpServletResponse resp) {
 
-        RequestDispatcher rd;
+		RequestDispatcher rd;
 
-        try {
-            int numeroConta = Integer.parseInt(req.getParameter("numeroConta"));
-            String produto = req.getParameter("produto");
-            BigDecimal valor = new BigDecimal(req.getParameter("valor"));
+		try {
+			int numeroConta = Integer.parseInt(req.getParameter("numeroConta"));
+			String produto = req.getParameter("produto");
+			BigDecimal valor = new BigDecimal(req.getParameter("valor"));
 
-            InvestimentoSERVICE service = new InvestimentoSERVICE();
+			InvestimentoSERVICE service = new InvestimentoSERVICE();
 
-          
-            service.montarInvestimento(numeroConta, produto, valor);
+			service.montarInvestimento(numeroConta, produto, valor);
 
- 
-            HttpSession session = req.getSession();
-            Usuario usuario = (Usuario) session.getAttribute("usuarioLogado");
-            
-            if (usuario != null) {
-                ContaDAO contaDAO = new ContaDAO();
-                Conta contaAtualizada = contaDAO.buscarPorIdUsuario(usuario.getId());
-                
-                if (contaAtualizada != null) {
-                    session.setAttribute("conta", contaAtualizada);
-                    session.setAttribute("saldoConta", contaAtualizada.getSaldo());
-                }
-            }
+			HttpSession session = req.getSession();
+			Usuario usuario = (Usuario) session.getAttribute("usuarioLogado");
 
-            req.setAttribute("mensagem", "Investimento realizado com sucesso!");
-            rd = req.getRequestDispatcher("/app/movimentacao/sucesso.jsp");
+			if (usuario != null) {
+				ContaDAO contaDAO = new ContaDAO();
+				Conta contaAtualizada = contaDAO.buscarPorIdUsuario(usuario.getId());
 
-        } catch (Exception e) {
-            e.printStackTrace(); 
-            req.setAttribute("erro", e.getMessage());
-            rd = req.getRequestDispatcher("/app/movimentacao/erro.jsp");
-        }
+				if (contaAtualizada != null) {
+					session.setAttribute("conta", contaAtualizada);
+					session.setAttribute("saldoConta", contaAtualizada.getSaldo());
+				}
+			}
 
-        try {
-            rd.forward(req, resp);
-        } catch (ServletException | IOException e) {
-            e.printStackTrace();
-        }
-    }
+			req.setAttribute("mensagem", "Investimento realizado com sucesso!");
+			rd = req.getRequestDispatcher("/app/movimentacao/sucesso.jsp");
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			req.setAttribute("erro", e.getMessage());
+			rd = req.getRequestDispatcher("/app/movimentacao/erro.jsp");
+		}
+
+		try {
+			rd.forward(req, resp);
+		} catch (ServletException | IOException e) {
+			e.printStackTrace();
+		}
+	}
 }

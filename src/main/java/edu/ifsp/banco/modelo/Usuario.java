@@ -128,9 +128,9 @@ public class Usuario {
 		this.DataCriacao = new Timestamp(System.currentTimeMillis());
 		this.DataAtualizacao = new Timestamp(System.currentTimeMillis());
 	}
-	
+
 	public Usuario() {
-		
+
 	}
 
 }

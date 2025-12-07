@@ -19,8 +19,7 @@ public class AuthController extends HttpServlet {
 			throws ServletException, IOException {
 		Command cmd = switch (request.getServletPath()) {
 		case "/Login" -> new ViewCommand("forward:/index.html"); // Página de login
-//            case "/logout" -> new LogoutCommand(); // Redireciona para logout
-		default -> PageNotFound.getInstance(); // Página não encontrada
+		default -> PageNotFound.getInstance();
 		};
 
 		cmd.execute(request, response);

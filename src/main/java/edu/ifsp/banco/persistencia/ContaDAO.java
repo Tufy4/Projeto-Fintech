@@ -14,110 +14,133 @@ import edu.ifsp.banco.modelo.enums.TiposConta;
 
 public class ContaDAO {
 
-    public void inserir(Conta conta) throws DataAccessException {
-        String sql = "INSERT INTO CONTAS (ID, USUARIO_ID, NUMERO_CONTA, TIPO, STATUS) "
-                + "VALUES (SEQ_CONTAS.NEXTVAL, ?, SEQ_CONTA.NEXTVAL, ?, 'BLOQUEADA')";
+	public void inserir(Conta conta) throws DataAccessException {
+		String sql = "INSERT INTO CONTAS (ID, USUARIO_ID, NUMERO_CONTA, TIPO, STATUS) "
+				+ "VALUES (SEQ_CONTAS.NEXTVAL, ?, SEQ_CONTA.NEXTVAL, ?, 'BLOQUEADA')";
 
-        try (Connection conn = ConnectionSingleton.getInstance().getConnection();
-                PreparedStatement stmt = conn.prepareStatement(sql)) {
+		try (Connection conn = ConnectionSingleton.getInstance().getConnection();
+				PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setInt(1, conta.getUsuarioId());
-            stmt.setString(2, conta.getTipo().getValor());
+			stmt.setInt(1, conta.getUsuarioId());
+			stmt.setString(2, conta.getTipo().getValor());
 
-            stmt.executeUpdate();
+			stmt.executeUpdate();
 
-        } catch (SQLException e) {
-            e.printStackTrace();
-            throw new DataAccessException("Erro ao inserir conta: " + e.getMessage());
-        }
-    }
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new DataAccessException("Erro ao inserir conta: " + e.getMessage());
+		}
+	}
 
-    public Conta buscarPorNumero(int numeroConta) throws DataAccessException {
-        String sql = "SELECT * FROM CONTAS WHERE NUMERO_CONTA = ?";
-        Conta conta = null;
+	public Conta buscarPorNumero(int numeroConta) throws DataAccessException {
+		String sql = "SELECT * FROM CONTAS WHERE NUMERO_CONTA = ?";
+		Conta conta = null;
 
-        try (Connection conn = ConnectionSingleton.getInstance().getConnection();
-                PreparedStatement stmt = conn.prepareStatement(sql)) {
+		try (Connection conn = ConnectionSingleton.getInstance().getConnection();
+				PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setInt(1, numeroConta);
-            ResultSet rs = stmt.executeQuery();
+			stmt.setInt(1, numeroConta);
+			ResultSet rs = stmt.executeQuery();
 
-            if (rs.next()) {
-                conta = new Conta(rs.getInt("ID"), rs.getInt("USUARIO_ID"), rs.getInt("AGENCIA"),
-                        rs.getInt("NUMERO_CONTA"), rs.getBigDecimal("SALDO"),
-                        TiposConta.valueOf(rs.getString("TIPO")), StatusConta.valueOf(rs.getString("STATUS")),
-                        rs.getTimestamp("DATA_CRIACAO"));
-            }
+			if (rs.next()) {
+				conta = new Conta(rs.getInt("ID"), rs.getInt("USUARIO_ID"), rs.getInt("AGENCIA"),
+						rs.getInt("NUMERO_CONTA"), rs.getBigDecimal("SALDO"), TiposConta.valueOf(rs.getString("TIPO")),
+						StatusConta.valueOf(rs.getString("STATUS")), rs.getTimestamp("DATA_CRIACAO"));
+			}
 
-        } catch (SQLException e) {
-            e.printStackTrace();
-            throw new DataAccessException("Erro ao buscar conta");
-        }
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new DataAccessException("Erro ao buscar conta");
+		}
 
-        return conta;
-    }
+		return conta;
+	}
 
-    public List<Conta> listar() throws DataAccessException {
-        List<Conta> contas = new ArrayList<>();
-        String sql = "SELECT * FROM CONTAS";
+	public Conta buscarPorId(int idConta) throws DataAccessException {
+		String sql = "SELECT * FROM CONTAS WHERE id = ?";
+		Conta conta = null;
 
-        try (Connection conn = ConnectionSingleton.getInstance().getConnection();
-                Statement stmt = conn.createStatement();
-                ResultSet rs = stmt.executeQuery(sql)) {
+		try (Connection conn = ConnectionSingleton.getInstance().getConnection();
+				PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            while (rs.next()) {
-                Conta c = new Conta(rs.getInt("ID"), rs.getInt("USUARIO_ID"), rs.getInt("AGENCIA"),
-                        rs.getInt("NUMERO_CONTA"), rs.getBigDecimal("SALDO"),
-                        TiposConta.valueOf(rs.getString("TIPO")), StatusConta.valueOf(rs.getString("STATUS")),
-                        rs.getTimestamp("DATA_CRIACAO"));
-                contas.add(c);
-            }
+			stmt.setInt(1, idConta);
+			ResultSet rs = stmt.executeQuery();
 
-        } catch (SQLException e) {
-            e.printStackTrace();
-            throw new DataAccessException("Erro ao listar contas");
-        }
+			if (rs.next()) {
+				conta = new Conta(rs.getInt("ID"), rs.getInt("USUARIO_ID"), rs.getInt("AGENCIA"),
+						rs.getInt("NUMERO_CONTA"), rs.getBigDecimal("SALDO"), TiposConta.valueOf(rs.getString("TIPO")),
+						StatusConta.valueOf(rs.getString("STATUS")), rs.getTimestamp("DATA_CRIACAO"));
+			}
 
-        return contas;
-    }
+			System.out.println("conta encontrada: " + conta.getId());
 
-    public void atualizarSaldo(int idConta, double novoSaldo) throws DataAccessException {
-        String sql = "UPDATE CONTAS SET SALDO = ? WHERE ID = ?";
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new DataAccessException("Erro ao buscar conta");
+		}
 
-        try (Connection conn = ConnectionSingleton.getInstance().getConnection();
-                PreparedStatement stmt = conn.prepareStatement(sql)) {
+		return conta;
+	}
 
-            stmt.setDouble(1, novoSaldo);
-            stmt.setInt(2, idConta);
-            stmt.executeUpdate();
+	public List<Conta> listar() throws DataAccessException {
+		List<Conta> contas = new ArrayList<>();
+		String sql = "SELECT * FROM CONTAS";
 
-        } catch (SQLException e) {
-            throw new DataAccessException("Erro ao atualizar saldo");
-        }
-    }
+		try (Connection conn = ConnectionSingleton.getInstance().getConnection();
+				Statement stmt = conn.createStatement();
+				ResultSet rs = stmt.executeQuery(sql)) {
 
-    public Conta buscarPorIdUsuario(int idUser) throws DataAccessException {
-        String sql = "SELECT * FROM CONTAS WHERE USUARIO_ID = ?";
-        Conta conta = null;
+			while (rs.next()) {
+				Conta c = new Conta(rs.getInt("ID"), rs.getInt("USUARIO_ID"), rs.getInt("AGENCIA"),
+						rs.getInt("NUMERO_CONTA"), rs.getBigDecimal("SALDO"), TiposConta.valueOf(rs.getString("TIPO")),
+						StatusConta.valueOf(rs.getString("STATUS")), rs.getTimestamp("DATA_CRIACAO"));
+				contas.add(c);
+			}
 
-        try (Connection conn = ConnectionSingleton.getInstance().getConnection();
-                PreparedStatement stmt = conn.prepareStatement(sql)) {
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new DataAccessException("Erro ao listar contas");
+		}
 
-            stmt.setInt(1, idUser);
-            ResultSet rs = stmt.executeQuery();
+		return contas;
+	}
 
-            if (rs.next()) {
-                conta = new Conta(rs.getInt("ID"), rs.getInt("USUARIO_ID"), rs.getInt("AGENCIA"),
-                        rs.getInt("NUMERO_CONTA"), rs.getBigDecimal("SALDO"),
-                        TiposConta.valueOf(rs.getString("TIPO")), StatusConta.valueOf(rs.getString("STATUS")),
-                        rs.getTimestamp("DATA_CRIACAO"));
-            }
+	public void atualizarSaldo(int idConta, double novoSaldo) throws DataAccessException {
+		String sql = "UPDATE CONTAS SET SALDO = ? WHERE ID = ?";
 
-        } catch (SQLException e) {
-            e.printStackTrace();
-            throw new DataAccessException("Erro ao buscar conta");
-        }
+		try (Connection conn = ConnectionSingleton.getInstance().getConnection();
+				PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-        return conta;
-    }
+			stmt.setDouble(1, novoSaldo);
+			stmt.setInt(2, idConta);
+			stmt.executeUpdate();
+
+		} catch (SQLException e) {
+			throw new DataAccessException("Erro ao atualizar saldo");
+		}
+	}
+
+	public Conta buscarPorIdUsuario(int idUser) throws DataAccessException {
+		String sql = "SELECT * FROM CONTAS WHERE USUARIO_ID = ?";
+		Conta conta = null;
+
+		try (Connection conn = ConnectionSingleton.getInstance().getConnection();
+				PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+			stmt.setInt(1, idUser);
+			ResultSet rs = stmt.executeQuery();
+
+			if (rs.next()) {
+				conta = new Conta(rs.getInt("ID"), rs.getInt("USUARIO_ID"), rs.getInt("AGENCIA"),
+						rs.getInt("NUMERO_CONTA"), rs.getBigDecimal("SALDO"), TiposConta.valueOf(rs.getString("TIPO")),
+						StatusConta.valueOf(rs.getString("STATUS")), rs.getTimestamp("DATA_CRIACAO"));
+			}
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new DataAccessException("Erro ao buscar conta");
+		}
+
+		return conta;
+	}
 }

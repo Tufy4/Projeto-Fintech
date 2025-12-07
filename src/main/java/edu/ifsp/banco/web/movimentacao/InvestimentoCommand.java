@@ -12,31 +12,31 @@ import jakarta.servlet.ServletException;
 
 public class InvestimentoCommand implements Command {
 
-    @Override
-    public void execute(HttpServletRequest request, HttpServletResponse response) {
-        RequestDispatcher rd;
+	@Override
+	public void execute(HttpServletRequest request, HttpServletResponse response) {
+		RequestDispatcher rd;
 
-        try {
-            int numeroConta = Integer.parseInt(request.getParameter("numeroConta"));
-            String tipo = request.getParameter("tipo");
-            BigDecimal valor = new BigDecimal(request.getParameter("valor"));
+		try {
+			int numeroConta = Integer.parseInt(request.getParameter("numeroConta"));
+			String tipo = request.getParameter("tipo");
+			BigDecimal valor = new BigDecimal(request.getParameter("valor"));
 
-            InvestimentoSERVICE service = new InvestimentoSERVICE();
-            service.montarInvestimento(numeroConta, tipo, valor);
+			InvestimentoSERVICE service = new InvestimentoSERVICE();
+			service.montarInvestimento(numeroConta, tipo, valor);
 
-            request.setAttribute("msg", "Investimento criado com sucesso!");
+			request.setAttribute("msg", "Investimento criado com sucesso!");
 
-            rd = request.getRequestDispatcher("/app/movimentacao/sucesso.jsp");
+			rd = request.getRequestDispatcher("/app/movimentacao/sucesso.jsp");
 
-        } catch (Exception e) {
-            request.setAttribute("erro", e.getMessage());
-            rd = request.getRequestDispatcher("/app/movimentacao/erro.jsp");
-        }
+		} catch (Exception e) {
+			request.setAttribute("erro", e.getMessage());
+			rd = request.getRequestDispatcher("/app/movimentacao/erro.jsp");
+		}
 
-        try {
-            rd.forward(request, response);
-        } catch (ServletException | IOException e) {
-            e.printStackTrace();
-        }
-    }
+		try {
+			rd.forward(request, response);
+		} catch (ServletException | IOException e) {
+			e.printStackTrace();
+		}
+	}
 }

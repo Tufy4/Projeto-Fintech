@@ -7,6 +7,12 @@ import edu.ifsp.banco.administrador.ConsultarUsuariosCommand;
 import edu.ifsp.banco.administrador.LiberarUsuarioCommand;
 import edu.ifsp.banco.login.LoginCommand;
 import edu.ifsp.banco.login.LogoutCommand;
+import edu.ifsp.banco.web.emprestimo.AprovarEmprestimoCommand;
+import edu.ifsp.banco.web.emprestimo.ListarSolicitacoesCommand;
+import edu.ifsp.banco.web.emprestimo.PagarParcelaCommand;
+import edu.ifsp.banco.web.emprestimo.PrepararSimulacaoCommand;
+import edu.ifsp.banco.web.emprestimo.SimularEmprestimoCommand;
+import edu.ifsp.banco.web.emprestimo.SolicitarEmprestimoCommand;
 import edu.ifsp.banco.web.helpers.RedirectCommand;
 import edu.ifsp.banco.web.movimentacao.DepositoCommand;
 import edu.ifsp.banco.web.movimentacao.EscolherInvestimentoCommand;
@@ -17,6 +23,7 @@ import edu.ifsp.banco.web.movimentacao.TransferenciaCommand;
 import edu.ifsp.banco.web.usuario.AtualizarUsuarioCommand;
 import edu.ifsp.banco.web.usuario.CadastrarUsuarioCommand;
 import edu.ifsp.banco.web.usuario.DadosUsuarioCommand;
+import edu.ifsp.banco.web.usuario.DashboardCommand;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -45,6 +52,13 @@ public class FrontController extends HttpServlet {
 		commands.put("transferir", new TransferenciaCommand());
 		commands.put("atualizarUsuario", new AtualizarUsuarioCommand());
 		commands.put("mostrarDadosUsuario", new DadosUsuarioCommand());
+		commands.put("simularEmprestimo", new SimularEmprestimoCommand());
+		commands.put("solicitarEmprestimo", new SolicitarEmprestimoCommand());
+		commands.put("aprovarEmprestimo", new AprovarEmprestimoCommand());
+		commands.put("pagarParcela", new PagarParcelaCommand());
+		commands.put("dashboardCliente", new DashboardCommand());
+		commands.put("prepararSimulacao", new PrepararSimulacaoCommand());
+		commands.put("listarEmprestimosGerente", new ListarSolicitacoesCommand()); 
 		//coloquem aqui
 	}
 

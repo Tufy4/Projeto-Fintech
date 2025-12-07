@@ -17,14 +17,13 @@ import jakarta.servlet.http.HttpServletResponse;
 
 public class AtualizarUsuarioCommand implements Command {
 
-    @Override
-    public void execute(HttpServletRequest request, HttpServletResponse response) throws IOException {
-    	int id = Integer.parseInt(request.getParameter("id"));
-    	ContaDAO dao = new ContaDAO();
-    	Conta conta = dao.buscarPorIdUsuario(id);
-    	
-    	response.sendRedirect("app/admin/home.jsp");
-    	
+	@Override
+	public void execute(HttpServletRequest request, HttpServletResponse response) throws IOException {
+		int id = Integer.parseInt(request.getParameter("id"));
+		ContaDAO dao = new ContaDAO();
+		Conta conta = dao.buscarPorIdUsuario(id);
 
-    }
+		response.sendRedirect("app/admin/home.jsp");
+
+	}
 }

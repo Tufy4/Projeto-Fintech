@@ -1,312 +1,401 @@
 BEGIN
     EXECUTE IMMEDIATE 'DROP TABLE INVESTIMENTOS CASCADE CONSTRAINTS';
-EXCEPTION WHEN OTHERS THEN NULL;
+EXCEPTION
+    WHEN OTHERS THEN
+        NULL;
 END;
 /
 
 BEGIN
-    EXECUTE IMMEDIATE 'DROP TABLE EMPRESTIMOS CASCADE CONSTRAINTS';
-EXCEPTION WHEN OTHERS THEN NULL;
+    EXECUTE IMMEDIATE 'DROP TABLE CONFIG_EMPRESTIMO CASCADE CONSTRAINTS';
+EXCEPTION
+    WHEN OTHERS THEN
+        NULL;
 END;
 /
 
 BEGIN
     EXECUTE IMMEDIATE 'DROP TABLE PARCELAS_EMPRESTIMO CASCADE CONSTRAINTS';
-EXCEPTION WHEN OTHERS THEN NULL;
+EXCEPTION
+    WHEN OTHERS THEN
+        NULL;
+END;
+/
+
+BEGIN
+    EXECUTE IMMEDIATE 'DROP TABLE EMPRESTIMOS CASCADE CONSTRAINTS';
+EXCEPTION
+    WHEN OTHERS THEN
+        NULL;
 END;
 /
 
 BEGIN
     EXECUTE IMMEDIATE 'DROP TABLE MOVIMENTACOES CASCADE CONSTRAINTS';
-EXCEPTION WHEN OTHERS THEN NULL;
+EXCEPTION
+    WHEN OTHERS THEN
+        NULL;
 END;
 /
 
 BEGIN
     EXECUTE IMMEDIATE 'DROP TABLE CONTAS CASCADE CONSTRAINTS';
-EXCEPTION WHEN OTHERS THEN NULL;
+EXCEPTION
+    WHEN OTHERS THEN
+        NULL;
 END;
 /
 
 BEGIN
     EXECUTE IMMEDIATE 'DROP TABLE USUARIOS CASCADE CONSTRAINTS';
-EXCEPTION WHEN OTHERS THEN NULL;
+EXCEPTION
+    WHEN OTHERS THEN
+        NULL;
 END;
 /
 
 BEGIN
     EXECUTE IMMEDIATE 'DROP SEQUENCE SEQ_USUARIOS';
-EXCEPTION WHEN OTHERS THEN NULL;
+EXCEPTION
+    WHEN OTHERS THEN
+        NULL;
 END;
 /
 
 BEGIN
     EXECUTE IMMEDIATE 'DROP SEQUENCE SEQ_CONTAS';
-EXCEPTION WHEN OTHERS THEN NULL;
+EXCEPTION
+    WHEN OTHERS THEN
+        NULL;
 END;
 /
 
 BEGIN
     EXECUTE IMMEDIATE 'DROP SEQUENCE SEQ_MOVIMENTACOES';
-EXCEPTION WHEN OTHERS THEN NULL;
+EXCEPTION
+    WHEN OTHERS THEN
+        NULL;
 END;
 /
 
 BEGIN
     EXECUTE IMMEDIATE 'DROP SEQUENCE SEQ_INVESTIMENTOS';
-EXCEPTION WHEN OTHERS THEN NULL;
+EXCEPTION
+    WHEN OTHERS THEN
+        NULL;
 END;
 /
 
 BEGIN
     EXECUTE IMMEDIATE 'DROP SEQUENCE SEQ_EMPRESTIMOS';
-EXCEPTION WHEN OTHERS THEN NULL;
+EXCEPTION
+    WHEN OTHERS THEN
+        NULL;
 END;
 /
 
 BEGIN
     EXECUTE IMMEDIATE 'DROP SEQUENCE SEQ_PARCELAS_EMPRESTIMO';
-EXCEPTION WHEN OTHERS THEN NULL;
+EXCEPTION
+    WHEN OTHERS THEN
+        NULL;
 END;
 /
 
 BEGIN
     EXECUTE IMMEDIATE 'DROP SEQUENCE SEQ_NUM_CONTA';
-EXCEPTION WHEN OTHERS THEN NULL;
+EXCEPTION
+    WHEN OTHERS THEN
+        NULL;
 END;
 /
 
+BEGIN
+    EXECUTE IMMEDIATE 'DROP SEQUENCE SEQ_CONFIG_EMPRESTIMO';
+EXCEPTION
+    WHEN OTHERS THEN
+        NULL;
+END;
+/
 
-
-CREATE TABLE USUARIOS (
-    ID INT NOT NULL PRIMARY KEY,
-    NOME VARCHAR2(255) NOT NULL,
-    EMAIL VARCHAR2(255) UNIQUE NOT NULL,
-    SENHA VARCHAR2(255) NOT NULL,
-    TELEFONE VARCHAR2(20),
-    ENDERECO VARCHAR(50),
-    PERFIL VARCHAR2(20) DEFAULT 'CLIENTE' CHECK (PERFIL IN ('CLIENTE', 'GERENTE')),
-    STATUS VARCHAR2(20) DEFAULT 'BLOQUEADO' CHECK (STATUS IN ('ATIVO', 'INATIVO', 'BLOQUEADO')),
-    DATA_CRIACAO TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    DATA_ULTIMA_ATUALIZACAO TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+CREATE TABLE usuarios (
+    id                      INT NOT NULL PRIMARY KEY,
+    nome                    VARCHAR2(255) NOT NULL,
+    email                   VARCHAR2(255) UNIQUE NOT NULL,
+    senha                   VARCHAR2(255) NOT NULL,
+    telefone                VARCHAR2(20),
+    endereco                VARCHAR(50),
+    perfil                  VARCHAR2(20) DEFAULT 'CLIENTE' CHECK ( perfil IN ( 'CLIENTE', 'GERENTE' ) ),
+    status                  VARCHAR2(20) DEFAULT 'BLOQUEADO' CHECK ( status IN ( 'ATIVO', 'INATIVO', 'BLOQUEADO' ) ),
+    data_criacao            TIMESTAMP DEFAULT current_timestamp,
+    data_ultima_atualizacao TIMESTAMP DEFAULT current_timestamp
 );
 
-
-CREATE TABLE CONTAS (
-    ID INT NOT NULL PRIMARY KEY,
-    AGENCIA INT DEFAULT 5 NOT NULL,
-    NUMERO_CONTA INT NOT NULL,
-    USUARIO_ID INT NOT NULL,
-    SALDO NUMBER(15,2) DEFAULT 0.00,
-    TIPO VARCHAR2(20) NOT NULL CHECK (TIPO IN ('CORRENTE', 'POUPANCA')),
-    STATUS VARCHAR2(20) DEFAULT 'BLOQUEADA' CHECK (STATUS IN ('ATIVA', 'BLOQUEADA')),
-    DATA_CRIACAO TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT FK_CONTAS_USUARIOS FOREIGN KEY (USUARIO_ID) REFERENCES USUARIOS(ID)
+CREATE TABLE contas (
+    id           INT NOT NULL PRIMARY KEY,
+    agencia      INT DEFAULT 5 NOT NULL,
+    numero_conta INT NOT NULL,
+    usuario_id   INT NOT NULL,
+    saldo        NUMBER(15, 2) DEFAULT 0.00,
+    tipo         VARCHAR2(20) NOT NULL CHECK ( tipo IN ( 'CORRENTE', 'POUPANCA' ) ),
+    status       VARCHAR2(20) DEFAULT 'BLOQUEADA' CHECK ( status IN ( 'ATIVA', 'BLOQUEADA' ) ),
+    data_criacao TIMESTAMP DEFAULT current_timestamp,
+    CONSTRAINT fk_contas_usuarios FOREIGN KEY ( usuario_id )
+        REFERENCES usuarios ( id )
 );
 
-
-CREATE TABLE MOVIMENTACOES (
-    ID INT NOT NULL PRIMARY KEY,
-    CONTA_ORIGEM_ID INT,
-    CONTA_DESTINO_ID INT,
-    VALOR NUMBER(15,2) NOT NULL,
-    TIPO VARCHAR2(30) CHECK (TIPO IN ('DEPOSITO', 'TRANSFERENCIA', 'INVESTIMENTO', 'SAQUE')),
-    DATA_TRANSACAO TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    DESCRICAO VARCHAR(200),
-    STATUS VARCHAR2(20) DEFAULT 'PENDENTE' CHECK (STATUS IN ('PENDENTE', 'CONCLUIDA', 'FALHA')),
-    CONSTRAINT FK_MOV_CONTA_ORIGEM FOREIGN KEY (CONTA_ORIGEM_ID) REFERENCES CONTAS(ID),
-    CONSTRAINT FK_MOV_CONTA_DESTINO FOREIGN KEY (CONTA_DESTINO_ID) REFERENCES CONTAS(ID)
+CREATE TABLE movimentacoes (
+    id               INT NOT NULL PRIMARY KEY,
+    conta_origem_id  INT,
+    conta_destino_id INT,
+    valor            NUMBER(15, 2) NOT NULL,
+    tipo             VARCHAR2(30) CHECK ( tipo IN ( 'DEPOSITO', 'TRANSFERENCIA', 'INVESTIMENTO', 'SAQUE' ) ),
+    data_transacao   TIMESTAMP DEFAULT current_timestamp,
+    descricao        VARCHAR(200),
+    status           VARCHAR2(20) DEFAULT 'PENDENTE' CHECK ( status IN ( 'PENDENTE', 'CONCLUIDA', 'FALHA' ) ),
+    CONSTRAINT fk_mov_conta_origem FOREIGN KEY ( conta_origem_id )
+        REFERENCES contas ( id ),
+    CONSTRAINT fk_mov_conta_destino FOREIGN KEY ( conta_destino_id )
+        REFERENCES contas ( id )
 );
 
-CREATE TABLE INVESTIMENTOS (
-    ID INT NOT NULL PRIMARY KEY,
-    CONTA_ID INT NOT NULL,
-    TIPO_INVESTIMENTO VARCHAR2(100) NOT NULL,
-    VALOR_INVESTIDO NUMBER(15,2) NOT NULL,
-    DATA_INICIO DATE DEFAULT SYSDATE,
-    DATA_FIM DATE,
-    STATUS VARCHAR2(20) DEFAULT 'ATIVO' CHECK (STATUS IN ('ATIVO', 'ENCERRADO')),
-    CONSTRAINT FK_INVEST_CONTA FOREIGN KEY (CONTA_ID) REFERENCES CONTAS(ID)
+CREATE TABLE investimentos (
+    id                INT NOT NULL PRIMARY KEY,
+    conta_id          INT NOT NULL,
+    tipo_investimento VARCHAR2(100) NOT NULL,
+    valor_investido   NUMBER(15, 2) NOT NULL,
+    data_inicio       DATE DEFAULT sysdate,
+    data_fim          DATE,
+    status            VARCHAR2(20) DEFAULT 'ATIVO' CHECK ( status IN ( 'ATIVO', 'ENCERRADO' ) ),
+    CONSTRAINT fk_invest_conta FOREIGN KEY ( conta_id )
+        REFERENCES contas ( id )
 );
 
-CREATE TABLE EMPRESTIMOS (
-    ID INT NOT NULL PRIMARY KEY,
-    CONTA_ID INT NOT NULL,
-    VALOR_EMPRESTIMO NUMBER(10,2) NOT NULL,
-    JUROS NUMBER(10,2) NOT NULL,
-    PARCELAS INT NOT NULL,
-    STATUS VARCHAR2(30) DEFAULT 'SIMULADO' CHECK (STATUS IN ('SIMULADO', 'APROVADO', 'EM_ANDAMENTO', 'QUITADO')),
-    DATA_SOLICITACAO DATE DEFAULT SYSDATE,
-    DATA_APROVACAO DATE,
-    DATA_ULTIMO_PAGAMENTO DATE,
-    CONSTRAINT FK_EMPRESTIMO_CONTA FOREIGN KEY (CONTA_ID) REFERENCES CONTAS(ID)
+CREATE TABLE config_emprestimo (
+    id                INT PRIMARY KEY,
+    taxa_juros_padrao NUMBER(5, 2) NOT NULL
 );
 
-CREATE TABLE PARCELAS_EMPRESTIMO (
-    ID INT NOT NULL PRIMARY KEY,
-    EMPRESTIMO_ID INT NOT NULL,
-    NUMERO_PARCELA INT NOT NULL,
-    VALOR_PARCELA NUMBER(15,2) NOT NULL,
-    DATA_VENCIMENTO DATE NOT NULL,
-    DATA_PAGAMENTO DATE,
-    STATUS VARCHAR2(20) DEFAULT 'PENDENTE' CHECK (STATUS IN ('PENDENTE', 'PAGO', 'ATRASADO')),
-    CONSTRAINT FK_PARCELAS_EMPRESTIMO FOREIGN KEY (EMPRESTIMO_ID) REFERENCES EMPRESTIMOS(ID)
+CREATE TABLE emprestimos (
+    id                    INT NOT NULL PRIMARY KEY,
+    conta_id              INT NOT NULL,
+    valor_emprestimo      NUMBER(10, 2) NOT NULL,
+    taxa_juros_mensal     NUMBER(5, 2) NOT NULL,
+    parcelas              INT NOT NULL,
+    status                VARCHAR2(30) DEFAULT 'SIMULADO' CHECK ( status IN ( 'SIMULADO', 'SOLICITADO', 'APROVADO', 'REJEITADO', 'EM_ANDAMENTO', 'QUITADO' ) ),
+    data_solicitacao      DATE DEFAULT sysdate,
+    data_aprovacao        DATE,
+    data_ultimo_pagamento DATE,
+    CONSTRAINT fk_emprestimo_conta FOREIGN KEY ( conta_id ) REFERENCES contas ( id ),
+    CONSTRAINT uk_emprestimo_duplicado UNIQUE ( conta_id, valor_emprestimo, parcelas, taxa_juros_mensal )
 );
 
-
-CREATE SEQUENCE SEQ_USUARIOS START WITH 1 INCREMENT BY 1 NOCACHE NOCYCLE;
-CREATE SEQUENCE SEQ_CONTA START WITH 1000 INCREMENT BY 1 NOCACHE NOCYCLE;
-CREATE SEQUENCE SEQ_MOVIMENTACOES START WITH 1 INCREMENT BY 1 NOCACHE NOCYCLE;
-CREATE SEQUENCE SEQ_INVESTIMENTOS START WITH 1 INCREMENT BY 1 NOCACHE NOCYCLE;
-CREATE SEQUENCE SEQ_EMPRESTIMOS START WITH 1 INCREMENT BY 1 NOCACHE NOCYCLE;
-CREATE SEQUENCE SEQ_PARCELAS_EMPRESTIMO START WITH 1 INCREMENT BY 1 NOCACHE NOCYCLE;
-CREATE SEQUENCE SEQ_NUM_CONTA START WITH 1 INCREMENT BY 1 NOCACHE NOCYCLE;
-
-
-
-INSERT INTO USUARIOS (
-    ID,
-    NOME,
-    EMAIL,
-    SENHA,
-    TELEFONE,
-    ENDERECO,
-    PERFIL,
-    STATUS,
-    DATA_CRIACAO,
-    DATA_ULTIMA_ATUALIZACAO
-) VALUES (
-    SEQ_USUARIOS.NEXTVAL,
-    'Miguel Batista',
-    'miguel.batista@gerente.com',
-    'SenhaSegura123',
-    '(11) 98765-4321',
-    'Rua Exemplo, 123, São Paulo, SP',
-    'GERENTE',
-    'ATIVO',
-    CURRENT_TIMESTAMP,
-    CURRENT_TIMESTAMP
+CREATE TABLE parcelas_emprestimo (
+    id                INT NOT NULL PRIMARY KEY,
+    emprestimo_id     INT NOT NULL,
+    numero_parcela    INT NOT NULL,
+    valor_amortizacao NUMBER(15, 2),
+    valor_juros       NUMBER(15, 2),
+    valor_parcela     NUMBER(15, 2) NOT NULL,
+    data_vencimento   DATE NOT NULL,
+    data_pagamento    DATE,
+    status            VARCHAR2(20) DEFAULT 'PENDENTE' CHECK ( status IN ( 'PENDENTE', 'PAGO', 'ATRASADO' ) ),
+    CONSTRAINT fk_parcelas_emprestimo FOREIGN KEY ( emprestimo_id )
+        REFERENCES emprestimos ( id )
 );
 
-INSERT INTO CONTAS (
-    ID,
-    AGENCIA,
-    NUMERO_CONTA,
-    USUARIO_ID,
-    SALDO,
-    TIPO,
-    STATUS,
-    DATA_CRIACAO
-) VALUES (
-    SEQ_CONTA.NEXTVAL,
-    0001,
-    SEQ_NUM_CONTA.NEXTVAL,
-    (SELECT ID FROM USUARIOS WHERE EMAIL = 'miguel.batista@gerente.com'),
-    5000.00,
-    'CORRENTE',
-    'ATIVA',
-    CURRENT_TIMESTAMP
-);
+CREATE SEQUENCE seq_usuarios START WITH 1 INCREMENT BY 1 NOCACHE NOCYCLE;
 
+CREATE SEQUENCE seq_contas START WITH 1000 INCREMENT BY 1 NOCACHE NOCYCLE;
 
+CREATE SEQUENCE seq_movimentacoes START WITH 1 INCREMENT BY 1 NOCACHE NOCYCLE;
 
-INSERT INTO USUARIOS (
-    ID,
-    NOME,
-    EMAIL,
-    SENHA,
-    TELEFONE,
-    ENDERECO,
-    PERFIL,
-    STATUS,
-    DATA_CRIACAO,
-    DATA_ULTIMA_ATUALIZACAO
-) VALUES (
-    SEQ_USUARIOS.NEXTVAL,
-    'Miguel Batista',
-    '123@123',
-    '123',
-    '(11) 98765-4321',
-    'Rua Exemplo, 123, São Paulo, SP',
-    'GERENTE',
-    'ATIVO',
-    CURRENT_TIMESTAMP,
-    CURRENT_TIMESTAMP
-);
+CREATE SEQUENCE seq_investimentos START WITH 1 INCREMENT BY 1 NOCACHE NOCYCLE;
 
-INSERT INTO USUARIOS (ID, NOME, EMAIL, SENHA, TELEFONE, ENDERECO, PERFIL, STATUS)
-VALUES (
-    SEQ_USUARIOS.NEXTVAL,
-    'Ana Silva',
-    'ana@cliente.com',
-    '123456',
-    '(11) 90000-0000',
-    'Rua Teste, 10',
-    'CLIENTE',
-    'ATIVO'
-);
+CREATE SEQUENCE seq_config_emprestimo START WITH 1 INCREMENT BY 1 NOCACHE NOCYCLE;
 
-INSERT INTO CONTAS (ID, AGENCIA, NUMERO_CONTA, USUARIO_ID, SALDO, TIPO, STATUS)
-VALUES (
-    SEQ_CONTAS.NEXTVAL,
-    0001,
-    SEQ_NUM_CONTA.NEXTVAL,
-    (SELECT ID FROM USUARIOS WHERE EMAIL = 'ana@cliente.com'),
-    1000.00,
-    'CORRENTE',
-    'ATIVA'
-);
+CREATE SEQUENCE seq_emprestimos START WITH 1 INCREMENT BY 1 NOCACHE NOCYCLE;
 
-INSERT INTO MOVIMENTACOES (ID, CONTA_ORIGEM_ID, CONTA_DESTINO_ID, VALOR, TIPO, STATUS, DESCRICAO)
-VALUES (
-    SEQ_MOVIMENTACOES.NEXTVAL,
-    (SELECT ID FROM CONTAS WHERE USUARIO_ID = (SELECT ID FROM USUARIOS WHERE EMAIL = 'miguel.batista@gerente.com')),
-    (SELECT ID FROM CONTAS WHERE USUARIO_ID = (SELECT ID FROM USUARIOS WHERE EMAIL = 'ana@cliente.com')),
-    100.00,
-    'TRANSFERENCIA',
-    'CONCLUIDA',
-    'Pagamento Almoco'
-);
+CREATE SEQUENCE seq_parcelas_emprestimo START WITH 1 INCREMENT BY 1 NOCACHE NOCYCLE;
 
-INSERT INTO INVESTIMENTOS (ID, CONTA_ID, TIPO_INVESTIMENTO, VALOR_INVESTIDO, DATA_INICIO, STATUS)
-VALUES (
-    SEQ_INVESTIMENTOS.NEXTVAL,
-    (SELECT ID FROM CONTAS WHERE USUARIO_ID = (SELECT ID FROM USUARIOS WHERE EMAIL = 'ana@cliente.com')),
-    'CDB',
-    500.00,
-    SYSDATE,
-    'ATIVO'
-);
+CREATE SEQUENCE seq_num_conta START WITH 1 INCREMENT BY 1 NOCACHE NOCYCLE;
 
-INSERT INTO EMPRESTIMOS (ID, CONTA_ID, VALOR_EMPRESTIMO, JUROS, PARCELAS, STATUS, DATA_APROVACAO)
-VALUES (
-    SEQ_EMPRESTIMOS.NEXTVAL,
-    (SELECT ID FROM CONTAS WHERE USUARIO_ID = (SELECT ID FROM USUARIOS WHERE EMAIL = 'ana@cliente.com')),
-    1000.00,
-    100.00,
-    2,
-    'APROVADO',
-    SYSDATE
-);
+INSERT INTO usuarios (
+    id,
+    nome,
+    email,
+    senha,
+    telefone,
+    endereco,
+    perfil,
+    status
+) VALUES ( seq_usuarios.NEXTVAL,
+           'Miguel Batista',
+           'miguel.batista@gerente.com',
+           'SenhaSegura123',
+           '(11) 98765-4321',
+           'Rua Exemplo, 123, São Paulo, SP',
+           'GERENTE',
+           'ATIVO' );
 
-INSERT INTO PARCELAS_EMPRESTIMO (ID, EMPRESTIMO_ID, NUMERO_PARCELA, VALOR_PARCELA, DATA_VENCIMENTO, STATUS)
-VALUES (
-    SEQ_PARCELAS_EMPRESTIMO.NEXTVAL,
-    SEQ_EMPRESTIMOS.CURRVAL,
-    1,
-    550.00,
-    SYSDATE + 30,
-    'PENDENTE'
-);
+INSERT INTO contas (
+    id,
+    agencia,
+    numero_conta,
+    usuario_id,
+    saldo,
+    tipo,
+    status
+) VALUES ( seq_contas.NEXTVAL,
+           0001,
+           seq_num_conta.NEXTVAL,
+           (
+               SELECT
+                   id
+               FROM
+                   usuarios
+               WHERE
+                   email = 'miguel.batista@gerente.com'
+           ),
+           5000.00,
+           'CORRENTE',
+           'ATIVA' );
 
-INSERT INTO PARCELAS_EMPRESTIMO (ID, EMPRESTIMO_ID, NUMERO_PARCELA, VALOR_PARCELA, DATA_VENCIMENTO, STATUS)
-VALUES (
-    SEQ_PARCELAS_EMPRESTIMO.NEXTVAL,
-    SEQ_EMPRESTIMOS.CURRVAL,
-    2,
-    550.00,
-    SYSDATE + 60,
-    'PENDENTE'
-);
+INSERT INTO usuarios (
+    id,
+    nome,
+    email,
+    senha,
+    telefone,
+    endereco,
+    perfil,
+    status
+) VALUES ( seq_usuarios.NEXTVAL,
+           'Miguel Batista Teste',
+           '123@123',
+           '123',
+           '(11) 98765-4321',
+           'Rua Exemplo, 123, São Paulo, SP',
+           'GERENTE',
+           'ATIVO' );
+
+INSERT INTO usuarios (
+    id,
+    nome,
+    email,
+    senha,
+    telefone,
+    endereco,
+    perfil,
+    status
+) VALUES ( seq_usuarios.NEXTVAL,
+           'Ana Silva',
+           'ana@cliente.com',
+           '123456',
+           '(11) 90000-0000',
+           'Rua Teste, 10',
+           'CLIENTE',
+           'ATIVO' );
+
+INSERT INTO contas (
+    id,
+    agencia,
+    numero_conta,
+    usuario_id,
+    saldo,
+    tipo,
+    status
+) VALUES ( seq_contas.NEXTVAL,
+           0001,
+           seq_num_conta.NEXTVAL,
+           (
+               SELECT
+                   id
+               FROM
+                   usuarios
+               WHERE
+                   email = 'ana@cliente.com'
+           ),
+           1000.00,
+           'CORRENTE',
+           'ATIVA' );
+
+INSERT INTO movimentacoes (
+    id,
+    conta_origem_id,
+    conta_destino_id,
+    valor,
+    tipo,
+    status,
+    descricao
+) VALUES ( seq_movimentacoes.NEXTVAL,
+           (
+               SELECT
+                   id
+               FROM
+                   contas
+               WHERE
+                   usuario_id = (
+                       SELECT
+                           id
+                       FROM
+                           usuarios
+                       WHERE
+                           email = 'miguel.batista@gerente.com'
+                   )
+           ),
+           (
+               SELECT
+                   id
+               FROM
+                   contas
+               WHERE
+                   usuario_id = (
+                       SELECT
+                           id
+                       FROM
+                           usuarios
+                       WHERE
+                           email = 'ana@cliente.com'
+                   )
+           ),
+           100.00,
+           'TRANSFERENCIA',
+           'CONCLUIDA',
+           'Pagamento Almoco' );
+
+INSERT INTO investimentos (
+    id,
+    conta_id,
+    tipo_investimento,
+    valor_investido,
+    data_inicio,
+    status
+) VALUES ( seq_investimentos.NEXTVAL,
+           (
+               SELECT
+                   id
+               FROM
+                   contas
+               WHERE
+                   usuario_id = (
+                       SELECT
+                           id
+                       FROM
+                           usuarios
+                       WHERE
+                           email = 'ana@cliente.com'
+                   )
+           ),
+           'CDB',
+           500.00,
+           sysdate,
+           'ATIVO' );
+
+INSERT INTO config_emprestimo (
+    id,
+    taxa_juros_padrao
+) VALUES ( seq_config_emprestimo.NEXTVAL,
+           1.99 );
 
 COMMIT;

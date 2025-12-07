@@ -14,46 +14,46 @@ import jakarta.servlet.http.HttpSession;
 
 public class TransferenciaCommand implements Command {
 
-    @Override
-    public void execute(HttpServletRequest request, HttpServletResponse response) {
-        RequestDispatcher rd;
+	@Override
+	public void execute(HttpServletRequest request, HttpServletResponse response) {
+		RequestDispatcher rd;
 
-        try {
-            int numeroDestino = Integer.parseInt(request.getParameter("contaDestino"));
-            BigDecimal valor = new BigDecimal(request.getParameter("valor"));
+		try {
+			int numeroDestino = Integer.parseInt(request.getParameter("contaDestino"));
+			BigDecimal valor = new BigDecimal(request.getParameter("valor"));
 
-            HttpSession session = request.getSession();
-            Conta contaOrigem = (Conta) session.getAttribute("conta");
+			HttpSession session = request.getSession();
+			Conta contaOrigem = (Conta) session.getAttribute("conta");
 
-            if (contaOrigem == null) {
-                throw new Exception("Sessão expirada. Faça login novamente.");
-            }
+			if (contaOrigem == null) {
+				throw new Exception("Sessão expirada. Faça login novamente.");
+			}
 
-            MovimentacaoSERVICE service = new MovimentacaoSERVICE();
-            service.realizarTransferencia(contaOrigem, numeroDestino, valor);
+			MovimentacaoSERVICE service = new MovimentacaoSERVICE();
+			service.realizarTransferencia(contaOrigem, numeroDestino, valor);
 
-            ContaDAO contaDAO = new ContaDAO();
-            Conta contaAtualizada = contaDAO.buscarPorNumero(contaOrigem.getNumero_conta());
-            
-            session.setAttribute("conta", contaAtualizada);
-            session.setAttribute("saldoConta", contaAtualizada.getSaldo());
+			ContaDAO contaDAO = new ContaDAO();
+			Conta contaAtualizada = contaDAO.buscarPorNumero(contaOrigem.getNumero_conta());
 
-            request.setAttribute("msg", "Transferência de R$ " + valor + " realizada com sucesso!");
-            rd = request.getRequestDispatcher("/app/movimentacao/sucesso.jsp");
+			session.setAttribute("conta", contaAtualizada);
+			session.setAttribute("saldoConta", contaAtualizada.getSaldo());
 
-        } catch (NumberFormatException e) {
-            request.setAttribute("erro", "Formato de valor ou conta inválido.");
-            rd = request.getRequestDispatcher("/app/movimentacao/erro.jsp");
-        } catch (Exception e) {
-            e.printStackTrace();
-            request.setAttribute("erro", e.getMessage());
-            rd = request.getRequestDispatcher("/app/movimentacao/erro.jsp");
-        }
+			request.setAttribute("msg", "Transferência de R$ " + valor + " realizada com sucesso!");
+			rd = request.getRequestDispatcher("/app/movimentacao/sucesso.jsp");
 
-        try {
-            rd.forward(request, response);
-        } catch (ServletException | IOException e) {
-            e.printStackTrace();
-        }
-    }
+		} catch (NumberFormatException e) {
+			request.setAttribute("erro", "Formato de valor ou conta inválido.");
+			rd = request.getRequestDispatcher("/app/movimentacao/erro.jsp");
+		} catch (Exception e) {
+			e.printStackTrace();
+			request.setAttribute("erro", e.getMessage());
+			rd = request.getRequestDispatcher("/app/movimentacao/erro.jsp");
+		}
+
+		try {
+			rd.forward(request, response);
+		} catch (ServletException | IOException e) {
+			e.printStackTrace();
+		}
+	}
 }

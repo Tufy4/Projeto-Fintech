@@ -6,8 +6,8 @@ public enum StatusInvestimento {
 	private String valor;
 
 	StatusInvestimento(String valor) {
-	        this.valor = valor;
-	    }
+		this.valor = valor;
+	}
 
 	public String getValor() {
 		return valor;

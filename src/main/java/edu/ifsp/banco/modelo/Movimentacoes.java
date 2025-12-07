@@ -63,7 +63,6 @@ public class Movimentacoes {
 		this.valor = valor;
 	}
 
-    
 	public TipoMovimentacao getTipo() {
 		return tipo;
 	}

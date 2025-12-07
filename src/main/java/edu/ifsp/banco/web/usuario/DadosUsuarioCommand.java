@@ -11,14 +11,14 @@ import jakarta.servlet.http.HttpSession;
 
 public class DadosUsuarioCommand implements Command {
 
-    @Override
-    public void execute(HttpServletRequest request, HttpServletResponse response) throws IOException {
-    	int id = Integer.parseInt(request.getParameter("id"));
-    	UsuarioDAO dao = new UsuarioDAO();
-    	Usuario user = dao.buscarPorId(id);
-    	
-    	HttpSession session = request.getSession(false);
-        session.setAttribute("userEditar", user);
-        response.sendRedirect("app/usuarios/EditarUser.jsp");
-    }
+	@Override
+	public void execute(HttpServletRequest request, HttpServletResponse response) throws IOException {
+		int id = Integer.parseInt(request.getParameter("id"));
+		UsuarioDAO dao = new UsuarioDAO();
+		Usuario user = dao.buscarPorId(id);
+
+		HttpSession session = request.getSession(false);
+		session.setAttribute("userEditar", user);
+		response.sendRedirect("app/usuarios/EditarUser.jsp");
+	}
 }

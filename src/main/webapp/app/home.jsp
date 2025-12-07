@@ -1,176 +1,205 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ page import="java.text.NumberFormat" %>
-<%@ page import="java.util.Locale" %>
-<%@ page import="java.math.BigDecimal" %>
-<%@page import="edu.ifsp.banco.persistencia.ContaDAO" %>
-<%@page import="edu.ifsp.banco.modelo.Usuario" %>
-<%@page import="edu.ifsp.banco.modelo.Conta" %>
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<%@page import="edu.ifsp.banco.modelo.Usuario"%>
+<%@page import="edu.ifsp.banco.modelo.Conta"%>
 <%
-	Usuario user = (Usuario) session.getAttribute("usuarioLogado");
-	Conta conta = (Conta) session.getAttribute("contaLogado");
-	ContaDAO dao = new ContaDAO();
-	
-	BigDecimal valor = conta.getSaldo();
-	
+Usuario user = (Usuario) session.getAttribute("usuarioLogado");
+Conta conta = (Conta) session.getAttribute("contaLogado");
+
+String nomeUsuario = (user != null) ? user.getNome() : "Cliente";
+String saldoFormatado = (conta != null) ? String.format("%.2f", conta.getSaldo()) : "0,00";
 %>
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BitPay | Minha Conta</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-    
-    <style>
-        body { 
-            background-color: #f8f9fa;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BitPay | Minha Conta</title>
+<link
+	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+	rel="stylesheet">
+<link rel="stylesheet"
+	href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
 
-        .hero-dashboard {
-            background: linear-gradient(135deg, rgba(0,0,0,0.8) 0%, rgba(13,110,253,0.6) 100%),
-                        url('https://images.unsplash.com/photo-1565514020176-dbf2277e4c73?auto=format&fit=crop&w=1920&q=80');
-            background-size: cover;
-            background-position: center;
-            color: white;
-            padding: 80px 0 120px 0;
-            margin-bottom: -60px;
-        }
+<style>
+body {
+	background-color: #f8f9fa;
+	font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
 
-        .op-card {
-            background: white;
-            border: none;
-            border-radius: 15px;
-            padding: 2rem;
-            text-align: center;
-            height: 100%;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
-            transition: all 0.3s ease;
-            text-decoration: none;
-            color: inherit;
-            display: block;
-        }
+.hero-dashboard {
+	background: linear-gradient(135deg, rgba(0, 0, 0, 0.8) 0%,
+		rgba(13, 110, 253, 0.6) 100%),
+		url('https://images.unsplash.com/photo-1565514020176-dbf2277e4c73?auto=format&fit=crop&w=1920&q=80');
+	background-size: cover;
+	background-position: center;
+	color: white;
+	padding: 80px 0 120px 0;
+	margin-bottom: -60px;
+}
 
-        .op-card:not(.disabled):hover {
-            transform: translateY(-10px);
-            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
-            color: #0d6efd;
-        }
+.op-card {
+	background: white;
+	border: none;
+	border-radius: 15px;
+	padding: 2rem;
+	text-align: center;
+	height: 100%;
+	box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+	transition: all 0.3s ease;
+	text-decoration: none;
+	color: inherit;
+	display: block;
+}
 
-        .op-card.disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            background-color: #e9ecef;
-        }
+.op-card:not(.disabled):hover {
+	transform: translateY(-10px);
+	box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+	color: #0d6efd;
+}
 
-        .op-icon {
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
-            color: #0d6efd;
-        }
+.op-card.disabled {
+	opacity: 0.6;
+	cursor: not-allowed;
+	background-color: #e9ecef;
+}
 
-        .op-card.disabled .op-icon {
-            color: #6c757d;
-        }
-    </style>
+.op-icon {
+	font-size: 2.5rem;
+	margin-bottom: 1rem;
+	color: #0d6efd;
+}
+
+.op-card.disabled .op-icon {
+	color: #6c757d;
+}
+</style>
 </head>
 <body>
 
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark py-3">
-        <div class="container">
-            <a class="navbar-brand fw-bold" href="#">BitPay <span class="badge bg-primary fs-6 ms-1">IB</span></a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
-                <ul class="navbar-nav gap-3 align-items-center">
-                    <li class="nav-item">
-                        <span class="nav-link text-white">Olá, 
-                            <strong>${sessionScope.usuarioLogado != null ? sessionScope.usuarioLogado.getNome() : 'Cliente'}</strong>
-                        </span>
-                    </li>
-                    <li class="nav-item">
-                        <a class="btn btn-outline-danger btn-sm rounded-pill px-3" 
-                           href="${pageContext.request.contextPath}/app?command=logout">Sair</a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
+	<nav class="navbar navbar-expand-lg navbar-dark bg-dark py-3">
+		<div class="container">
+			<a class="navbar-brand fw-bold" href="#">BitPay <span
+				class="badge bg-primary fs-6 ms-1">IB</span></a>
+			<button class="navbar-toggler" type="button"
+				data-bs-toggle="collapse" data-bs-target="#navbarNav">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+			<div class="collapse navbar-collapse justify-content-end"
+				id="navbarNav">
+				<ul class="navbar-nav gap-3 align-items-center">
+					<li class="nav-item"><span class="nav-link text-white">Olá,
+							<strong><%=nomeUsuario%></strong>
+					</span></li>
+					<li class="nav-item"><a
+						class="btn btn-outline-danger btn-sm rounded-pill px-3"
+						href="${pageContext.request.contextPath}/app?command=logout">Sair</a>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</nav>
 
-    <header class="hero-dashboard text-center">
-        <div class="container">
-            <p class="lead mb-1 text-white-50 text-uppercase small ls-1">Saldo Disponível</p>
-            <h1 class="display-1 fw-bold mb-4">R$ <%= valor%></h1>
-            
-            <div class="d-flex justify-content-center">
-                <a href="${pageContext.request.contextPath}/app?command=redirect&url=app/movimentacao/deposito.jsp" 
-                   class="btn btn-primary btn-lg rounded-pill px-5 shadow-lg">
-                   <i class="bi bi-plus-lg me-2"></i>Fazer Depósito
-                </a>
-            </div>
-        </div>
-    </header>
+	<header class="hero-dashboard text-center">
+		<div class="container">
+			<p class="lead mb-1 text-white-50 text-uppercase small ls-1">Saldo
+				Disponível</p>
+			<h1 class="display-1 fw-bold mb-4">
+				R$
+				<%=saldoFormatado%></h1>
 
-    <section class="container py-5">
-        <div class="row g-4 row-cols-1 row-cols-md-2 row-cols-lg-4">
+			<div class="d-flex justify-content-center">
+				<a
+					href="${pageContext.request.contextPath}/app?command=redirect&url=app/movimentacao/deposito.jsp"
+					class="btn btn-primary btn-lg rounded-pill px-5 shadow-lg"> <i
+					class="bi bi-plus-lg me-2"></i>Fazer Depósito
+				</a>
+			</div>
+		</div>
+	</header>
 
-            <div class="col">
-                <a href="${pageContext.request.contextPath}/app?command=redirect&url=app/movimentacao/deposito.jsp" class="op-card">
-                    <div class="op-icon"><i class="bi bi-wallet2"></i></div>
-                    <h3 class="h4 fw-bold">Depositar</h3>
-                    <p class="small text-muted mb-0">Adicione fundos à sua conta instantaneamente.</p>
-                </a>
-            </div>
+	<section class="container py-5">
+		<div class="row g-4 row-cols-1 row-cols-md-2 row-cols-lg-4">
 
-            <div class="col">
-                <a href="${pageContext.request.contextPath}/app/movimentacao/investir.jsp" class="op-card">
-                    <div class="op-icon"><i class="bi bi-graph-up-arrow"></i></div>
-                    <h3 class="h4 fw-bold">Investimentos</h3>
-                    <p class="small text-muted mb-0">Renda fixa e variável com liquidez diária.</p>
-                </a>
-            </div>
+			<div class="col">
+				<a
+					href="${pageContext.request.contextPath}/app?command=redirect&url=app/movimentacao/deposito.jsp"
+					class="op-card">
+					<div class="op-icon">
+						<i class="bi bi-wallet2"></i>
+					</div>
+					<h3 class="h4 fw-bold">Depositar</h3>
+					<p class="small text-muted mb-0">Adicione fundos à sua conta
+						instantaneamente.</p>
+				</a>
+			</div>
 
-            <div class="col">
-                <a href="${pageContext.request.contextPath}/app?command=redirect&url=app/movimentacao/transferencia.jsp" class="op-card">
-                    <div class="op-icon"><i class="bi bi-arrow-left-right"></i></div>
-                    <h3 class="h4 fw-bold">Transferir</h3>
-                    <p class="small text-muted mb-0">Envie dinheiro para outras contas.</p>
-                </a>
-            </div>
+			<div class="col">
+				<a
+					href="${pageContext.request.contextPath}/app/movimentacao/investir.jsp"
+					class="op-card">
+					<div class="op-icon">
+						<i class="bi bi-graph-up-arrow"></i>
+					</div>
+					<h3 class="h4 fw-bold">Investimentos</h3>
+					<p class="small text-muted mb-0">Renda fixa e variável com
+						liquidez diária.</p>
+				</a>
+			</div>
 
-            <div class="col">
-            	<a href="${pageContext.request.contextPath}/app">
-	                <div class="op-card disabled">
-	                    <div class="op-icon"><i class="bi bi-house-door"></i></div>
-	                    <h3 class="h4 fw-bold text-muted">Empréstimos</h3>
-	                    <p class="small text-muted mb-0">Simulação de crédito SAC (Em breve).</p>
-	                </div>
-                </a>
-            </div>
-            
-            
-            <div class="col">
-            	<a href="${pageContext.request.contextPath}/app?command=mostrarDadosUsuario&id=<%=conta.getUsuarioId() %>">
-	                <div class="op-card ">
-	                    <div class="op-icon"><i class="bi bi-house-door"></i></div>
-	                    <h3 class="h4 fw-bold text-muted">Editar usuario</h3>
-	                    <p class="small text-muted mb-0">Altere dados do usuario.</p>
-	                </div>
-                </a>
-            </div>
-            
-            
-            
-            
-		
-			<p>Conta: <%=conta.getNumero_conta() %></p>
-			<p>Agencia: <%=conta.getAgencia() %></p>
-		
-        </div>
-    </section>
+			<div class="col">
+				<a
+					href="${pageContext.request.contextPath}/app?command=redirect&url=app/movimentacao/transferencia.jsp"
+					class="op-card">
+					<div class="op-icon">
+						<i class="bi bi-arrow-left-right"></i>
+					</div>
+					<h3 class="h4 fw-bold">Transferir</h3>
+					<p class="small text-muted mb-0">Envie dinheiro para outras
+						contas.</p>
+				</a>
+			</div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+			<div class="col">
+				<a
+					href="${pageContext.request.contextPath}/app?command=prepararSimulacao"
+					class="op-card">
+					<div class="op-icon">
+						<i class="bi bi-house-door"></i>
+					</div>
+					<h3 class="h4 fw-bold">Empréstimos</h3>
+					<p class="small text-muted mb-0">Simulação de crédito SAC.</p>
+				</a>
+			</div>
+
+			<div class="col">
+				<a
+					href="${pageContext.request.contextPath}/app?command=mostrarDadosUsuario&id=<%=conta.getUsuarioId() %>">
+					<div class="op-card ">
+						<div class="op-icon">
+							<i class="bi bi-house-door"></i>
+						</div>
+						<h3 class="h4 fw-bold text-muted">Editar usuario</h3>
+						<p class="small text-muted mb-0">Altere dados do usuario.</p>
+					</div>
+				</a>
+			</div>
+
+
+
+
+
+			<p>
+				Conta:
+				<%=conta.getNumero_conta()%></p>
+			<p>
+				Agencia:
+				<%=conta.getAgencia()%></p>
+
+		</div>
+	</section>
+
+	<script
+		src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

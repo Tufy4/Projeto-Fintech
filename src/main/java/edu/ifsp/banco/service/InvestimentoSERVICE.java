@@ -61,7 +61,7 @@ public class InvestimentoSERVICE {
 		BigDecimal valorDevolvido = inv.getValorInvestido();
 
 		Conta conta = contaDAO.buscarPorNumero(inv.getIdConta());
-		
+
 		if (conta == null) {
 			throw new DataAccessException("Conta vinculada ao investimento não encontrada");
 		}
