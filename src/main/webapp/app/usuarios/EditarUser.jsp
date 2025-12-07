@@ -16,8 +16,12 @@ Usuario user = (Usuario) session.getAttribute("userEditar");
 %>
 <body>
 	<form action="">
-		<input type="text" value="<%=user.getEmail() %>">;
-		<label>EMail</label>
+		<label>Email</label>
+		<input type="text" value="<%=user.getEmail() %>">
+		
+		<label>Email</label>
+		<input type="text" value="<%=user.getEmail() %>">
+		
 	
 	</form>
 </body>

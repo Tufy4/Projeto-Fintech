@@ -23,7 +23,7 @@ public class AtualizarUsuarioCommand implements Command {
     	ContaDAO dao = new ContaDAO();
     	Conta conta = dao.buscarPorIdUsuario(id);
     	
-    	response.sendRedirect("app/admin/home.jsp");
+    	
     	
 
     }
