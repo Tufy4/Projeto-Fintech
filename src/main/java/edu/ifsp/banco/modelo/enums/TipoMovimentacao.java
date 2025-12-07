@@ -6,8 +6,8 @@ public enum TipoMovimentacao {
 	private String valor;
 
 	TipoMovimentacao(String valor) {
-        this.valor = valor;
-    }
+		this.valor = valor;
+	}
 
 	public String getValor() {
 		return valor;

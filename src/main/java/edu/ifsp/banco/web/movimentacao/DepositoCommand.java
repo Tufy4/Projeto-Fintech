@@ -3,6 +3,7 @@ package edu.ifsp.banco.web.movimentacao;
 import java.io.IOException;
 import java.math.BigDecimal;
 
+import edu.ifsp.banco.modelo.Conta;
 import edu.ifsp.banco.service.MovimentacaoSERVICE;
 import edu.ifsp.banco.web.Command;
 import jakarta.servlet.http.HttpServletRequest;
@@ -20,7 +21,13 @@ public class DepositoCommand implements Command {
 			BigDecimal valor = new BigDecimal(request.getParameter("valor"));
 
 			MovimentacaoSERVICE service = new MovimentacaoSERVICE();
-			service.depositar(idConta, valor);
+			Conta contaDestino = service.depositar(idConta, valor);
+			Conta contaLogado = (Conta) request.getSession().getAttribute("contaLogado");
+
+			if (contaLogado.getId() == contaDestino.getId()) {
+
+				request.getSession().setAttribute("contaLogado", contaDestino);
+			}
 
 			request.setAttribute("msg", "Depósito realizado com sucesso!");
 

@@ -12,64 +12,58 @@ import edu.ifsp.banco.persistencia.MovimentacaoDAO;
 
 public class MovimentacaoSERVICE {
 
-    private ContaDAO contaDAO = new ContaDAO();
-    private MovimentacaoDAO movimentacaoDAO = new MovimentacaoDAO();
+	private ContaDAO contaDAO = new ContaDAO();
+	private MovimentacaoDAO movimentacaoDAO = new MovimentacaoDAO();
 
-    public void depositar(int idConta, BigDecimal valor) throws DataAccessException {
-        Conta conta = contaDAO.buscarPorNumero(idConta);
-        if (conta == null) {
-            throw new DataAccessException("Conta não encontrada");
-        }
-        
-        BigDecimal novoSaldo = conta.getSaldo().add(valor);
-        contaDAO.atualizarSaldo(conta.getId(), novoSaldo.doubleValue());
+	public Conta depositar(int idConta, BigDecimal valor) throws DataAccessException {
+		Conta conta = contaDAO.buscarPorNumero(idConta);
+		if (conta == null) {
+			throw new DataAccessException("Conta não encontrada");
+		}
 
-        Movimentacoes mov = new Movimentacoes(0, conta.getId(), 0, valor, 
-                TipoMovimentacao.DEPOSITO, 
-                new Timestamp(System.currentTimeMillis()), 
-                "Depósito via App", 
-                StatusMovimentacao.CONCLUIDA);
-        
-        movimentacaoDAO.inserir(mov);
-    }
+		BigDecimal novoSaldo = conta.getSaldo().add(valor);
+		contaDAO.atualizarSaldo(conta.getId(), novoSaldo.doubleValue());
 
-    public void realizarTransferencia(Conta contaOrigem, int numeroContaDestino, BigDecimal valor) throws DataAccessException {
-        
-        if (valor.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new DataAccessException("Valor deve ser maior que zero.");
-        }
-        
-        if (contaOrigem.getSaldo().compareTo(valor) < 0) {
-            throw new DataAccessException("Saldo insuficiente.");
-        }
+		Movimentacoes mov = new Movimentacoes(0, conta.getId(), 0, valor, TipoMovimentacao.DEPOSITO,
+				new Timestamp(System.currentTimeMillis()), "Depósito via App", StatusMovimentacao.CONCLUIDA);
 
-        Conta contaDestino = contaDAO.buscarPorNumero(numeroContaDestino);
-        
-        if (contaDestino == null) {
-            throw new DataAccessException("Conta de destino não encontrada.");
-        }
+		movimentacaoDAO.inserir(mov);
+		conta.setSaldo(novoSaldo);
 
-        if (contaOrigem.getId() == contaDestino.getId()) {
-            throw new DataAccessException("Não é possível transferir para a mesma conta.");
-        }
+		return conta;
+	}
 
-        BigDecimal novoSaldoOrigem = contaOrigem.getSaldo().subtract(valor);
-        BigDecimal novoSaldoDestino = contaDestino.getSaldo().add(valor);
+	public void realizarTransferencia(Conta contaOrigem, int numeroContaDestino, BigDecimal valor)
+			throws DataAccessException {
 
-        contaDAO.atualizarSaldo(contaOrigem.getId(), novoSaldoOrigem.doubleValue());
-        contaDAO.atualizarSaldo(contaDestino.getId(), novoSaldoDestino.doubleValue());
+		if (valor.compareTo(BigDecimal.ZERO) <= 0) {
+			throw new DataAccessException("Valor deve ser maior que zero.");
+		}
 
-        Movimentacoes mov = new Movimentacoes(
-                0, 
-                contaOrigem.getId(), 
-                contaDestino.getId(), 
-                valor, 
-                TipoMovimentacao.TRANSFERENCIA, 
-                new Timestamp(System.currentTimeMillis()), 
-                "Transferência para " + numeroContaDestino, 
-                StatusMovimentacao.CONCLUIDA
-        );
-        
-        movimentacaoDAO.inserir(mov);
-    }
+		if (contaOrigem.getSaldo().compareTo(valor) < 0) {
+			throw new DataAccessException("Saldo insuficiente.");
+		}
+
+		Conta contaDestino = contaDAO.buscarPorNumero(numeroContaDestino);
+
+		if (contaDestino == null) {
+			throw new DataAccessException("Conta de destino não encontrada.");
+		}
+
+		if (contaOrigem.getId() == contaDestino.getId()) {
+			throw new DataAccessException("Não é possível transferir para a mesma conta.");
+		}
+
+		BigDecimal novoSaldoOrigem = contaOrigem.getSaldo().subtract(valor);
+		BigDecimal novoSaldoDestino = contaDestino.getSaldo().add(valor);
+
+		contaDAO.atualizarSaldo(contaOrigem.getId(), novoSaldoOrigem.doubleValue());
+		contaDAO.atualizarSaldo(contaDestino.getId(), novoSaldoDestino.doubleValue());
+
+		Movimentacoes mov = new Movimentacoes(0, contaOrigem.getId(), contaDestino.getId(), valor,
+				TipoMovimentacao.TRANSFERENCIA, new Timestamp(System.currentTimeMillis()),
+				"Transferência para " + numeroContaDestino, StatusMovimentacao.CONCLUIDA);
+
+		movimentacaoDAO.inserir(mov);
+	}
 }

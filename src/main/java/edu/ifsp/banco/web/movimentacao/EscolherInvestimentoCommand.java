@@ -9,24 +9,24 @@ import java.io.IOException;
 
 public class EscolherInvestimentoCommand implements Command {
 
-    @Override
-    public void execute(HttpServletRequest request, HttpServletResponse response) {
-        RequestDispatcher rd = null;
+	@Override
+	public void execute(HttpServletRequest request, HttpServletResponse response) {
+		RequestDispatcher rd = null;
 
-        try {
-            String produto = request.getParameter("produto");
-            request.setAttribute("produto", produto);
+		try {
+			String produto = request.getParameter("produto");
+			request.setAttribute("produto", produto);
 
-            rd = request.getRequestDispatcher("/app/movimentacao/investir-detalhe.jsp"); 
-        } catch (Exception e) {
-            request.setAttribute("erro", e.getMessage());
-            rd = request.getRequestDispatcher("/app/movimentacao/erro.jsp");
-        }
+			rd = request.getRequestDispatcher("/app/movimentacao/investir-detalhe.jsp");
+		} catch (Exception e) {
+			request.setAttribute("erro", e.getMessage());
+			rd = request.getRequestDispatcher("/app/movimentacao/erro.jsp");
+		}
 
-        try {
-            rd.forward(request, response);
-        } catch (ServletException | IOException e) {
-            e.printStackTrace();
-        }
-    }
+		try {
+			rd.forward(request, response);
+		} catch (ServletException | IOException e) {
+			e.printStackTrace();
+		}
+	}
 }

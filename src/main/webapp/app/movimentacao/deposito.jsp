@@ -136,10 +136,10 @@ sessionScope.usuarioLogado.getNome() : 'Cliente'}</strong>
 				action="${pageContext.request.contextPath}/app?command=depositar"
 				method="post">
 				<input type="hidden" name="command" value="Depositar"> <label
-					for="idConta">Numero da conta depositada: </label> <input type="number"
-					id="idConta" name="idConta" required> <label for="valor">Valor
-					(R$):</label> <input type="number" step="0.01" id="valor" name="valor"
-					required>
+					for="idConta">Numero da conta depositada: </label> <input
+					type="number" id="idConta" name="idConta" required> <label
+					for="valor">Valor (R$):</label> <input type="number" step="0.01"
+					id="valor" name="valor" required>
 
 				<p class="note">Digite o valor à ser depositado!</p>
 

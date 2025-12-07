@@ -2,6 +2,8 @@ package edu.ifsp.banco.modelo;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
+import java.util.List;
+import java.util.ArrayList;
 
 import edu.ifsp.banco.modelo.enums.StatusEmprestimo;
 
@@ -9,26 +11,32 @@ public class Emprestimo {
 	private int id;
 	private int conta_id;
 	private BigDecimal valor_emprestimo;
-	private BigDecimal juros;
+	private BigDecimal taxa_juros_mensal;
 	private int parcelas;
 	private StatusEmprestimo status;
 	private Timestamp data_solicitacao;
 	private Timestamp data_aprovacao;
 	private Timestamp data_ultimo_pagamento;
 
-	public Emprestimo(int id, int conta_id, BigDecimal valor_emprestimo, BigDecimal juros, int parcelas,
-			StatusEmprestimo status, Timestamp data_solicitacao, Timestamp data_aprovacao,
-			Timestamp data_ultimo_pagamento) {
-		super();
+	private List<ParcelaEmprestimo> listaParcelas = new ArrayList<>();
+
+	public Emprestimo(int id, int conta_id, BigDecimal valor_emprestimo, BigDecimal taxa_juros_mensal, int parcelas,
+			StatusEmprestimo status, Timestamp data_solicitacao) {
 		this.id = id;
 		this.conta_id = conta_id;
 		this.valor_emprestimo = valor_emprestimo;
-		this.juros = juros;
+		this.taxa_juros_mensal = taxa_juros_mensal;
 		this.parcelas = parcelas;
 		this.status = status;
 		this.data_solicitacao = data_solicitacao;
-		this.data_aprovacao = data_aprovacao;
-		this.data_ultimo_pagamento = data_ultimo_pagamento;
+	}
+
+	public BigDecimal getTaxa_juros_mensal() {
+		return taxa_juros_mensal;
+	}
+
+	public void setTaxa_juros_mensal(BigDecimal taxa_juros_mensal) {
+		this.taxa_juros_mensal = taxa_juros_mensal;
 	}
 
 	public int getId() {
@@ -53,14 +61,6 @@ public class Emprestimo {
 
 	public void setValor_emprestimo(BigDecimal valor_emprestimo) {
 		this.valor_emprestimo = valor_emprestimo;
-	}
-
-	public BigDecimal getJuros() {
-		return juros;
-	}
-
-	public void setJuros(BigDecimal juros) {
-		this.juros = juros;
 	}
 
 	public int getParcelas() {
@@ -101,6 +101,14 @@ public class Emprestimo {
 
 	public void setData_ultimo_pagamento(Timestamp data_ultimo_pagamento) {
 		this.data_ultimo_pagamento = data_ultimo_pagamento;
+	}
+
+	public List<ParcelaEmprestimo> getListaParcelas() {
+		return listaParcelas;
+	}
+
+	public void setListaParcelas(List<ParcelaEmprestimo> listaParcelas) {
+		this.listaParcelas = listaParcelas;
 	}
 
 }

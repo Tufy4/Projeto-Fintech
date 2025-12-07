@@ -41,7 +41,7 @@ public class LoginCommand implements Command {
             	response.sendRedirect("app/admin/home.jsp");
             }
             else {
-            	response.sendRedirect("app/home.jsp");
+            	response.sendRedirect("app?command=dashboardCliente");
             }
 
         } catch (Exception e) {

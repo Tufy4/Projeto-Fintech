@@ -17,45 +17,44 @@ import jakarta.servlet.http.HttpSession;
 
 public class MeusInvestimentosCommand implements Command {
 
-    @Override
-    public void execute(HttpServletRequest request, HttpServletResponse response) {
-        RequestDispatcher rd;
+	@Override
+	public void execute(HttpServletRequest request, HttpServletResponse response) {
+		RequestDispatcher rd;
 
-        try {
-            HttpSession session = request.getSession();
-            Conta conta = (Conta) session.getAttribute("conta");
+		try {
+			HttpSession session = request.getSession();
+			Conta conta = (Conta) session.getAttribute("conta");
 
-            if (conta == null) {
- 
-                response.sendRedirect("index.jsp");
-                return;
-            }
+			if (conta == null) {
 
-            InvestimentoSERVICE service = new InvestimentoSERVICE();
-            List<Investimento> investimentos = service.listarPorConta(conta.getId());
-            
-            
-            BigDecimal totalInvestido = BigDecimal.ZERO;
-            for (Investimento inv : investimentos) {
-                if (inv.getStatus() == StatusInvestimento.ATIVO) {
-                    totalInvestido = totalInvestido.add(inv.getValorInvestido());
-                }
-            }
+				response.sendRedirect("index.jsp");
+				return;
+			}
 
-            request.setAttribute("investimentos", investimentos);
-            request.setAttribute("totalInvestido", totalInvestido);
+			InvestimentoSERVICE service = new InvestimentoSERVICE();
+			List<Investimento> investimentos = service.listarPorConta(conta.getId());
 
-            rd = request.getRequestDispatcher("/app/movimentacao/meus-investimentos.jsp");
-            rd.forward(request, response);
+			BigDecimal totalInvestido = BigDecimal.ZERO;
+			for (Investimento inv : investimentos) {
+				if (inv.getStatus() == StatusInvestimento.ATIVO) {
+					totalInvestido = totalInvestido.add(inv.getValorInvestido());
+				}
+			}
 
-        } catch (Exception e) {
-            e.printStackTrace();
-            request.setAttribute("erro", "Erro ao carregar investimentos: " + e.getMessage());
-            try {
-                request.getRequestDispatcher("/app/movimentacao/erro.jsp").forward(request, response);
-            } catch (ServletException | IOException ex) {
-                ex.printStackTrace();
-            }
-        }
-    }
+			request.setAttribute("investimentos", investimentos);
+			request.setAttribute("totalInvestido", totalInvestido);
+
+			rd = request.getRequestDispatcher("/app/movimentacao/meus-investimentos.jsp");
+			rd.forward(request, response);
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			request.setAttribute("erro", "Erro ao carregar investimentos: " + e.getMessage());
+			try {
+				request.getRequestDispatcher("/app/movimentacao/erro.jsp").forward(request, response);
+			} catch (ServletException | IOException ex) {
+				ex.printStackTrace();
+			}
+		}
+	}
 }

@@ -6,8 +6,8 @@ public enum StatusConta {
 	private String valor;
 
 	StatusConta(String valor) {
-	        this.valor = valor;
-	    }
+		this.valor = valor;
+	}
 
 	public String getValor() {
 		return valor;
