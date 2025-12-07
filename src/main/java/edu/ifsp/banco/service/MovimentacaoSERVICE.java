@@ -1,7 +1,11 @@
 package edu.ifsp.banco.service;
 
 import java.math.BigDecimal;
+import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
+
 import edu.ifsp.banco.modelo.Conta;
 import edu.ifsp.banco.modelo.Movimentacoes;
 import edu.ifsp.banco.modelo.enums.StatusMovimentacao;
@@ -65,5 +69,15 @@ public class MovimentacaoSERVICE {
 				"Transferência para " + numeroContaDestino, StatusMovimentacao.CONCLUIDA);
 
 		movimentacaoDAO.inserir(mov);
+	}
+	
+	public List<Movimentacoes> consultarExtrato(int idConta) throws DataAccessException {
+	    try {
+			return movimentacaoDAO.listarMovimentacoes(idConta);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	    return new ArrayList<>();
 	}
 }

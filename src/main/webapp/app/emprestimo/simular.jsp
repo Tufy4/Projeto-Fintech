@@ -91,7 +91,7 @@ body {
 
 						<div class="mb-4">
 							<h3 class="form-label fw-bold">
-								Taxa de Juros (arequest.getSession().getAttribute("taxaPadrao")te("taxaPadrao") %></h3>
+								Taxa de Juros <%= request.getSession().getAttribute("taxaPadrao") %>% a.m.</h3>
 						</div>
 
 						<div class="d-grid">

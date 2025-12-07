@@ -6,13 +6,19 @@ import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+
+import edu.ifsp.banco.modelo.Conta;
+import edu.ifsp.banco.modelo.Movimentacoes;
 import edu.ifsp.banco.modelo.Emprestimo;
 import edu.ifsp.banco.modelo.ParcelaEmprestimo;
 import edu.ifsp.banco.modelo.enums.StatusEmprestimo;
+import edu.ifsp.banco.modelo.enums.StatusMovimentacao;
 import edu.ifsp.banco.modelo.enums.StatusParcela;
+import edu.ifsp.banco.modelo.enums.TipoMovimentacao;
 import edu.ifsp.banco.persistencia.ContaDAO;
 import edu.ifsp.banco.persistencia.DataAccessException;
 import edu.ifsp.banco.persistencia.EmprestimoDAO;
+import edu.ifsp.banco.persistencia.MovimentacaoDAO;
 import edu.ifsp.banco.persistencia.ParcelaEmprestimoDAO;
 
 public class EmprestimoSERVICE {
@@ -20,11 +26,13 @@ public class EmprestimoSERVICE {
 	private EmprestimoDAO emprestimoDAO;
 	private ParcelaEmprestimoDAO parcelaDAO;
 	private ContaDAO contaDAO;
+	private MovimentacaoDAO movimentacaoDAO;
 
 	public EmprestimoSERVICE() {
 		this.emprestimoDAO = new EmprestimoDAO();
 		this.parcelaDAO = new ParcelaEmprestimoDAO();
 		this.contaDAO = new ContaDAO();
+		this.movimentacaoDAO = new MovimentacaoDAO();
 	}
 
 	public List<ParcelaEmprestimo> simularCondicoes(BigDecimal valor, int parcelas, BigDecimal taxaJuros) {
@@ -32,13 +40,24 @@ public class EmprestimoSERVICE {
 		return calcularCronogramaSAC(temp);
 	}
 
+	public List<Emprestimo> buscarPorConta(int idConta) throws Exception {
+		try {
+			List<Emprestimo> emprestimos = emprestimoDAO.listarPorConta(idConta);
+			for (Emprestimo emp : emprestimos) {
+				List<ParcelaEmprestimo> parcelas = parcelaDAO.listarPorEmprestimo(emp.getId());
+				emp.setListaParcelas(parcelas);
+			}
+			return emprestimos;
+		} catch (DataAccessException e) {
+			throw new Exception("Erro ao buscar empréstimos do cliente.");
+		}
+	}
+
 	public void solicitarEmprestimo(Emprestimo emp) throws Exception {
 		validarDadosIniciais(emp);
 
-		// Regra de Negócio: Quem define o status inicial é o Service
 		emp.setStatus(StatusEmprestimo.SOLICITADO);
 
-		// Regra de Negócio: Data de solicitação é AGORA
 		emp.setData_solicitacao(new Timestamp(System.currentTimeMillis()));
 
 		try {
@@ -79,21 +98,47 @@ public class EmprestimoSERVICE {
 
 	public void pagarParcela(int idParcela) throws Exception {
 		ParcelaEmprestimo parcela = parcelaDAO.buscarPorId(idParcela);
-
 		if (parcela == null)
 			throw new Exception("Parcela não encontrada.");
+
 		if (parcela.getStatus() == StatusParcela.PAGO)
 			throw new Exception("Esta parcela já foi paga.");
 
+		Emprestimo emprestimo = emprestimoDAO.buscarPorId(parcela.getEmprestimoId());
+		if (emprestimo == null)
+			throw new Exception("Empréstimo vinculado não encontrado.");
+
+		Conta conta = contaDAO.buscarPorId(emprestimo.getConta_id());
+		if (conta == null)
+			throw new Exception("Conta do cliente não encontrada.");
+
+		BigDecimal valorPagamento = parcela.getValorParcela();
+		if (conta.getSaldo().compareTo(valorPagamento) < 0) {
+			throw new Exception("Saldo insuficiente para pagar esta parcela.");
+		}
+
 		try {
+			BigDecimal novoSaldo = conta.getSaldo().subtract(valorPagamento);
+			conta.setSaldo(novoSaldo);
+			contaDAO.atualizarSaldo(conta.getId(), novoSaldo.doubleValue());
+
+			Movimentacoes mov = new Movimentacoes();
+			mov.setContaOrigemId(conta.getId());
+			mov.setValor(valorPagamento);
+			mov.setTipo(TipoMovimentacao.SAQUE);
+			mov.setDescricao("Pagamento Empréstimo #" + emprestimo.getId() + " - Parc. " + parcela.getNumeroParcela());
+			mov.setDataTransacao(new Timestamp(System.currentTimeMillis()));
+			mov.setStatus(StatusMovimentacao.CONCLUIDA);
+
+			movimentacaoDAO.inserir(mov);
 
 			parcelaDAO.pagarParcela(idParcela);
-			emprestimoDAO.registrarPagamento(parcela.getEmprestimoId(), new Timestamp(System.currentTimeMillis()));
 
+			emprestimoDAO.registrarPagamento(parcela.getEmprestimoId(), new Timestamp(System.currentTimeMillis()));
 			verificarQuitacao(parcela.getEmprestimoId());
 
 		} catch (DataAccessException e) {
-			throw new Exception("Erro ao processar pagamento da parcela.");
+			throw new Exception("Erro técnico ao processar pagamento: " + e.getMessage());
 		}
 	}
 

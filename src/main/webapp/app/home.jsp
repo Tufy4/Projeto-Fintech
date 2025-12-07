@@ -1,7 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
-<%@page import="edu.ifsp.banco.modelo.Usuario"%>
-<%@page import="edu.ifsp.banco.modelo.Conta"%>
+<%@ page import="edu.ifsp.banco.modelo.Usuario"%>
+<%@ page import="edu.ifsp.banco.modelo.Conta"%>
 <%
 Usuario user = (Usuario) session.getAttribute("usuarioLogado");
 Conta conta = (Conta) session.getAttribute("contaLogado");
@@ -122,6 +122,18 @@ body {
 		<div class="row g-4 row-cols-1 row-cols-md-2 row-cols-lg-4">
 
 			<div class="col">
+				<a href="${pageContext.request.contextPath}/app?command=extrato"
+					class="op-card">
+					<div class="op-icon">
+						<i class="bi bi-receipt"></i>
+					</div>
+					<h3 class="h4 fw-bold">Extrato</h3>
+					<p class="small text-muted mb-0">Consulte histórico de
+						movimentações.</p>
+				</a>
+			</div>
+
+			<div class="col">
 				<a
 					href="${pageContext.request.contextPath}/app?command=redirect&url=app/movimentacao/deposito.jsp"
 					class="op-card">
@@ -162,7 +174,7 @@ body {
 
 			<div class="col">
 				<a
-					href="${pageContext.request.contextPath}/app?command=prepararSimulacao"
+					href="${pageContext.request.contextPath}/app?command=meusEmprestimos"
 					class="op-card">
 					<div class="op-icon">
 						<i class="bi bi-house-door"></i>
@@ -177,26 +189,22 @@ body {
 					href="${pageContext.request.contextPath}/app?command=mostrarDadosUsuario&id=<%=conta.getUsuarioId() %>">
 					<div class="op-card ">
 						<div class="op-icon">
-							<i class="bi bi-house-door"></i>
+							<i class="bi bi-person-gear"></i>
 						</div>
-						<h3 class="h4 fw-bold text-muted">Editar usuario</h3>
-						<p class="small text-muted mb-0">Altere dados do usuario.</p>
+						<h3 class="h4 fw-bold text-muted">Editar Usuário</h3>
+						<p class="small text-muted mb-0">Altere dados cadastrais.</p>
 					</div>
 				</a>
 			</div>
 
-
-
-
-
-			<p>
-				Conta:
-				<%=conta.getNumero_conta()%></p>
-			<p>
-				Agencia:
-				<%=conta.getAgencia()%></p>
-
 		</div>
+
+		<div class="mt-5 text-center text-muted small">
+			<p>
+				Conta: <strong><%=conta.getNumero_conta()%></strong> | Agência: <strong><%=conta.getAgencia()%></strong>
+			</p>
+		</div>
+
 	</section>
 
 	<script

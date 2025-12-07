@@ -19,6 +19,7 @@ public class PagarParcelaCommand implements Command {
 
 			EmprestimoSERVICE service = new EmprestimoSERVICE();
 			service.pagarParcela(idParcela);
+			request.getSession().setAttribute("contaLogado", null);
 
 			request.setAttribute("msg", "Parcela paga com sucesso!");
 
