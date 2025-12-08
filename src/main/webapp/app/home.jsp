@@ -186,19 +186,8 @@ text-decoration: none;
 				</a>
 			</div>
 
-<<<<<<< HEAD
-			<div class="col">
-				<a
-					href="${pageContext.request.contextPath}/app?command=mostrarDadosUsuario&id=<%=conta.getUsuarioId() %>">
-					<div class="op-card ">
-						<div class="op-icon">
-							<i class="bi bi-person-gear"></i>
-						</div>
-						<h3 class="h4 fw-bold text-muted">Editar Usuário</h3>
-						<p class="small text-muted mb-0">Altere dados cadastrais.</p>
-					</div>
-				</a>
-			</div>
+
+	
 	<div class="col">
     <a
         href="${pageContext.request.contextPath}/app?command=mostrarDadosUsuario&id=<%=conta.getUsuarioId() %>"
