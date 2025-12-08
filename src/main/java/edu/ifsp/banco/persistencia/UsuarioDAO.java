@@ -111,7 +111,7 @@ public class UsuarioDAO {
 		}
 	}
 
-	public void atualizar(Usuario usuario) {
+	public void atualizar(Usuario usuario,int id) {
 		String sql = """
 				    UPDATE USUARIOS
 				       SET NOME = ?, EMAIL = ?, SENHA = ?, TELEFONE = ?, ENDERECO = ?, DATA_ULTIMA_ATUALIZACAO = CURRENT_TIMESTAMP
@@ -127,10 +127,11 @@ public class UsuarioDAO {
 			ps.setString(4, usuario.getTelefone());
 			ps.setString(5, usuario.getEndereco());
 
-			ps.setInt(8, usuario.getId());
+			ps.setInt(6, id);
 
 			ps.executeUpdate();
 		} catch (SQLException e) {
+			e.printStackTrace();
 			throw new DataAccessException("Erro ao atualizar usuário.");
 		}
 	}
@@ -147,4 +148,7 @@ public class UsuarioDAO {
 			throw new DataAccessException("Erro ao excluir usuário.");
 		}
 	}
+	
+	
+	
 }

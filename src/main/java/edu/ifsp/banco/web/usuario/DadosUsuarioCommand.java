@@ -18,7 +18,12 @@ public class DadosUsuarioCommand implements Command {
 		Usuario user = dao.buscarPorId(id);
 
 		HttpSession session = request.getSession(false);
-		session.setAttribute("userEditar", user);
-		response.sendRedirect("app/usuarios/EditarUser.jsp");
+		request.setAttribute("userEditar", user);
+		try {
+		    request.getRequestDispatcher("app/usuarios/EditarUser.jsp").forward(request, response);
+		} catch (Exception e) {
+		    throw new RuntimeException(e);
+		}
+
 	}
 }

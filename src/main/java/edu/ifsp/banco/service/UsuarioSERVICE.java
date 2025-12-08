@@ -20,14 +20,14 @@ public class UsuarioSERVICE {
 		}
 	}
 
-	public void AtualizarConta(Usuario user) throws Exception {
+	public void AtualizarConta(Usuario user,int id) throws Exception {
 		UsuarioDAO dao = new UsuarioDAO();
 		if (user == null) {
 			throw new Exception("Usuario inválida");
 		}
 
 		try {
-			dao.atualizar(user);
+			dao.atualizar(user,id);
 		} catch (DataAccessException e) {
 			throw new Exception("Erro ao criar usuario: " + e.getMessage());
 		}

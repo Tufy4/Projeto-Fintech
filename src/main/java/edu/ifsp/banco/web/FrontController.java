@@ -3,6 +3,7 @@ package edu.ifsp.banco.web;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+
 import edu.ifsp.banco.administrador.ConsultarUsuariosCommand;
 import edu.ifsp.banco.administrador.LiberarUsuarioCommand;
 import edu.ifsp.banco.login.LoginCommand;
@@ -22,7 +23,7 @@ import edu.ifsp.banco.web.movimentacao.FinalizarInvestimentoCommand;
 import edu.ifsp.banco.web.movimentacao.InvestimentoCommand;
 import edu.ifsp.banco.web.movimentacao.MeusInvestimentosCommand;
 import edu.ifsp.banco.web.movimentacao.TransferenciaCommand;
-import edu.ifsp.banco.web.usuario.AtualizarUsuarioCommand;
+import edu.ifsp.banco.web.usuario.AtualizarDadosUsuarioCommand;
 import edu.ifsp.banco.web.usuario.CadastrarUsuarioCommand;
 import edu.ifsp.banco.web.usuario.DadosUsuarioCommand;
 import edu.ifsp.banco.web.usuario.DashboardCommand;
@@ -52,7 +53,7 @@ public class FrontController extends HttpServlet {
 		commands.put("finalizarInvestimento", new FinalizarInvestimentoCommand());
 		commands.put("meusInvestimentos", new MeusInvestimentosCommand());
 		commands.put("transferir", new TransferenciaCommand());
-		commands.put("atualizarUsuario", new AtualizarUsuarioCommand());
+		commands.put("atualizarUsuario", new AtualizarDadosUsuarioCommand());
 		commands.put("mostrarDadosUsuario", new DadosUsuarioCommand());
 		commands.put("simularEmprestimo", new SimularEmprestimoCommand());
 		commands.put("solicitarEmprestimo", new SolicitarEmprestimoCommand());
