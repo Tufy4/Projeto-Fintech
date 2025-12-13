@@ -81,7 +81,7 @@ public class UsuarioDAO {
 
 		String sql = """
 				    INSERT INTO USUARIOS (ID, NOME, EMAIL, SENHA, TELEFONE, ENDERECO)
-				    VALUES (SEQ_USUARIOS.NEXTVAL, ?, ?, ?, ?, ?)
+				    VALUES (seq_usuarios.NEXTVAL, ?, ?, ?, ?, ?)
 				""";
 
 		if (usuario.getNome() == null || usuario.getNome().isEmpty()) {

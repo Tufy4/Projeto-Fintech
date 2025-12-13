@@ -71,6 +71,8 @@ public class EmprestimoSERVICE {
 	public void aprovarEmprestimo(int idEmprestimo) throws Exception {
 		Emprestimo emp = emprestimoDAO.buscarPorId(idEmprestimo);
 
+		Conta conta = contaDAO.buscarPorId(emp.getConta_id());
+
 		if (emp == null)
 			throw new Exception("Empréstimo não encontrado.");
 
@@ -80,9 +82,16 @@ public class EmprestimoSERVICE {
 
 		List<ParcelaEmprestimo> cronogramaDefinitivo = calcularCronogramaSAC(emp);
 
+		Movimentacoes mov = new Movimentacoes(0, 1000, conta.getId(), emp.getValor_emprestimo(),
+				TipoMovimentacao.TRANSFERENCIA, null, "Empréstimo bancário", StatusMovimentacao.CONCLUIDA);
+		
+		movimentacaoDAO.inserir(mov);	
+		
 		try {
 			emprestimoDAO.aprovarEmprestimo(idEmprestimo);
 			parcelaDAO.inserirLote(cronogramaDefinitivo);
+			contaDAO.atualizarSaldo(conta.getId(),
+					conta.getSaldo().doubleValue() + emp.getValor_emprestimo().doubleValue());
 		} catch (DataAccessException e) {
 			throw new Exception("Erro técnico ao processar aprovação: " + e.getMessage());
 		}
