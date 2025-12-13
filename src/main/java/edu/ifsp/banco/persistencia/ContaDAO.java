@@ -16,7 +16,7 @@ public class ContaDAO {
 
 	public void inserir(Conta conta) throws DataAccessException {
 		String sql = "INSERT INTO CONTAS (ID, USUARIO_ID, NUMERO_CONTA, TIPO, STATUS) "
-				+ "VALUES (SEQ_CONTAS.NEXTVAL, ?, SEQ_CONTA.NEXTVAL, ?, 'BLOQUEADA')";
+				+ "VALUES (seq_contas.NEXTVAL, ?, seq_num_conta.NEXTVAL, ?, 'BLOQUEADA')";
 
 		try (Connection conn = ConnectionSingleton.getInstance().getConnection();
 				PreparedStatement stmt = conn.prepareStatement(sql)) {

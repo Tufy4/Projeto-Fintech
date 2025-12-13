@@ -17,12 +17,12 @@ public class DepositoCommand implements Command {
 	public void execute(HttpServletRequest request, HttpServletResponse response) {
 		RequestDispatcher rd;
 		try {
-			int idConta = Integer.parseInt(request.getParameter("idConta"));
+			Conta contaLogado = (Conta) request.getSession().getAttribute("contaLogado");
+			int numeroConta = contaLogado.getNumero_conta();
 			BigDecimal valor = new BigDecimal(request.getParameter("valor"));
 
 			MovimentacaoSERVICE service = new MovimentacaoSERVICE();
-			Conta contaDestino = service.depositar(idConta, valor);
-			Conta contaLogado = (Conta) request.getSession().getAttribute("contaLogado");
+			Conta contaDestino = service.depositar(numeroConta, valor);
 
 			if (contaLogado.getId() == contaDestino.getId()) {
 
