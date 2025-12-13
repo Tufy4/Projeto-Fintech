@@ -39,6 +39,22 @@ public class ContaSERVICE {
 		}
 	}
 
+	public List<Conta> buscarContasPorUsuario(int idUsuario) throws Exception {
+		try {
+			return contaDAO.buscarPorIdUsuario(idUsuario);
+		} catch (DataAccessException e) {
+			throw new Exception("Erro ao buscar contas do usuário: " + e.getMessage());
+		}
+	}
+
+	public Conta buscarPorId(int idConta) throws Exception {
+		try {
+			return contaDAO.buscarPorId(idConta);
+		} catch (DataAccessException e) {
+			throw new Exception("Erro ao buscar conta específica: " + e.getMessage());
+		}
+	}
+
 	public List<Conta> listarContas() throws Exception {
 
 		try {
@@ -62,6 +78,14 @@ public class ContaSERVICE {
 			contaDAO.atualizarSaldo(idConta, novoSaldo.doubleValue());
 		} catch (DataAccessException e) {
 			throw new Exception("Erro ao atualizar saldo: " + e.getMessage());
+		}
+	}
+
+	public int obterTotalContas() throws Exception {
+		try {
+			return contaDAO.contarTotal();
+		} catch (DataAccessException e) {
+			return 0;
 		}
 	}
 }

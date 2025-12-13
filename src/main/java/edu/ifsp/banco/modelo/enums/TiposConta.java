@@ -1,7 +1,7 @@
 package edu.ifsp.banco.modelo.enums;
 
 public enum TiposConta {
-	CORRENTE("CORRENTE"), POUPANCA("POUPANCA");
+	CLIENTE("CLIENTE"), GERENTE("GERENTE");
 
 	private String valor;
 

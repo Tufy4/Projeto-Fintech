@@ -23,7 +23,7 @@ public class TransferenciaCommand implements Command {
 			BigDecimal valor = new BigDecimal(request.getParameter("valor"));
 
 			HttpSession session = request.getSession();
-			Conta contaOrigem = (Conta) session.getAttribute("conta");
+			Conta contaOrigem = (Conta) session.getAttribute("contaLogado");
 
 			if (contaOrigem == null) {
 				throw new Exception("Sessão expirada. Faça login novamente.");

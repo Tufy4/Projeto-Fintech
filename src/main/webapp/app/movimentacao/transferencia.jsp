@@ -125,27 +125,20 @@ body {
 						Disponível: <span class="text-success"><%=dinheiro.format(saldo)%></span>
 					</div>
 				</div>
-
 				<form
-					action="${pageContext.request.contextPath}/app?command=transferir"
+					action="${pageContext.request.contextPath}/app?command=realizarTransacao"
 					method="post">
+					<input type="hidden" name="tipoTransacao" value="TRANSFERENCIA">
 
 					<div class="form-floating mb-3">
-						<input type="number" class="form-control" id="contaDestino"
-							name="contaDestino" required placeholder="00000"> <label
-							for="contaDestino">Número da Conta Destino</label>
+						<input type="number" class="form-control" name="contaDestino"
+							required> <label>Número da Conta Destino</label>
 					</div>
-
 					<div class="form-floating mb-4">
-						<input type="number" class="form-control" id="valor" name="valor"
-							step="0.01" min="0.01" required placeholder="0,00"> <label
-							for="valor">Valor (R$)</label>
+						<input type="number" class="form-control" name="valor" step="0.01"
+							required> <label>Valor (R$)</label>
 					</div>
-
-					<div class="d-grid">
-						<button type="submit" class="btn btn-primary btn-transfer">
-							Confirmar Transferência</button>
-					</div>
+					<button type="submit" class="btn btn-primary">Confirmar</button>
 				</form>
 			</div>
 		</div>

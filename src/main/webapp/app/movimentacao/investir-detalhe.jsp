@@ -8,9 +8,16 @@
 Locale localeBR = new Locale("pt", "BR");
 NumberFormat dinheiro = NumberFormat.getCurrencyInstance(localeBR);
 
+// Recupera saldo da sessão
 BigDecimal saldo = (BigDecimal) session.getAttribute("saldoConta");
 if (saldo == null)
 	saldo = BigDecimal.ZERO;
+
+// Garante que o produto esteja disponível (seja por atributo ou parametro)
+String produto = (String) request.getAttribute("produto");
+if (produto == null || produto.isEmpty()) {
+	produto = request.getParameter("produto");
+}
 %>
 
 <!DOCTYPE html>
@@ -151,7 +158,7 @@ body {
 				<div class="icon-box">
 					<i class="bi bi-graph-up-arrow"></i>
 				</div>
-				<h2 class="produto-titulo">${produto}</h2>
+				<h2 class="produto-titulo"><%=produto%></h2>
 				<p class="mb-0 opacity-75">Configurar Aplicação</p>
 			</div>
 
@@ -176,9 +183,10 @@ body {
 						<div class="form-text ms-1">Mínimo de R$ 1,00</div>
 					</div>
 
-					<input type="hidden" name="produto" value="${produto}"> <input
-						type="hidden" name="numeroConta"
-						value="${sessionScope.conta.numero_conta}">
+					<input type="hidden" name="produto" value="<%=produto%>">
+
+					<input type="hidden" name="numeroConta"
+						value="${sessionScope.contaLogado.numero_conta}">
 
 					<div class="d-grid gap-2">
 						<button type="submit" class="btn btn-primary btn-confirmar">

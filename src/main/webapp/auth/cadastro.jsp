@@ -129,13 +129,6 @@ body {
 					for="endereco">Endereço</label>
 			</div>
 
-			<div class="form-floating mb-4">
-				<select class="form-select" id="typeAccount" name="typeAccount">
-					<option value="CORRENTE" selected>Conta Corrente</option>
-					<option value="POUPANCA">Conta Poupança</option>
-				</select> <label for="typeAccount">Tipo de Conta</label>
-			</div>
-
 			<div class="d-grid gap-2">
 				<button type="submit" class="btn btn-primary btn-register">Criar
 					Conta</button>

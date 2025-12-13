@@ -23,32 +23,11 @@ body {
 	<nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
 		<div class="container">
 			<a class="navbar-brand fw-bold"
-				href="${pageContext.request.contextPath}/app/admin/home.jsp">
+				href="${pageContext.request.contextPath}/app?command=dashboardAdmin">
 				BitPay <span class="badge bg-primary"
 				style="font-size: 0.5em; vertical-align: top;">ADMIN</span>
 			</a>
 
-			<button class="navbar-toggler" type="button"
-				data-bs-toggle="collapse" data-bs-target="#navbarNav">
-				<span class="navbar-toggler-icon"></span>
-			</button>
-
-			<div class="collapse navbar-collapse justify-content-end"
-				id="navbarNav">
-				<ul class="navbar-nav gap-2 align-items-center">
-					<li class="nav-item me-2"><a class="btn btn-secondary btn-sm"
-						href="${pageContext.request.contextPath}/app/admin/home.jsp">
-							<i class="bi bi-arrow-left"></i> Voltar
-					</a></li>
-					<li class="nav-item"><span class="nav-link text-white">
-							Olá, <strong>${sessionScope.usuarioLogado != null ? sessionScope.usuarioLogado.getNome() : 'Administrador'}</strong>
-					</span></li>
-					<li class="nav-item"><a class="btn btn-outline-danger btn-sm"
-						href="${pageContext.request.contextPath}/app?command=logout">
-							<i class="bi bi-box-arrow-right"></i>
-					</a></li>
-				</ul>
-			</div>
 		</div>
 	</nav>
 
@@ -74,7 +53,6 @@ body {
 								<th>Email</th>
 								<th>Telefone</th>
 								<th>Endereço</th>
-								<th>Perfil</th>
 								<th class="text-center">Ação</th>
 							</tr>
 						</thead>
@@ -89,7 +67,6 @@ body {
 								<td><%=u.getEmail()%></td>
 								<td><%=u.getTelefone()%></td>
 								<td><%=u.getEndereco() != null ? u.getEndereco() : "-"%></td>
-								<td><span class="badge bg-secondary"><%=u.getPerfil()%></span></td>
 								<td class="text-center"><a class="btn btn-success btn-sm"
 									href="${pageContext.request.contextPath}/app?command=liberarUsuario&id=<%= u.getId() %>"
 									title="Aprovar Cadastro"> <i class="bi bi-check-lg"></i>
@@ -101,7 +78,7 @@ body {
 							} else {
 							%>
 							<tr>
-								<td colspan="7" class="text-center py-5 text-muted"><i
+								<td colspan="6" class="text-center py-5 text-muted"><i
 									class="bi bi-check-circle display-4 d-block mb-3"></i>
 									<h5>Tudo certo!</h5>
 									<p>Não há usuários pendentes de liberação no momento.</p></td>

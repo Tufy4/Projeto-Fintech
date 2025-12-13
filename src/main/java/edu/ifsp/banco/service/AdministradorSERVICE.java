@@ -24,4 +24,9 @@ public class AdministradorSERVICE {
 			throw new Exception("Deu problema na liberação do usuario");
 		}
 	}
+
+	public int obterQuantidadeUsuariosBloqueados() {
+		AdministradorDAO dao = new AdministradorDAO();
+		return dao.contarBloqueados();
+	}
 }

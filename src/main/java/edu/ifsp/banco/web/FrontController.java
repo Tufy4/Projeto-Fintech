@@ -8,6 +8,7 @@ import edu.ifsp.banco.administrador.ConsultarUsuariosCommand;
 import edu.ifsp.banco.administrador.LiberarUsuarioCommand;
 import edu.ifsp.banco.login.LoginCommand;
 import edu.ifsp.banco.login.LogoutCommand;
+import edu.ifsp.banco.login.SelecionarContaCommand;
 import edu.ifsp.banco.web.emprestimo.AprovarEmprestimoCommand;
 import edu.ifsp.banco.web.emprestimo.ListarSolicitacoesCommand;
 import edu.ifsp.banco.web.emprestimo.MeusEmprestimosCommand;
@@ -16,17 +17,20 @@ import edu.ifsp.banco.web.emprestimo.PrepararSimulacaoCommand;
 import edu.ifsp.banco.web.emprestimo.SimularEmprestimoCommand;
 import edu.ifsp.banco.web.emprestimo.SolicitarEmprestimoCommand;
 import edu.ifsp.banco.web.helpers.RedirectCommand;
-import edu.ifsp.banco.web.movimentacao.DepositoCommand;
 import edu.ifsp.banco.web.movimentacao.EscolherInvestimentoCommand;
 import edu.ifsp.banco.web.movimentacao.ExtratoCommand;
 import edu.ifsp.banco.web.movimentacao.FinalizarInvestimentoCommand;
 import edu.ifsp.banco.web.movimentacao.InvestimentoCommand;
 import edu.ifsp.banco.web.movimentacao.MeusInvestimentosCommand;
-import edu.ifsp.banco.web.movimentacao.TransferenciaCommand;
+import edu.ifsp.banco.web.movimentacao.RealizarTransacaoCommand;
 import edu.ifsp.banco.web.usuario.AtualizarDadosUsuarioCommand;
 import edu.ifsp.banco.web.usuario.CadastrarUsuarioCommand;
 import edu.ifsp.banco.web.usuario.DadosUsuarioCommand;
+import edu.ifsp.banco.web.usuario.DashboardAdminCommand;
 import edu.ifsp.banco.web.usuario.DashboardCommand;
+import edu.ifsp.banco.web.usuario.recovery.RedefinirSenhaCommand;
+import edu.ifsp.banco.web.usuario.recovery.SolicitarRecuperacaoCommand;
+import edu.ifsp.banco.web.usuario.recovery.ValidarTokenCommand;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -42,7 +46,6 @@ public class FrontController extends HttpServlet {
 	@Override
 	public void init() throws ServletException {
 		commands.put("cadastrarUsuario", new CadastrarUsuarioCommand());
-		commands.put("depositar", new DepositoCommand());
 		commands.put("login", new LoginCommand());
 		commands.put("redirect", new RedirectCommand());
 		commands.put("consultarBloqueados", new ConsultarUsuariosCommand());
@@ -52,7 +55,6 @@ public class FrontController extends HttpServlet {
 		commands.put("escolherInvestimento", new EscolherInvestimentoCommand());
 		commands.put("finalizarInvestimento", new FinalizarInvestimentoCommand());
 		commands.put("meusInvestimentos", new MeusInvestimentosCommand());
-		commands.put("transferir", new TransferenciaCommand());
 		commands.put("atualizarUsuario", new AtualizarDadosUsuarioCommand());
 		commands.put("mostrarDadosUsuario", new DadosUsuarioCommand());
 		commands.put("simularEmprestimo", new SimularEmprestimoCommand());
@@ -60,11 +62,18 @@ public class FrontController extends HttpServlet {
 		commands.put("aprovarEmprestimo", new AprovarEmprestimoCommand());
 		commands.put("pagarParcela", new PagarParcelaCommand());
 		commands.put("dashboardCliente", new DashboardCommand());
+		commands.put("dashboardAdmin", new DashboardAdminCommand());
 		commands.put("prepararSimulacao", new PrepararSimulacaoCommand());
 		commands.put("listarEmprestimosGerente", new ListarSolicitacoesCommand());
 		commands.put("meusEmprestimos", new MeusEmprestimosCommand());
 		commands.put("extrato", new ExtratoCommand());
-		//coloquem aqui
+		commands.put("selecionarConta", new SelecionarContaCommand());
+		commands.put("realizarTransacao", new RealizarTransacaoCommand());
+		commands.put("solicitarRecuperacao", new SolicitarRecuperacaoCommand());
+		commands.put("validarToken", new ValidarTokenCommand());
+		commands.put("redefinirSenha", new RedefinirSenhaCommand());
+
+		// coloquem aqui
 	}
 
 	@Override
@@ -81,14 +90,14 @@ public class FrontController extends HttpServlet {
 		Command command = commands.get(acao);
 		command.execute(request, response);
 	}
-	
-    @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-    	service(req, resp);
-    }
 
-    @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-    	service(req, resp);
-    }
+	@Override
+	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		service(req, resp);
+	}
+
+	@Override
+	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		service(req, resp);
+	}
 }

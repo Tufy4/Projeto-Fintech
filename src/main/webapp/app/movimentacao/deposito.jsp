@@ -128,19 +128,16 @@ sessionScope.usuarioLogado.getNome() : 'Cliente'}</strong>
 sessionScope.usuarioLogado.getNome() : 'Cliente'}</strong>
 			<br> Saldo atual: R$ <strong>${sessionScope.saldoConta != null ? sessionScope.saldoConta : '0.00'}</strong>
 		</h2>
-
 		<div class="deposit-form">
 			<h2 class="deposit-title">Depósito</h2>
 
 			<form
-				action="${pageContext.request.contextPath}/app?command=depositar"
+				action="${pageContext.request.contextPath}/app?command=realizarTransacao"
 				method="post">
-				<label
-					for="valor">Valor (R$):</label> <input type="number" step="0.01"
-					id="valor" name="valor" required>
+				<input type="hidden" name="tipoTransacao" value="DEPOSITO">
 
-				<p class="note">Digite o valor à ser depositado!</p>
-
+				<label for="valor">Valor (R$):</label> <input type="number"
+					step="0.01" id="valor" name="valor" required>
 				<button type="submit">Depositar</button>
 			</form>
 		</div>

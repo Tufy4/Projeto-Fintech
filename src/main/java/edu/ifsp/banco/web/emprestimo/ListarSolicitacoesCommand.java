@@ -3,10 +3,11 @@ package edu.ifsp.banco.web.emprestimo;
 import java.io.IOException;
 import java.util.List;
 
+import edu.ifsp.banco.modelo.Conta;
 import edu.ifsp.banco.modelo.Emprestimo;
 import edu.ifsp.banco.modelo.Usuario;
 import edu.ifsp.banco.modelo.enums.StatusEmprestimo;
-import edu.ifsp.banco.modelo.enums.TipoUsuario;
+import edu.ifsp.banco.modelo.enums.TiposConta;
 import edu.ifsp.banco.service.EmprestimoSERVICE;
 import edu.ifsp.banco.web.Command;
 import jakarta.servlet.RequestDispatcher;
@@ -20,8 +21,9 @@ public class ListarSolicitacoesCommand implements Command {
 	public void execute(HttpServletRequest request, HttpServletResponse response) {
 		HttpSession session = request.getSession();
 		Usuario user = (Usuario) session.getAttribute("usuarioLogado");
+		Conta conta = (Conta) session.getAttribute("contaLogado");
 
-		if (user == null || TipoUsuario.GERENTE != user.getPerfil()) {
+		if (user == null || conta == null || (conta != null && conta.getTipo() != TiposConta.GERENTE)) {
 			try {
 				response.sendRedirect(request.getContextPath() + "/index.jsp");
 			} catch (IOException e) {

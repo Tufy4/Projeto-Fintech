@@ -3,7 +3,6 @@ package edu.ifsp.banco.modelo;
 import java.sql.Timestamp;
 
 import edu.ifsp.banco.modelo.enums.StatusUsuario;
-import edu.ifsp.banco.modelo.enums.TipoUsuario;
 
 public class Usuario {
 	private int id;
@@ -12,7 +11,6 @@ public class Usuario {
 	private String senha;
 	private String telefone;
 	private String endereco;
-	private TipoUsuario perfil;
 	private StatusUsuario status;
 	private Timestamp DataCriacao;
 	private Timestamp DataAtualizacao;
@@ -24,8 +22,8 @@ public class Usuario {
 	@Override
 	public String toString() {
 		return "Usuario [id=" + id + ", nome=" + nome + ", email=" + email + ", senha=" + senha + ", telefone="
-				+ telefone + ", endereco=" + endereco + ", perfil=" + perfil + ", status=" + status + ", DataCriacao="
-				+ DataCriacao + ", DataAtualizacao=" + DataAtualizacao + "]";
+				+ telefone + ", endereco=" + endereco + ", status=" + status + ", DataCriacao=" + DataCriacao
+				+ ", DataAtualizacao=" + DataAtualizacao + "]";
 	}
 
 	public void setId(int id) {
@@ -72,14 +70,6 @@ public class Usuario {
 		this.endereco = endereco;
 	}
 
-	public TipoUsuario getPerfil() {
-		return perfil;
-	}
-
-	public void setPerfil(TipoUsuario perfil) {
-		this.perfil = perfil;
-	}
-
 	public StatusUsuario getStatus() {
 		return status;
 	}
@@ -104,7 +94,7 @@ public class Usuario {
 		DataAtualizacao = dataAtualizacao;
 	}
 
-	public Usuario(String nome, String email, String senha, String telefone, String endereco, TipoUsuario perfil,
+	public Usuario(String nome, String email, String senha, String telefone, String endereco,
 			StatusUsuario status) {
 		super();
 		this.nome = nome;
@@ -112,7 +102,6 @@ public class Usuario {
 		this.senha = senha;
 		this.telefone = telefone;
 		this.endereco = endereco;
-		this.perfil = perfil;
 		this.status = status;
 		this.DataCriacao = new Timestamp(System.currentTimeMillis());
 		this.DataAtualizacao = new Timestamp(System.currentTimeMillis());

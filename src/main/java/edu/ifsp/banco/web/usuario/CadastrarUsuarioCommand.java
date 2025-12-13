@@ -25,7 +25,6 @@ public class CadastrarUsuarioCommand implements Command {
 		String senha = request.getParameter("senha");
 		String telefone = request.getParameter("telefone");
 		String endereco = request.getParameter("endereco");
-		String tipoConta = request.getParameter("typeAccount");
 
 		Usuario usuario = new Usuario(nome, email, senha, telefone, endereco);
 		UsuarioSERVICE service = new UsuarioSERVICE();
@@ -38,7 +37,7 @@ public class CadastrarUsuarioCommand implements Command {
 			Usuario userBancoDados = dao.buscarPorEmail(usuario.getEmail());
 			Conta conta = new Conta();
 			conta.setUsuarioId(userBancoDados.getId());
-			conta.setTipo(TiposConta.valueOf(tipoConta));
+			conta.setTipo(TiposConta.CLIENTE);
 			ContaServ.criarConta(conta);
 
 			rd = request.getRequestDispatcher("index.jsp");

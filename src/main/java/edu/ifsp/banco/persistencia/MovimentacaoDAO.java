@@ -14,8 +14,8 @@ public class MovimentacaoDAO {
 	public void inserir(Movimentacoes mov) throws DataAccessException {
 		String sql = """
 				   INSERT INTO MOVIMENTACOES
-				   (ID, CONTA_ORIGEM_ID, CONTA_DESTINO_ID, VALOR, TIPO, DATA_TRANSACAO, DESCRICAO, STATUS)
-				   VALUES (SEQ_MOVIMENTACOES.NEXTVAL, ?, ?, ?, ?, ?, ?, ?)
+				   (ID, CONTA_ORIGEM_ID, CONTA_DESTINO_ID, VALOR, SALDO_ANTERIOR, SALDO_POSTERIOR, TIPO, DATA_TRANSACAO, DESCRICAO, STATUS)
+				   VALUES (SEQ_MOVIMENTACOES.NEXTVAL, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 				""";
 
 		try (Connection conn = ConnectionSingleton.getInstance().getConnection();
@@ -34,10 +34,12 @@ public class MovimentacaoDAO {
 			}
 
 			ps.setBigDecimal(3, mov.getValor());
-			ps.setString(4, mov.getTipo().toString());
-			ps.setTimestamp(5, mov.getDataTransacao());
-			ps.setString(6, mov.getDescricao());
-			ps.setString(7, mov.getStatus().toString());
+			ps.setBigDecimal(4, mov.getSaldoAnterior());
+			ps.setBigDecimal(5, mov.getSaldoPosterior());
+			ps.setString(6, mov.getTipo().toString());
+			ps.setTimestamp(7, mov.getDataTransacao());
+			ps.setString(8, mov.getDescricao());
+			ps.setString(9, mov.getStatus().toString());
 
 			ps.executeUpdate();
 
@@ -49,7 +51,9 @@ public class MovimentacaoDAO {
 
 	public Movimentacoes buscarPorId(int id) throws DataAccessException {
 		String sql = """
-				   SELECT ID, CONTA_ORIGEM_ID, CONTA_DESTINO_ID, VALOR, TIPO, DATA_TRANSACAO, DESCRICAO, STATUS
+				   SELECT ID, CONTA_ORIGEM_ID, CONTA_DESTINO_ID, VALOR,
+				          SALDO_ANTERIOR, SALDO_POSTERIOR,
+				          TIPO, DATA_TRANSACAO, DESCRICAO, STATUS
 				   FROM MOVIMENTACOES
 				   WHERE ID = ?
 				""";
@@ -61,19 +65,7 @@ public class MovimentacaoDAO {
 
 			try (ResultSet rs = ps.executeQuery()) {
 				if (rs.next()) {
-					Movimentacoes mov = new Movimentacoes();
-					mov.setId(rs.getInt("ID"));
-					mov.setContaOrigemId(rs.getInt("CONTA_ORIGEM_ID"));
-					mov.setContaDestinoId(rs.getInt("CONTA_DESTINO_ID"));
-					mov.setValor(rs.getBigDecimal("VALOR"));
-
-					mov.setTipo(edu.ifsp.banco.modelo.enums.TipoMovimentacao.valueOf(rs.getString("TIPO")));
-					mov.setStatus(edu.ifsp.banco.modelo.enums.StatusMovimentacao.valueOf(rs.getString("STATUS")));
-
-					mov.setDataTransacao(rs.getTimestamp("DATA_TRANSACAO"));
-					mov.setDescricao(rs.getString("DESCRICAO"));
-
-					return mov;
+					return mapResultSetToMovimentacao(rs);
 				}
 			}
 
@@ -86,8 +78,11 @@ public class MovimentacaoDAO {
 	}
 
 	public ArrayList<Movimentacoes> listarMovimentacoes(int idConta) throws SQLException {
+		// SQL atualizado
 		String sql = """
-				   SELECT m.ID, m.CONTA_ORIGEM_ID, m.CONTA_DESTINO_ID, m.VALOR, m.TIPO, m.DATA_TRANSACAO, m.DESCRICAO, m.STATUS
+				   SELECT m.ID, m.CONTA_ORIGEM_ID, m.CONTA_DESTINO_ID, m.VALOR,
+				          m.SALDO_ANTERIOR, m.SALDO_POSTERIOR,
+				          m.TIPO, m.DATA_TRANSACAO, m.DESCRICAO, m.STATUS
 				   FROM MOVIMENTACOES m
 				   WHERE m.CONTA_ORIGEM_ID = ? OR m.CONTA_DESTINO_ID = ?
 				   ORDER BY m.DATA_TRANSACAO DESC
@@ -103,19 +98,7 @@ public class MovimentacaoDAO {
 
 			try (ResultSet rs = ps.executeQuery()) {
 				while (rs.next()) {
-					Movimentacoes mov = new Movimentacoes();
-					mov.setId(rs.getInt("ID"));
-					mov.setContaOrigemId(rs.getInt("CONTA_ORIGEM_ID"));
-					mov.setContaDestinoId(rs.getInt("CONTA_DESTINO_ID"));
-					mov.setValor(rs.getBigDecimal("VALOR"));
-
-					mov.setTipo(edu.ifsp.banco.modelo.enums.TipoMovimentacao.valueOf(rs.getString("TIPO")));
-					mov.setStatus(edu.ifsp.banco.modelo.enums.StatusMovimentacao.valueOf(rs.getString("STATUS")));
-
-					mov.setDataTransacao(rs.getTimestamp("DATA_TRANSACAO"));
-					mov.setDescricao(rs.getString("DESCRICAO"));
-
-					movimentacoesList.add(mov);
+					movimentacoesList.add(mapResultSetToMovimentacao(rs));
 				}
 			}
 
@@ -144,5 +127,21 @@ public class MovimentacaoDAO {
 		} catch (SQLException e) {
 			throw new DataAccessException("Erro ao atualizar Movimentação.");
 		}
+	}
+
+	private Movimentacoes mapResultSetToMovimentacao(ResultSet rs) throws SQLException {
+		Movimentacoes mov = new Movimentacoes();
+		mov.setId(rs.getInt("ID"));
+		mov.setContaOrigemId(rs.getInt("CONTA_ORIGEM_ID"));
+		mov.setContaDestinoId(rs.getInt("CONTA_DESTINO_ID"));
+		mov.setValor(rs.getBigDecimal("VALOR"));
+		mov.setSaldoAnterior(rs.getBigDecimal("SALDO_ANTERIOR"));
+		mov.setSaldoPosterior(rs.getBigDecimal("SALDO_POSTERIOR"));
+		mov.setTipo(edu.ifsp.banco.modelo.enums.TipoMovimentacao.valueOf(rs.getString("TIPO")));
+		mov.setStatus(edu.ifsp.banco.modelo.enums.StatusMovimentacao.valueOf(rs.getString("STATUS")));
+		mov.setDataTransacao(rs.getTimestamp("DATA_TRANSACAO"));
+		mov.setDescricao(rs.getString("DESCRICAO"));
+
+		return mov;
 	}
 }

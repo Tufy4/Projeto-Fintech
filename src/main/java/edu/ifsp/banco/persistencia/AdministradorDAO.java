@@ -8,83 +8,100 @@ import java.util.List;
 
 import edu.ifsp.banco.modelo.Usuario;
 import edu.ifsp.banco.modelo.enums.StatusUsuario;
-import edu.ifsp.banco.modelo.enums.TipoUsuario;
-import edu.ifsp.banco.modelo.enums.TiposConta;
 
 public class AdministradorDAO {
-	public List<Usuario> listarUsuariosBloqueados() {
-		List<Usuario> usuarios = new ArrayList<>();
 
-		String sql = "SELECT ID, NOME, EMAIL, TELEFONE, ENDERECO, PERFIL, STATUS FROM USUARIOS WHERE STATUS = 'BLOQUEADO'";
+    public List<Usuario> listarUsuariosBloqueados() {
+        List<Usuario> usuarios = new ArrayList<>();
+        String sql = "SELECT ID, NOME, EMAIL, TELEFONE, ENDERECO, STATUS FROM USUARIOS WHERE STATUS = 'BLOQUEADO'";
 
-		try (Connection conn = ConnectionSingleton.getInstance().getConnection();
-				PreparedStatement stmt = conn.prepareStatement(sql);
-				ResultSet rs = stmt.executeQuery()) {
+        try (Connection conn = ConnectionSingleton.getInstance().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
 
-			while (rs.next()) {
-				Usuario u = new Usuario();
-				u.setId(rs.getInt("ID"));
-				u.setNome(rs.getString("NOME"));
-				u.setEmail(rs.getString("EMAIL"));
-				u.setTelefone(rs.getString("TELEFONE"));
-				u.setEndereco(rs.getString("ENDERECO"));
-				u.setPerfil(TipoUsuario.valueOf(rs.getString("PERFIL")));
-				u.setStatus(StatusUsuario.valueOf(rs.getString("STATUS")));
+            while (rs.next()) {
+                Usuario u = new Usuario();
+                u.setId(rs.getInt("ID"));
+                u.setNome(rs.getString("NOME"));
+                u.setEmail(rs.getString("EMAIL"));
+                u.setTelefone(rs.getString("TELEFONE"));
+                u.setEndereco(rs.getString("ENDERECO"));
+                u.setStatus(StatusUsuario.valueOf(rs.getString("STATUS")));
+                usuarios.add(u);
+            }
 
-				usuarios.add(u);
-				System.out.println(u);
-			}
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return usuarios;
+    }
 
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+    public Usuario ProcurarUsuarioId(int id) {
+        Usuario u = null; // Inicialize como null para saber se não achou
+        String sql = "SELECT ID, NOME, EMAIL, TELEFONE, ENDERECO, STATUS FROM USUARIOS WHERE ID = ?";
 
-		return usuarios;
-	}
+        // OBS: O try-with-resources fecha tudo automaticamente, mas a ordem importa.
+        // Não podemos colocar o executeQuery() dentro do try() porque precisamos setar o ID antes.
+        try (Connection conn = ConnectionSingleton.getInstance().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-	public Usuario ProcurarUsuarioId(int id) {
-		Usuario u = new Usuario();
-		;
-		String sql = "SELECT ID, NOME, EMAIL, TELEFONE, ENDERECO, PERFIL, STATUS FROM USUARIOS WHERE ID = ?";
+            stmt.setInt(1, id); // 1. Seta o parâmetro PRIMEIRO
 
-		try (Connection conn = ConnectionSingleton.getInstance().getConnection();
-				PreparedStatement stmt = conn.prepareStatement(sql);
+            try (ResultSet rs = stmt.executeQuery()) { // 2. Executa DEPOIS
+                if (rs.next()) {
+                    u = new Usuario();
+                    u.setId(rs.getInt("ID"));
+                    u.setNome(rs.getString("NOME"));
+                    u.setEmail(rs.getString("EMAIL"));
+                    u.setTelefone(rs.getString("TELEFONE"));
+                    u.setEndereco(rs.getString("ENDERECO"));
+                    u.setStatus(StatusUsuario.valueOf(rs.getString("STATUS")));
+                }
+            }
 
-				ResultSet rs = stmt.executeQuery()) {
-			stmt.setInt(1, id);
-			if (rs.next()) {
-				u.setId(rs.getInt("ID"));
-				u.setNome(rs.getString("NOME"));
-				u.setEmail(rs.getString("EMAIL"));
-				u.setTelefone(rs.getString("TELEFONE"));
-				u.setEndereco(rs.getString("ENDERECO"));
-				u.setPerfil(TipoUsuario.valueOf(rs.getString("PERFIL")));
-				u.setStatus(StatusUsuario.valueOf(rs.getString("STATUS")));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
-			}
+        return u;
+    }
 
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+    public boolean liberarUsuario(int id) {
+        String sql = "UPDATE USUARIOS SET STATUS = 'ATIVO', DATA_ULTIMA_ATUALIZACAO = CURRENT_TIMESTAMP WHERE ID = ? AND STATUS = 'BLOQUEADO'";
+        
+        try (Connection conn = ConnectionSingleton.getInstance().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-		return u;
-	}
+            stmt.setInt(1, id);
+            int linhasAfetadas = stmt.executeUpdate();
+            
+            // Se for Oracle JDBC puro, as vezes precisa comitar explicitamente se o auto-commit estiver false
+            // conn.commit(); 
+            
+            return linhasAfetadas > 0;
 
-	public boolean liberarUsuario(int id) {
-		String sql = "UPDATE USUARIOS SET STATUS = 'ATIVO', DATA_ULTIMA_ATUALIZACAO = CURRENT_TIMESTAMP WHERE ID = ? AND STATUS = 'BLOQUEADO'";
-		int linhasAfetadas = 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 
-		try (Connection conn = ConnectionSingleton.getInstance().getConnection();
-				PreparedStatement stmt = conn.prepareStatement(sql)) {
+    public int contarBloqueados() {
+        String sql = "SELECT COUNT(*) FROM USUARIOS WHERE STATUS = 'BLOQUEADO'";
+        
+        try (Connection conn = ConnectionSingleton.getInstance().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
 
-			stmt.setInt(1, id);
+            if (rs.next()) {
+                // Pega pelo índice 1 (primeira coluna) é mais seguro que pegar pelo nome do alias
+                return rs.getInt(1); 
+            }
 
-			linhasAfetadas = stmt.executeUpdate();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		return linhasAfetadas > 0;
-	}
-
+        } catch (Exception e) {
+            System.err.println("Erro ao contar usuários bloqueados: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return 0;
+    }
 }

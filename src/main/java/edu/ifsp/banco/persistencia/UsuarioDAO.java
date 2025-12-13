@@ -7,7 +7,6 @@ import java.sql.SQLException;
 
 import edu.ifsp.banco.modelo.Usuario;
 import edu.ifsp.banco.modelo.enums.StatusUsuario;
-import edu.ifsp.banco.modelo.enums.TipoUsuario;
 
 public class UsuarioDAO {
 
@@ -21,11 +20,10 @@ public class UsuarioDAO {
 
 			try (ResultSet rs = ps.executeQuery()) {
 				if (rs.next()) {
-					TipoUsuario perfil = TipoUsuario.valueOf(rs.getString("PERFIL"));
 					StatusUsuario status = StatusUsuario.valueOf(rs.getString("STATUS"));
 
 					Usuario usuario = new Usuario(rs.getString("NOME"), rs.getString("EMAIL"), rs.getString("SENHA"),
-							rs.getString("TELEFONE"), rs.getString("ENDERECO"), perfil, status);
+							rs.getString("TELEFONE"), rs.getString("ENDERECO"), status);
 
 					usuario.setId(rs.getInt("ID"));
 					usuario.setDataCriacao(rs.getTimestamp("DATA_CRIACAO"));
@@ -54,11 +52,10 @@ public class UsuarioDAO {
 
 			try (ResultSet rs = ps.executeQuery()) {
 				if (rs.next()) {
-					TipoUsuario perfil = TipoUsuario.valueOf(rs.getString("PERFIL"));
 					StatusUsuario status = StatusUsuario.valueOf(rs.getString("STATUS"));
 
 					Usuario usuario = new Usuario(rs.getString("NOME"), rs.getString("EMAIL"), rs.getString("SENHA"),
-							rs.getString("TELEFONE"), rs.getString("ENDERECO"), perfil, status);
+							rs.getString("TELEFONE"), rs.getString("ENDERECO"), status);
 
 					usuario.setId(rs.getInt("ID"));
 					usuario.setDataCriacao(rs.getTimestamp("DATA_CRIACAO"));
@@ -111,7 +108,7 @@ public class UsuarioDAO {
 		}
 	}
 
-	public void atualizar(Usuario usuario,int id) {
+	public void atualizar(Usuario usuario, int id) {
 		String sql = """
 				    UPDATE USUARIOS
 				       SET NOME = ?, EMAIL = ?, SENHA = ?, TELEFONE = ?, ENDERECO = ?, DATA_ULTIMA_ATUALIZACAO = CURRENT_TIMESTAMP
@@ -148,7 +145,26 @@ public class UsuarioDAO {
 			throw new DataAccessException("Erro ao excluir usuário.");
 		}
 	}
-	
-	
-	
+
+	public void atualizarSenha(int id, String novaSenha) throws DataAccessException {
+		String sql = "UPDATE USUARIOS SET SENHA = ?, DATA_ULTIMA_ATUALIZACAO = CURRENT_TIMESTAMP WHERE ID = ?";
+
+		try (Connection conn = ConnectionSingleton.getInstance().getConnection();
+				PreparedStatement ps = conn.prepareStatement(sql)) {
+
+			ps.setString(1, novaSenha);
+			ps.setInt(2, id);
+
+			int linhasAfetadas = ps.executeUpdate();
+
+			if (linhasAfetadas == 0) {
+				throw new DataAccessException("Nenhum usuário encontrado para atualizar a senha (ID: " + id + ")");
+			}
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new DataAccessException("Erro ao atualizar a senha do usuário: " + e.getMessage());
+		}
+	}
+
 }

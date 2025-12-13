@@ -1,16 +1,13 @@
 package edu.ifsp.banco.web.usuario;
 
 import java.io.IOException;
+import java.util.List;
 
 import edu.ifsp.banco.modelo.Conta;
 import edu.ifsp.banco.modelo.Usuario;
-import edu.ifsp.banco.modelo.enums.TiposConta;
-import edu.ifsp.banco.persistencia.ContaDAO;
 import edu.ifsp.banco.persistencia.UsuarioDAO;
 import edu.ifsp.banco.service.ContaSERVICE;
-import edu.ifsp.banco.service.UsuarioSERVICE;
 import edu.ifsp.banco.web.Command;
-import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -18,12 +15,31 @@ import jakarta.servlet.http.HttpServletResponse;
 public class MostrarDadosUsuarioCommand implements Command {
 
 	@Override
-	public void execute(HttpServletRequest request, HttpServletResponse response) throws IOException {
-		int id = Integer.parseInt(request.getParameter("id"));
-		ContaDAO dao = new ContaDAO();
-		Conta conta = dao.buscarPorIdUsuario(id);
+	public void execute(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		String idParam = request.getParameter("id");
 
-		response.sendRedirect("app/admin/home.jsp");
+		if (idParam == null || idParam.isEmpty()) {
+			response.sendRedirect("app/admin/home.jsp?msg=IdInvalido");
+			return;
+		}
 
+		try {
+			int idUsuario = Integer.parseInt(idParam);
+
+			UsuarioDAO usuarioDAO = new UsuarioDAO();
+			Usuario usuarioAlvo = usuarioDAO.buscarPorId(idUsuario);
+
+			ContaSERVICE contaService = new ContaSERVICE();
+			List<Conta> contasDoUsuario = contaService.buscarContasPorUsuario(idUsuario);
+
+			request.setAttribute("usuarioDetalhe", usuarioAlvo);
+			request.setAttribute("contasDetalhe", contasDoUsuario);
+
+			request.getRequestDispatcher("/app/admin/detalhes_usuario.jsp").forward(request, response);
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			response.sendRedirect("app/admin/home.jsp?msg=ErroAoCarregarUsuario");
+		}
 	}
 }

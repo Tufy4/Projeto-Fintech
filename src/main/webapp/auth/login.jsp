@@ -84,6 +84,21 @@ body {
 
 		<h4 class="text-center mb-4 text-secondary">Acesse sua conta</h4>
 
+		<%-- Bloco de Mensagem de Sucesso (Ex: Senha alterada) --%>
+		<%
+		String msg = (String) request.getAttribute("msg");
+		if (msg != null) {
+		%>
+		<div class="alert alert-success d-flex align-items-center"
+			role="alert">
+			<i class="bi bi-check-circle-fill me-2"></i>
+			<div><%=msg%></div>
+		</div>
+		<%
+		}
+		%>
+
+		<%-- Bloco de Mensagem de Erro --%>
 		<%
 		if (request.getAttribute("erro") != null) {
 		%>
@@ -94,18 +109,24 @@ body {
 		<%
 		}
 		%>
-
 		<form action="${pageContext.request.contextPath}/app?command=login"
 			method="post">
+
 			<div class="form-floating mb-3">
-				<input type="email" class="form-control" id="email" name="user"
+				<input type="text" class="form-control" id="email" name="user"
 					placeholder="nome@exemplo.com" required> <label for="email">E-mail</label>
 			</div>
 
-			<div class="form-floating mb-4">
+			<div class="form-floating mb-2">
 				<input type="password" class="form-control" id="senha"
 					name="password" placeholder="Senha" required> <label
 					for="senha">Senha</label>
+			</div>
+
+			<div class="d-flex justify-content-end mb-4">
+				<a
+					href="${pageContext.request.contextPath}/auth/recuperar_senha.jsp"
+					class="text-decoration-none small"> Esqueci minha senha </a>
 			</div>
 
 			<div class="d-grid gap-2">
@@ -121,6 +142,5 @@ body {
 			</p>
 		</div>
 	</div>
-
 </body>
 </html>

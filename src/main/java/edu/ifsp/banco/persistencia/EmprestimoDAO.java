@@ -88,24 +88,24 @@ public class EmprestimoDAO {
 
 		return lista;
 	}
-	
+
 	public List<Emprestimo> listarPorConta(int idConta) throws DataAccessException {
-	    List<Emprestimo> lista = new ArrayList<>();
-	    String sql = "SELECT * FROM emprestimos WHERE conta_id = ? ORDER BY id DESC";
+		List<Emprestimo> lista = new ArrayList<>();
+		String sql = "SELECT * FROM emprestimos WHERE conta_id = ? ORDER BY id DESC";
 
-	    try (Connection conn = ConnectionSingleton.getInstance().getConnection();
-	            PreparedStatement stmt = conn.prepareStatement(sql)) {
+		try (Connection conn = ConnectionSingleton.getInstance().getConnection();
+				PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-	        stmt.setInt(1, idConta);
-	        ResultSet rs = stmt.executeQuery();
+			stmt.setInt(1, idConta);
+			ResultSet rs = stmt.executeQuery();
 
-	        while (rs.next()) {
-	            lista.add(mapResultSetToEmprestimo(rs));
-	        }
-	    } catch (SQLException ex) {
-	        throw new DataAccessException("Erro ao listar empréstimos da conta: " + ex.getMessage());
-	    }
-	    return lista;
+			while (rs.next()) {
+				lista.add(mapResultSetToEmprestimo(rs));
+			}
+		} catch (SQLException ex) {
+			throw new DataAccessException("Erro ao listar empréstimos da conta: " + ex.getMessage());
+		}
+		return lista;
 	}
 
 	public List<Emprestimo> listarPorStatus(StatusEmprestimo status) throws DataAccessException {
@@ -192,6 +192,20 @@ public class EmprestimoDAO {
 		} catch (SQLException ex) {
 			throw new DataAccessException("Erro ao registrar pagamento do empréstimo");
 		}
+	}
+
+	public int contarSolicitados() throws DataAccessException {
+		String sql = "SELECT COUNT(*) AS TOTAL FROM EMPRESTIMOS WHERE STATUS = 'SOLICITADO'";
+		try (Connection conn = ConnectionSingleton.getInstance().getConnection();
+				PreparedStatement stmt = conn.prepareStatement(sql);
+				ResultSet rs = stmt.executeQuery()) {
+			if (rs.next()) {
+				return rs.getInt("TOTAL");
+			}
+		} catch (SQLException e) {
+			throw new DataAccessException("Erro ao contar empréstimos: " + e.getMessage());
+		}
+		return 0;
 	}
 
 	private Emprestimo mapResultSetToEmprestimo(ResultSet rs) throws SQLException {
