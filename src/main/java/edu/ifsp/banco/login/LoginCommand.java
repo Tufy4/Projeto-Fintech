@@ -1,11 +1,11 @@
 package edu.ifsp.banco.login;
 
 import java.io.IOException;
+import java.util.List;
 
 import edu.ifsp.banco.modelo.Conta;
 import edu.ifsp.banco.modelo.Usuario;
-import edu.ifsp.banco.modelo.enums.TipoUsuario;
-import edu.ifsp.banco.persistencia.ContaDAO;
+import edu.ifsp.banco.service.ContaSERVICE;
 import edu.ifsp.banco.service.UsuarioSERVICE;
 import edu.ifsp.banco.web.Command;
 import jakarta.servlet.ServletException;
@@ -14,40 +14,35 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 public class LoginCommand implements Command {
-
+	@SuppressWarnings("unused")
 	private static final long serialVersionUID = 1L;
 
 	@Override
 	public void execute(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		String userEmail = request.getParameter("user");
-        String password = request.getParameter("password");
-        
-        UsuarioSERVICE service = new UsuarioSERVICE();
+		String password = request.getParameter("password");
 
-        try {
-            Usuario usuario = service.login(userEmail, password);
-            ContaDAO dao = new ContaDAO();
-            
-            HttpSession session = request.getSession();
-            session.setAttribute("usuarioLogado", usuario);
-            
-            System.out.println("Login efetuado: " + usuario.getEmail() + " - " + usuario.getPerfil());
-            
-            Conta conta = dao.buscarPorIdUsuario(usuario.getId());
-            session.setAttribute("contaLogado", conta);
-           
-            
-            if(usuario.getPerfil().equals(TipoUsuario.GERENTE)) {
-            	response.sendRedirect("app/admin/home.jsp");
-            }
-            else {
-            	response.sendRedirect("app?command=dashboardCliente");
-            }
+		UsuarioSERVICE usuarioService = new UsuarioSERVICE();
+		ContaSERVICE contaService = new ContaSERVICE();
 
-        } catch (Exception e) {
-            System.out.println("Falha no login: " + e.getMessage());
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().write(e.getMessage());
-        }
-    }
+		try {
+			Usuario usuario = usuarioService.login(userEmail, password);
+
+			HttpSession session = request.getSession();
+			session.setAttribute("usuarioLogado", usuario);
+
+			List<Conta> contas = contaService.buscarContasPorUsuario(usuario.getId());
+
+			if (contas.isEmpty()) {
+				throw new Exception("Usuário sem contas ativas. Contate o suporte.");
+			}
+
+			request.setAttribute("listaContas", contas);
+			request.getRequestDispatcher("/auth/selecao_conta.jsp").forward(request, response);
+
+		} catch (Exception e) {
+			request.setAttribute("erro", e.getMessage());
+			request.getRequestDispatcher("/auth/login.jsp").forward(request, response);
+		}
+	}
 }

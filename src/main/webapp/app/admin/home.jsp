@@ -1,5 +1,18 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
+<%@ page import="edu.ifsp.banco.modelo.Usuario"%>
+<%
+	Integer countBloqueados = (Integer) request.getAttribute("countBloqueados");
+	Integer countEmprestimos = (Integer) request.getAttribute("countEmprestimos");
+	Integer countContas = (Integer) request.getAttribute("countContas");
+
+	if (countBloqueados == null) countBloqueados = 0;
+	if (countEmprestimos == null) countEmprestimos = 0;
+	if (countContas == null) countContas = 0;
+
+	Usuario usuarioLogado = (Usuario) session.getAttribute("usuarioLogado");
+	String nomeUsuario = (usuarioLogado != null) ? usuarioLogado.getNome() : "Administrador";
+%>
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -25,11 +38,43 @@ body {
 .admin-card {
 	transition: transform 0.2s;
 	cursor: pointer;
+	position: relative;
+	overflow: visible;
 }
 
 .admin-card:hover {
 	transform: translateY(-5px);
 	border-color: #0d6efd;
+}
+
+.metric-card {
+	cursor: default;
+	background-color: #fff;
+	border: 1px solid #e9ecef;
+}
+
+.notification-badge {
+	position: absolute;
+	top: -10px;
+	right: -10px;
+	background-color: #fd7e14;
+	color: white;
+	border-radius: 50%;
+	width: 40px;
+	height: 40px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-weight: bold;
+	font-size: 1.1rem;
+	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+	border: 2px solid #fff;
+	z-index: 10;
+}
+
+.notification-badge.zero {
+	background-color: #6c757d;
+	transform: scale(0.8);
 }
 </style>
 </head>
@@ -38,7 +83,7 @@ body {
 	<nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
 		<div class="container">
 			<a class="navbar-brand fw-bold"
-				href="${pageContext.request.contextPath}/app/admin/home.jsp">
+				href="${pageContext.request.contextPath}/app?command=dashboardAdmin">
 				BitPay <span class="badge bg-primary"
 				style="font-size: 0.5em; vertical-align: top;">ADMIN</span>
 			</a>
@@ -52,7 +97,7 @@ body {
 				id="navbarNav">
 				<ul class="navbar-nav gap-2 align-items-center">
 					<li class="nav-item"><span class="nav-link text-white">
-							Olá, <strong>${sessionScope.usuarioLogado != null ? sessionScope.usuarioLogado.getNome() : 'Administrador'}</strong>
+							Olá, <strong><%=nomeUsuario%></strong>
 					</span></li>
 					<li class="nav-item"><a class="btn btn-outline-danger btn-sm"
 						href="${pageContext.request.contextPath}/app?command=logout">
@@ -66,13 +111,28 @@ body {
 	<div class="container">
 		<h2 class="mb-4 text-secondary">Painel Administrativo</h2>
 
-		<div class="row row-cols-1 row-cols-md-3 g-4">
+		<%
+		String erro = (String) request.getAttribute("erro");
+		if (erro != null) {
+		%>
+		<div class="alert alert-danger"><%=erro%></div>
+		<%
+		}
+		%>
+
+		<div class="row row-cols-1 row-cols-md-3 g-4 mt-2">
 
 			<div class="col">
 				<a
 					href="${pageContext.request.contextPath}/app?command=consultarBloqueados"
 					class="text-decoration-none">
 					<div class="card h-100 border-0 shadow-sm admin-card">
+
+						<div
+							class="notification-badge <%= countBloqueados == 0 ? "zero" : "" %>">
+							<%= countBloqueados %>
+						</div>
+
 						<div class="card-body text-center p-4">
 							<div class="feature-icon">
 								<i class="bi bi-person-check-fill"></i>
@@ -90,28 +150,37 @@ body {
 					href="${pageContext.request.contextPath}/app?command=listarEmprestimosGerente"
 					class="text-decoration-none">
 					<div class="card h-100 border-0 shadow-sm admin-card">
+
+						<div
+							class="notification-badge <%= countEmprestimos == 0 ? "zero" : "" %>">
+							<%= countEmprestimos %>
+						</div>
+
 						<div class="card-body text-center p-4">
 							<div class="feature-icon">
-								<i class="bi bi-person-check-fill"></i>
+								<i class="bi bi-cash-coin"></i>
 							</div>
-							<h5 class="card-title text-dark">Emprestimos solicitados</h5>
+							<h5 class="card-title text-dark">Empréstimos Solicitados</h5>
 							<p class="card-text text-muted small">Consultar e aprovar
-								emprestimos pendentes.</p>
+								empréstimos pendentes.</p>
 						</div>
 					</div>
 				</a>
 			</div>
 
 			<div class="col">
-				<div class="card h-100 border-0 shadow-sm opacity-50"
-					style="cursor: not-allowed;">
-					<div class="card-body text-center p-4">
-						<div class="feature-icon text-secondary">
-							<i class="bi bi-bar-chart-fill"></i>
-						</div>
-						<h5 class="card-title text-secondary">Relatórios</h5>
-						<p class="card-text text-muted small">Em breve: Visualização
-							de transações globais.</p>
+				<div class="card h-100 shadow-sm metric-card">
+					<div class="card-body text-center p-4 d-flex flex-column justify-content-center">
+						
+						<h5 class="card-title text-secondary mb-3">Total de Contas</h5>
+						
+						<h2 class="display-3 fw-bold text-primary mb-2">
+							<%= countContas %>
+						</h2>
+						
+						<p class="card-text text-muted small">
+							<i class="bi bi-database-check"></i> Contas ativas na base
+						</p>
 					</div>
 				</div>
 			</div>

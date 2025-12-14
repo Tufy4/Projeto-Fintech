@@ -18,7 +18,7 @@ public class AuthController extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		Command cmd = switch (request.getServletPath()) {
-		case "/Login" -> new ViewCommand("forward:/index.html"); // Página de login
+		case "/Login" -> new ViewCommand("forward:/index.html");
 		default -> PageNotFound.getInstance();
 		};
 
@@ -29,8 +29,8 @@ public class AuthController extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		Command cmd = switch (request.getServletPath()) {
-		case "/Login" -> new LoginCommand(); // Processa o login
-		default -> PageNotFound.getInstance(); // Página não encontrada
+		case "/Login" -> new LoginCommand();
+		default -> PageNotFound.getInstance();
 		};
 
 		cmd.execute(request, response);

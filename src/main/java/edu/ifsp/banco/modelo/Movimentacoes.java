@@ -2,7 +2,6 @@ package edu.ifsp.banco.modelo;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
-
 import edu.ifsp.banco.modelo.enums.StatusMovimentacao;
 import edu.ifsp.banco.modelo.enums.TipoMovimentacao;
 
@@ -11,6 +10,8 @@ public class Movimentacoes {
 	private int contaOrigemId;
 	private int contaDestinoId;
 	private BigDecimal valor;
+	private BigDecimal saldoAnterior;
+	private BigDecimal saldoPosterior;
 	private TipoMovimentacao tipo;
 	private Timestamp dataTransacao;
 	private String descricao;
@@ -19,16 +20,35 @@ public class Movimentacoes {
 	public Movimentacoes() {
 	}
 
-	public Movimentacoes(int id, int contaOrigemId, int contaDestinoId, BigDecimal valor, TipoMovimentacao tipo,
-			Timestamp dataTransacao, String descricao, StatusMovimentacao status) {
+	public Movimentacoes(int id, int contaOrigemId, int contaDestinoId, BigDecimal valor, BigDecimal saldoAnterior,
+			BigDecimal saldoPosterior, TipoMovimentacao tipo, Timestamp dataTransacao, String descricao,
+			StatusMovimentacao status) {
 		this.id = id;
 		this.contaOrigemId = contaOrigemId;
 		this.contaDestinoId = contaDestinoId;
 		this.valor = valor;
+		this.saldoAnterior = saldoAnterior;
+		this.saldoPosterior = saldoPosterior;
 		this.tipo = tipo;
 		this.dataTransacao = dataTransacao;
 		this.descricao = descricao;
 		this.status = status;
+	}
+
+	public BigDecimal getSaldoAnterior() {
+		return saldoAnterior;
+	}
+
+	public void setSaldoAnterior(BigDecimal saldoAnterior) {
+		this.saldoAnterior = saldoAnterior;
+	}
+
+	public BigDecimal getSaldoPosterior() {
+		return saldoPosterior;
+	}
+
+	public void setSaldoPosterior(BigDecimal saldoPosterior) {
+		this.saldoPosterior = saldoPosterior;
 	}
 
 	public int getId() {

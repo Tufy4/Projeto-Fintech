@@ -9,14 +9,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.ifsp.banco.modelo.Conta;
-import edu.ifsp.banco.modelo.enums.StatusConta;
 import edu.ifsp.banco.modelo.enums.TiposConta;
 
 public class ContaDAO {
 
 	public void inserir(Conta conta) throws DataAccessException {
-		String sql = "INSERT INTO CONTAS (ID, USUARIO_ID, NUMERO_CONTA, TIPO, STATUS) "
-				+ "VALUES (seq_contas.NEXTVAL, ?, seq_num_conta.NEXTVAL, ?, 'BLOQUEADA')";
+		String sql = "INSERT INTO CONTAS (ID, USUARIO_ID, NUMERO_CONTA, TIPO) "
+				+ "VALUES (seq_contas.NEXTVAL, ?, seq_num_conta.NEXTVAL, ?)";
 
 		try (Connection conn = ConnectionSingleton.getInstance().getConnection();
 				PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -45,7 +44,7 @@ public class ContaDAO {
 			if (rs.next()) {
 				conta = new Conta(rs.getInt("ID"), rs.getInt("USUARIO_ID"), rs.getInt("AGENCIA"),
 						rs.getInt("NUMERO_CONTA"), rs.getBigDecimal("SALDO"), TiposConta.valueOf(rs.getString("TIPO")),
-						StatusConta.valueOf(rs.getString("STATUS")), rs.getTimestamp("DATA_CRIACAO"));
+						rs.getTimestamp("DATA_CRIACAO"));
 			}
 
 		} catch (SQLException e) {
@@ -69,7 +68,7 @@ public class ContaDAO {
 			if (rs.next()) {
 				conta = new Conta(rs.getInt("ID"), rs.getInt("USUARIO_ID"), rs.getInt("AGENCIA"),
 						rs.getInt("NUMERO_CONTA"), rs.getBigDecimal("SALDO"), TiposConta.valueOf(rs.getString("TIPO")),
-						StatusConta.valueOf(rs.getString("STATUS")), rs.getTimestamp("DATA_CRIACAO"));
+						rs.getTimestamp("DATA_CRIACAO"));
 			}
 
 			System.out.println("conta encontrada: " + conta.getId());
@@ -93,7 +92,7 @@ public class ContaDAO {
 			while (rs.next()) {
 				Conta c = new Conta(rs.getInt("ID"), rs.getInt("USUARIO_ID"), rs.getInt("AGENCIA"),
 						rs.getInt("NUMERO_CONTA"), rs.getBigDecimal("SALDO"), TiposConta.valueOf(rs.getString("TIPO")),
-						StatusConta.valueOf(rs.getString("STATUS")), rs.getTimestamp("DATA_CRIACAO"));
+						rs.getTimestamp("DATA_CRIACAO"));
 				contas.add(c);
 			}
 
@@ -120,9 +119,9 @@ public class ContaDAO {
 		}
 	}
 
-	public Conta buscarPorIdUsuario(int idUser) throws DataAccessException {
+	public List<Conta> buscarPorIdUsuario(int idUser) throws DataAccessException {
+		List<Conta> contas = new ArrayList<>();
 		String sql = "SELECT * FROM CONTAS WHERE USUARIO_ID = ?";
-		Conta conta = null;
 
 		try (Connection conn = ConnectionSingleton.getInstance().getConnection();
 				PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -130,17 +129,32 @@ public class ContaDAO {
 			stmt.setInt(1, idUser);
 			ResultSet rs = stmt.executeQuery();
 
-			if (rs.next()) {
-				conta = new Conta(rs.getInt("ID"), rs.getInt("USUARIO_ID"), rs.getInt("AGENCIA"),
+			while (rs.next()) {
+				Conta conta = new Conta(rs.getInt("ID"), rs.getInt("USUARIO_ID"), rs.getInt("AGENCIA"),
 						rs.getInt("NUMERO_CONTA"), rs.getBigDecimal("SALDO"), TiposConta.valueOf(rs.getString("TIPO")),
-						StatusConta.valueOf(rs.getString("STATUS")), rs.getTimestamp("DATA_CRIACAO"));
+						rs.getTimestamp("DATA_CRIACAO"));
+				contas.add(conta);
 			}
 
 		} catch (SQLException e) {
 			e.printStackTrace();
-			throw new DataAccessException("Erro ao buscar conta");
+			throw new DataAccessException("Erro ao buscar contas do usuário");
 		}
 
-		return conta;
+		return contas;
+	}
+
+	public int contarTotal() throws DataAccessException {
+		String sql = "SELECT COUNT(*) AS TOTAL FROM CONTAS";
+		try (Connection conn = ConnectionSingleton.getInstance().getConnection();
+				PreparedStatement stmt = conn.prepareStatement(sql);
+				ResultSet rs = stmt.executeQuery()) {
+			if (rs.next()) {
+				return rs.getInt("TOTAL");
+			}
+		} catch (SQLException e) {
+			throw new DataAccessException("Erro ao contar contas: " + e.getMessage());
+		}
+		return 0;
 	}
 }

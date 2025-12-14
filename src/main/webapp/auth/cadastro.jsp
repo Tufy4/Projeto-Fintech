@@ -32,7 +32,7 @@ body {
 	padding: 40px;
 	box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
 	width: 100%;
-	max-width: 500px; /* Um pouco mais largo para o cadastro */
+	max-width: 500px;
 }
 
 .brand-logo {
@@ -127,13 +127,6 @@ body {
 				<input type="text" class="form-control" id="endereco"
 					name="endereco" placeholder="Endereço"> <label
 					for="endereco">Endereço</label>
-			</div>
-
-			<div class="form-floating mb-4">
-				<select class="form-select" id="typeAccount" name="typeAccount">
-					<option value="CORRENTE" selected>Conta Corrente</option>
-					<option value="POUPANCA">Conta Poupança</option>
-				</select> <label for="typeAccount">Tipo de Conta</label>
 			</div>
 
 			<div class="d-grid gap-2">

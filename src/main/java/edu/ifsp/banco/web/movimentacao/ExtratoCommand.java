@@ -8,7 +8,6 @@ import edu.ifsp.banco.modelo.Movimentacoes;
 import edu.ifsp.banco.service.MovimentacaoSERVICE;
 import edu.ifsp.banco.web.Command;
 import jakarta.servlet.RequestDispatcher;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
@@ -30,10 +29,16 @@ public class ExtratoCommand implements Command {
 		}
 
 		try {
+			String dataInicio = request.getParameter("dataInicio");
+			String dataFim = request.getParameter("dataFim");
+
 			MovimentacaoSERVICE service = new MovimentacaoSERVICE();
-			List<Movimentacoes> extrato = service.consultarExtrato(conta.getId());
+
+			List<Movimentacoes> extrato = service.consultarExtrato(conta.getId(), dataInicio, dataFim);
 
 			request.setAttribute("listaExtrato", extrato);
+			request.setAttribute("filtroInicio", dataInicio);
+			request.setAttribute("filtroFim", dataFim);
 
 			RequestDispatcher rd = request.getRequestDispatcher("/app/movimentacao/extrato.jsp");
 			rd.forward(request, response);

@@ -80,7 +80,7 @@
 }
 
 .center-wrapper {
-	min-height: calc(100vh - 80px); /* altura total menos a navbar */
+	min-height: calc(100vh - 80px);
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -120,32 +120,25 @@ sessionScope.usuarioLogado.getNome() : 'Cliente'}</strong>
 			</div>
 		</div>
 	</nav>
-
 	<section id="deposito" class="container center-wrapper">
-
 		<h2>
 			Seja Bem-vindo, <strong>${sessionScope.usuarioLogado != null ?
 sessionScope.usuarioLogado.getNome() : 'Cliente'}</strong>
 			<br> Saldo atual: R$ <strong>${sessionScope.saldoConta != null ? sessionScope.saldoConta : '0.00'}</strong>
 		</h2>
-
 		<div class="deposit-form">
 			<h2 class="deposit-title">Depósito</h2>
 
 			<form
-				action="${pageContext.request.contextPath}/app?command=depositar"
+				action="${pageContext.request.contextPath}/app?command=realizarTransacao"
 				method="post">
-				<label
-					for="valor">Valor (R$):</label> <input type="number" step="0.01"
-					id="valor" name="valor" required>
+				<input type="hidden" name="tipoTransacao" value="DEPOSITO">
 
-				<p class="note">Digite o valor à ser depositado!</p>
-
+				<label for="valor">Valor (R$):</label> <input type="number"
+					step="0.01" id="valor" name="valor" required>
 				<button type="submit">Depositar</button>
 			</form>
 		</div>
-
 	</section>
-
 </body>
 </html>

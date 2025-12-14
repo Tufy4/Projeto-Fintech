@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.math.BigDecimal;
 
 import edu.ifsp.banco.modelo.Conta;
-import edu.ifsp.banco.modelo.Usuario;
 import edu.ifsp.banco.persistencia.ContaDAO;
 import edu.ifsp.banco.service.InvestimentoSERVICE;
 import edu.ifsp.banco.web.Command;
@@ -22,33 +21,46 @@ public class FinalizarInvestimentoCommand implements Command {
 		RequestDispatcher rd;
 
 		try {
-			int numeroConta = Integer.parseInt(req.getParameter("numeroConta"));
-			String produto = req.getParameter("produto");
-			BigDecimal valor = new BigDecimal(req.getParameter("valor"));
-
-			InvestimentoSERVICE service = new InvestimentoSERVICE();
-
-			service.montarInvestimento(numeroConta, produto, valor);
-
 			HttpSession session = req.getSession();
-			Usuario usuario = (Usuario) session.getAttribute("usuarioLogado");
+			Conta contaSessao = (Conta) session.getAttribute("contaLogado");
 
-			if (usuario != null) {
-				ContaDAO contaDAO = new ContaDAO();
-				Conta contaAtualizada = contaDAO.buscarPorIdUsuario(usuario.getId());
-
-				if (contaAtualizada != null) {
-					session.setAttribute("conta", contaAtualizada);
-					session.setAttribute("saldoConta", contaAtualizada.getSaldo());
-				}
+			if (contaSessao == null) {
+				throw new Exception("Sessão expirada. Faça login novamente.");
 			}
 
-			req.setAttribute("mensagem", "Investimento realizado com sucesso!");
+			int numeroConta = contaSessao.getNumero_conta();
+			String produto = req.getParameter("produto");
+
+			if (produto == null || produto.trim().isEmpty()) {
+				throw new Exception("O tipo de investimento (produto) não foi informado.");
+			}
+
+			String valorStr = req.getParameter("valor");
+			if (valorStr == null || valorStr.isEmpty()) {
+				throw new Exception("O valor do investimento é obrigatório.");
+			}
+
+			BigDecimal valor = new BigDecimal(valorStr.replace(",", "."));
+
+			InvestimentoSERVICE service = new InvestimentoSERVICE();
+			service.montarInvestimento(numeroConta, produto, valor);
+			ContaDAO contaDAO = new ContaDAO();
+			Conta contaAtualizada = contaDAO.buscarPorNumero(numeroConta);
+
+			if (contaAtualizada != null) {
+				session.setAttribute("contaLogado", contaAtualizada);
+				session.setAttribute("saldoConta", contaAtualizada.getSaldo());
+			}
+
+			req.setAttribute("msg", "Investimento em " + produto + " realizado com sucesso!");
 			rd = req.getRequestDispatcher("/app/movimentacao/sucesso.jsp");
 
+		} catch (NumberFormatException e) {
+			req.setAttribute("erro", "Formato de valor inválido.");
+			rd = req.getRequestDispatcher("/app/movimentacao/erro.jsp");
 		} catch (Exception e) {
 			e.printStackTrace();
-			req.setAttribute("erro", e.getMessage());
+			req.setAttribute("erro", "Erro ao investir: " + e.getMessage());
 			rd = req.getRequestDispatcher("/app/movimentacao/erro.jsp");
 		}
 

@@ -2,6 +2,7 @@ package edu.ifsp.banco.web.movimentacao;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+
 import edu.ifsp.banco.modelo.Conta;
 import edu.ifsp.banco.persistencia.ContaDAO;
 import edu.ifsp.banco.service.MovimentacaoSERVICE;
@@ -12,37 +13,63 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
-public class TransferenciaCommand implements Command {
+public class RealizarTransacaoCommand implements Command {
 
 	@Override
 	public void execute(HttpServletRequest request, HttpServletResponse response) {
 		RequestDispatcher rd;
 
 		try {
-			int numeroDestino = Integer.parseInt(request.getParameter("contaDestino"));
-			BigDecimal valor = new BigDecimal(request.getParameter("valor"));
-
 			HttpSession session = request.getSession();
 			Conta contaOrigem = (Conta) session.getAttribute("contaLogado");
 
 			if (contaOrigem == null) {
 				throw new Exception("Sessão expirada. Faça login novamente.");
 			}
+			String tipo = request.getParameter("tipoTransacao");
+			String valorStr = request.getParameter("valor");
+
+			if (valorStr == null || valorStr.isEmpty()) {
+				throw new Exception("Valor obrigatório.");
+			}
+
+			BigDecimal valor = new BigDecimal(valorStr.replace(",", "."));
 
 			MovimentacaoSERVICE service = new MovimentacaoSERVICE();
-			service.realizarTransferencia(contaOrigem, numeroDestino, valor);
+			String mensagemSucesso = "";
 
+			if ("DEPOSITO".equalsIgnoreCase(tipo)) {
+
+				service.depositar(contaOrigem.getNumero_conta(), valor);
+				mensagemSucesso = "Depósito realizado com sucesso!";
+
+			} else if ("TRANSFERENCIA".equalsIgnoreCase(tipo)) {
+
+				String contaDestinoStr = request.getParameter("contaDestino");
+				if (contaDestinoStr == null || contaDestinoStr.isEmpty()) {
+					throw new Exception("Conta de destino obrigatória.");
+				}
+				int numeroDestino = Integer.parseInt(contaDestinoStr);
+
+				service.realizarTransferencia(contaOrigem, numeroDestino, valor);
+				mensagemSucesso = "Transferência de R$ " + valorStr + " realizada com sucesso!";
+
+			} else {
+				throw new Exception("Tipo de transação desconhecido.");
+			}
 			ContaDAO contaDAO = new ContaDAO();
 			Conta contaAtualizada = contaDAO.buscarPorNumero(contaOrigem.getNumero_conta());
 
-			session.setAttribute("conta", contaAtualizada);
-			session.setAttribute("saldoConta", contaAtualizada.getSaldo());
+			if (contaAtualizada != null) {
+				session.setAttribute("contaLogado", contaAtualizada);
+				session.setAttribute("saldoConta", contaAtualizada.getSaldo());
+			}
 
-			request.setAttribute("msg", "Transferência de R$ " + valor + " realizada com sucesso!");
+			request.setAttribute("msg", mensagemSucesso);
 			rd = request.getRequestDispatcher("/app/movimentacao/sucesso.jsp");
 
 		} catch (NumberFormatException e) {
-			request.setAttribute("erro", "Formato de valor ou conta inválido.");
+			request.setAttribute("erro", "Valor ou número da conta inválido.");
 			rd = request.getRequestDispatcher("/app/movimentacao/erro.jsp");
 		} catch (Exception e) {
 			e.printStackTrace();

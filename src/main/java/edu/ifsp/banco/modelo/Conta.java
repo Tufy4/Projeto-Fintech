@@ -12,11 +12,10 @@ public class Conta {
 	private int numero_conta;
 	private BigDecimal saldo;
 	private TiposConta tipo;
-	private StatusConta status;
 	private Timestamp DataCriacao;
 
 	public Conta(int id, int usuarioId, int agencia, int numero_conta, BigDecimal saldo, TiposConta tipo,
-			StatusConta status, Timestamp dataCriacao) {
+			Timestamp dataCriacao) {
 		super();
 		this.id = id;
 		this.usuarioId = usuarioId;
@@ -24,7 +23,6 @@ public class Conta {
 		this.numero_conta = numero_conta;
 		this.saldo = saldo;
 		this.tipo = tipo;
-		this.status = status;
 		DataCriacao = dataCriacao;
 	}
 
@@ -64,14 +62,6 @@ public class Conta {
 		this.tipo = tipo;
 	}
 
-	public StatusConta getStatus() {
-		return status;
-	}
-
-	public void setStatus(StatusConta status) {
-		this.status = status;
-	}
-
 	public Timestamp getDataCriacao() {
 		return DataCriacao;
 	}
@@ -99,8 +89,7 @@ public class Conta {
 	@Override
 	public String toString() {
 		return "Conta [id=" + id + ", usuarioId=" + usuarioId + ", agencia=" + agencia + ", numero_conta="
-				+ numero_conta + ", saldo=" + saldo + ", tipo=" + tipo + ", status=" + status + ", DataCriacao="
-				+ DataCriacao + "]";
+				+ numero_conta + ", saldo=" + saldo + ", tipo=" + tipo + ", DataCriacao=" + DataCriacao + "]";
 	}
 
 }

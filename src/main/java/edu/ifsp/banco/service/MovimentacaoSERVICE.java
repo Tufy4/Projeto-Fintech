@@ -19,20 +19,23 @@ public class MovimentacaoSERVICE {
 	private ContaDAO contaDAO = new ContaDAO();
 	private MovimentacaoDAO movimentacaoDAO = new MovimentacaoDAO();
 
-	public Conta depositar(int idConta, BigDecimal valor) throws DataAccessException {
-		Conta conta = contaDAO.buscarPorNumero(idConta);
+	public Conta depositar(int numeroConta, BigDecimal valor) throws DataAccessException {
+		Conta conta = contaDAO.buscarPorNumero(numeroConta);
 		if (conta == null) {
 			throw new DataAccessException("Conta não encontrada");
 		}
 
-		BigDecimal novoSaldo = conta.getSaldo().add(valor);
-		contaDAO.atualizarSaldo(conta.getId(), novoSaldo.doubleValue());
+		BigDecimal saldoAnterior = conta.getSaldo();
+		BigDecimal novoSaldo = saldoAnterior.add(valor);
 
-		Movimentacoes mov = new Movimentacoes(0, conta.getId(), 0, valor, TipoMovimentacao.DEPOSITO,
-				new Timestamp(System.currentTimeMillis()), "Depósito via App", StatusMovimentacao.CONCLUIDA);
+		contaDAO.atualizarSaldo(conta.getId(), novoSaldo.doubleValue());
+		conta.setSaldo(novoSaldo);
+
+		Movimentacoes mov = new Movimentacoes(0, conta.getId(), conta.getId(), valor, saldoAnterior, novoSaldo,
+				TipoMovimentacao.DEPOSITO, new Timestamp(System.currentTimeMillis()), "Depósito via App",
+				StatusMovimentacao.CONCLUIDA);
 
 		movimentacaoDAO.inserir(mov);
-		conta.setSaldo(novoSaldo);
 
 		return conta;
 	}
@@ -43,41 +46,72 @@ public class MovimentacaoSERVICE {
 		if (valor.compareTo(BigDecimal.ZERO) <= 0) {
 			throw new DataAccessException("Valor deve ser maior que zero.");
 		}
-
 		if (contaOrigem.getSaldo().compareTo(valor) < 0) {
 			throw new DataAccessException("Saldo insuficiente.");
 		}
 
 		Conta contaDestino = contaDAO.buscarPorNumero(numeroContaDestino);
-
 		if (contaDestino == null) {
 			throw new DataAccessException("Conta de destino não encontrada.");
 		}
-
 		if (contaOrigem.getId() == contaDestino.getId()) {
 			throw new DataAccessException("Não é possível transferir para a mesma conta.");
 		}
 
-		BigDecimal novoSaldoOrigem = contaOrigem.getSaldo().subtract(valor);
-		BigDecimal novoSaldoDestino = contaDestino.getSaldo().add(valor);
+		BigDecimal saldoAnteriorOrigem = contaOrigem.getSaldo();
+		BigDecimal novoSaldoOrigem = saldoAnteriorOrigem.subtract(valor);
+		BigDecimal saldoAnteriorDestino = contaDestino.getSaldo();
+		BigDecimal novoSaldoDestino = saldoAnteriorDestino.add(valor);
 
 		contaDAO.atualizarSaldo(contaOrigem.getId(), novoSaldoOrigem.doubleValue());
 		contaDAO.atualizarSaldo(contaDestino.getId(), novoSaldoDestino.doubleValue());
 
-		Movimentacoes mov = new Movimentacoes(0, contaOrigem.getId(), contaDestino.getId(), valor,
-				TipoMovimentacao.TRANSFERENCIA, new Timestamp(System.currentTimeMillis()),
-				"Transferência para " + numeroContaDestino, StatusMovimentacao.CONCLUIDA);
+		Timestamp dataAgora = new Timestamp(System.currentTimeMillis());
 
-		movimentacaoDAO.inserir(mov);
+		Movimentacoes movSaida = new Movimentacoes(0, contaOrigem.getId(), contaDestino.getId(), valor,
+				saldoAnteriorOrigem, novoSaldoOrigem, TipoMovimentacao.TRANSFERENCIA_ENVIADA, dataAgora,
+				"Transferência enviada", StatusMovimentacao.CONCLUIDA);
+
+		movimentacaoDAO.inserir(movSaida);
+
+		Movimentacoes movEntrada = new Movimentacoes(0, contaOrigem.getId(), contaDestino.getId(), valor,
+				saldoAnteriorDestino, novoSaldoDestino, TipoMovimentacao.TRANSFERENCIA_RECEBIDA, dataAgora,
+				"Transferência recebida", StatusMovimentacao.CONCLUIDA);
+
+		movimentacaoDAO.inserir(movEntrada);
 	}
-	
+
 	public List<Movimentacoes> consultarExtrato(int idConta) throws DataAccessException {
-	    try {
+		try {
 			return movimentacaoDAO.listarMovimentacoes(idConta);
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+			return new ArrayList<>();
 		}
-	    return new ArrayList<>();
+	}
+
+	public List<Movimentacoes> consultarExtrato(int idConta, String inicioStr, String fimStr)
+			throws DataAccessException {
+		try {
+			java.sql.Date dataInicio = null;
+			java.sql.Date dataFim = null;
+
+			if (inicioStr != null && !inicioStr.isEmpty()) {
+				dataInicio = java.sql.Date.valueOf(inicioStr);
+			}
+			if (fimStr != null && !fimStr.isEmpty()) {
+				dataFim = java.sql.Date.valueOf(fimStr);
+			}
+
+			if (dataInicio == null && dataFim == null) {
+				return movimentacaoDAO.listarMovimentacoes(idConta);
+			} else {
+				return movimentacaoDAO.listarMovimentacoes(idConta, dataInicio, dataFim);
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ArrayList<>();
+		}
 	}
 }

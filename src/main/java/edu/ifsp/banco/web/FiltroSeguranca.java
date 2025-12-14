@@ -4,8 +4,8 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
-import edu.ifsp.banco.modelo.Usuario;
-import edu.ifsp.banco.modelo.enums.TipoUsuario;
+import edu.ifsp.banco.modelo.Conta;
+import edu.ifsp.banco.modelo.enums.TiposConta;
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -19,79 +19,66 @@ import jakarta.servlet.http.HttpSession;
 
 @WebFilter("/*")
 public class FiltroSeguranca extends HttpFilter implements Filter {
-    
-    private static final long serialVersionUID = 1L;
 
-    private static final List<String> COMANDOS_PUBLICOS = Arrays.asList(
-        "login", 
-        "cadastro", 
-        "salvarUsuario",
-        "cadastrarUsuario",
-        "redirect"
-    );
+	private static final long serialVersionUID = 1L;
+	private static final List<String> COMANDOS_PUBLICOS = Arrays.asList("login", "cadastro", "salvarUsuario",
+			"cadastrarUsuario", "redirect", "solicitarRecuperacao", "validarToken", "redefinirSenha");
 
-    private static final List<String> CAMINHOS_PUBLICOS = Arrays.asList(
-        "/index.jsp",
-        "/auth/login.jsp",
-        "/auth/cadastro.jsp"
-    );
+	private static final List<String> CAMINHOS_PUBLICOS = Arrays.asList("/index.jsp", "/auth/login.jsp",
+			"/auth/cadastro.jsp", "/auth/recuperar_senha.jsp", "/auth/nova_senha.jsp");
 
-    @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
-            throws IOException, ServletException {
+	@Override
+	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+			throws IOException, ServletException {
 
-        HttpServletRequest req = (HttpServletRequest) request;
-        HttpServletResponse res = (HttpServletResponse) response;
-        
-        HttpSession session = req.getSession(false);
-        boolean isLogado = (session != null && session.getAttribute("usuarioLogado") != null);
-        
-        String command = req.getParameter("command");
-        String uri = req.getRequestURI();
-        String contextPath = req.getContextPath();
-        String path = uri.substring(contextPath.length());
+		HttpServletRequest req = (HttpServletRequest) request;
+		HttpServletResponse res = (HttpServletResponse) response;
 
-        
-        if (path.equals("/") || path.equals("/index.jsp")) {
-            chain.doFilter(request, response);
-            return;
-        }
+		HttpSession session = req.getSession(false);
+		boolean isLogado = (session != null && session.getAttribute("usuarioLogado") != null);
 
-        boolean isPublicPath = CAMINHOS_PUBLICOS.stream().anyMatch(path::startsWith);
-        if (isPublicPath) {
-            chain.doFilter(request, response);
-            return;
-        }
+		String command = req.getParameter("command");
+		String uri = req.getRequestURI();
+		String contextPath = req.getContextPath();
+		String path = uri.substring(contextPath.length());
 
-        if (path.equals("/app")) {
-            if (command == null || COMANDOS_PUBLICOS.contains(command)) {
-                chain.doFilter(request, response);
-                return;
-            }
-        }
-        
-        if (path.startsWith("/app/admin/")) {
+		if (path.equals("/") || path.equals("/index.jsp")) {
+			chain.doFilter(request, response);
+			return;
+		}
 
-            if (!isLogado)   {
-                res.sendRedirect(contextPath + "/auth/login.jsp");
-                return;
-            }else {
-            	Usuario user = (Usuario) session.getAttribute("usuarioLogado");
-            	if(user.getPerfil()!=TipoUsuario.GERENTE){
-            		 res.sendRedirect(contextPath + "/auth/login.jsp");
-            	}
-            	 
-            	
-            }
-        }
+		boolean isPublicPath = CAMINHOS_PUBLICOS.stream().anyMatch(path::startsWith);
+		if (isPublicPath) {
+			chain.doFilter(request, response);
+			return;
+		}
 
-        
+		if (path.equals("/app")) {
+			if (command == null || COMANDOS_PUBLICOS.contains(command)) {
+				chain.doFilter(request, response);
+				return;
+			}
+		}
 
-        if (isLogado) {
-            chain.doFilter(request, response);
-        } else {
-            req.setAttribute("erro", "Acesso negado. Faça login.");
-            req.getRequestDispatcher("/auth/login.jsp").forward(request, response);
-        }
-    }
+		if (path.startsWith("/app/admin/")) {
+
+			if (!isLogado) {
+				res.sendRedirect(contextPath + "/auth/login.jsp");
+				return;
+			} else {
+				Conta conta = (Conta) session.getAttribute("contaLogado");
+				if (conta == null || conta.getTipo() != TiposConta.GERENTE) {
+					res.sendRedirect(contextPath + "/auth/login.jsp");
+					return;
+				}
+			}
+		}
+
+		if (isLogado) {
+			chain.doFilter(request, response);
+		} else {
+			req.setAttribute("erro", "Acesso negado. Faça login.");
+			req.getRequestDispatcher("/auth/login.jsp").forward(request, response);
+		}
+	}
 }

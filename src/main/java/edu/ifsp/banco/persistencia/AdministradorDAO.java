@@ -8,14 +8,12 @@ import java.util.List;
 
 import edu.ifsp.banco.modelo.Usuario;
 import edu.ifsp.banco.modelo.enums.StatusUsuario;
-import edu.ifsp.banco.modelo.enums.TipoUsuario;
-import edu.ifsp.banco.modelo.enums.TiposConta;
 
 public class AdministradorDAO {
+
 	public List<Usuario> listarUsuariosBloqueados() {
 		List<Usuario> usuarios = new ArrayList<>();
-
-		String sql = "SELECT ID, NOME, EMAIL, TELEFONE, ENDERECO, PERFIL, STATUS FROM USUARIOS WHERE STATUS = 'BLOQUEADO'";
+		String sql = "SELECT ID, NOME, EMAIL, TELEFONE, ENDERECO, STATUS FROM USUARIOS WHERE STATUS = 'BLOQUEADO'";
 
 		try (Connection conn = ConnectionSingleton.getInstance().getConnection();
 				PreparedStatement stmt = conn.prepareStatement(sql);
@@ -28,39 +26,35 @@ public class AdministradorDAO {
 				u.setEmail(rs.getString("EMAIL"));
 				u.setTelefone(rs.getString("TELEFONE"));
 				u.setEndereco(rs.getString("ENDERECO"));
-				u.setPerfil(TipoUsuario.valueOf(rs.getString("PERFIL")));
 				u.setStatus(StatusUsuario.valueOf(rs.getString("STATUS")));
-
 				usuarios.add(u);
-				System.out.println(u);
 			}
 
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
 		return usuarios;
 	}
 
 	public Usuario ProcurarUsuarioId(int id) {
-		Usuario u = new Usuario();
-		;
-		String sql = "SELECT ID, NOME, EMAIL, TELEFONE, ENDERECO, PERFIL, STATUS FROM USUARIOS WHERE ID = ?";
+		Usuario u = null;
+		String sql = "SELECT ID, NOME, EMAIL, TELEFONE, ENDERECO, STATUS FROM USUARIOS WHERE ID = ?";
 
 		try (Connection conn = ConnectionSingleton.getInstance().getConnection();
-				PreparedStatement stmt = conn.prepareStatement(sql);
+				PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-				ResultSet rs = stmt.executeQuery()) {
 			stmt.setInt(1, id);
-			if (rs.next()) {
-				u.setId(rs.getInt("ID"));
-				u.setNome(rs.getString("NOME"));
-				u.setEmail(rs.getString("EMAIL"));
-				u.setTelefone(rs.getString("TELEFONE"));
-				u.setEndereco(rs.getString("ENDERECO"));
-				u.setPerfil(TipoUsuario.valueOf(rs.getString("PERFIL")));
-				u.setStatus(StatusUsuario.valueOf(rs.getString("STATUS")));
 
+			try (ResultSet rs = stmt.executeQuery()) {
+				if (rs.next()) {
+					u = new Usuario();
+					u.setId(rs.getInt("ID"));
+					u.setNome(rs.getString("NOME"));
+					u.setEmail(rs.getString("EMAIL"));
+					u.setTelefone(rs.getString("TELEFONE"));
+					u.setEndereco(rs.getString("ENDERECO"));
+					u.setStatus(StatusUsuario.valueOf(rs.getString("STATUS")));
+				}
 			}
 
 		} catch (Exception e) {
@@ -72,19 +66,35 @@ public class AdministradorDAO {
 
 	public boolean liberarUsuario(int id) {
 		String sql = "UPDATE USUARIOS SET STATUS = 'ATIVO', DATA_ULTIMA_ATUALIZACAO = CURRENT_TIMESTAMP WHERE ID = ? AND STATUS = 'BLOQUEADO'";
-		int linhasAfetadas = 0;
 
 		try (Connection conn = ConnectionSingleton.getInstance().getConnection();
 				PreparedStatement stmt = conn.prepareStatement(sql)) {
 
 			stmt.setInt(1, id);
+			int linhasAfetadas = stmt.executeUpdate();
+			return linhasAfetadas > 0;
 
-			linhasAfetadas = stmt.executeUpdate();
 		} catch (Exception e) {
 			e.printStackTrace();
+			return false;
 		}
-
-		return linhasAfetadas > 0;
 	}
 
+	public int contarBloqueados() {
+		String sql = "SELECT COUNT(*) FROM USUARIOS WHERE STATUS = 'BLOQUEADO'";
+
+		try (Connection conn = ConnectionSingleton.getInstance().getConnection();
+				PreparedStatement stmt = conn.prepareStatement(sql);
+				ResultSet rs = stmt.executeQuery()) {
+
+			if (rs.next()) {
+				return rs.getInt(1);
+			}
+
+		} catch (Exception e) {
+			System.err.println("Erro ao contar usuários bloqueados: " + e.getMessage());
+			e.printStackTrace();
+		}
+		return 0;
+	}
 }
