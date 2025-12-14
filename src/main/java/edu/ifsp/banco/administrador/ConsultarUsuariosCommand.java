@@ -24,12 +24,7 @@ public class ConsultarUsuariosCommand implements Command {
             request.setAttribute("ListaBloqueados", bloqueados);
             RequestDispatcher rd = request.getRequestDispatcher("app/admin/listarUsuarios.jsp");
             rd.forward(request, response);
-
-            System.out.println(bloqueados);
-
-
         } catch (Exception e) {
-            System.out.println(e.getMessage());
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.getWriter().write(e.getMessage());
         }

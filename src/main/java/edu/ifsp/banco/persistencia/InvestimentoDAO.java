@@ -9,13 +9,18 @@ import java.util.List;
 
 public class InvestimentoDAO {
 
+	private Connection connection;
+
+	public InvestimentoDAO(Connection connection) {
+		this.connection = connection;
+	}
+
 	public void inserir(Investimento inv) throws DataAccessException {
 
 		String sql = "INSERT INTO INVESTIMENTOS (id, conta_id, tipo_investimento, status, valor_investido, data_inicio, data_fim) "
 				+ "VALUES (SEQ_INVESTIMENTOS.NEXTVAL, ?, ?, ?, ?, ?, ?)";
 
-		try (Connection conn = ConnectionSingleton.getInstance().getConnection();
-				PreparedStatement stmt = conn.prepareStatement(sql)) {
+		try (PreparedStatement stmt = connection.prepareStatement(sql)) {
 
 			stmt.setInt(1, inv.getIdConta());
 			stmt.setString(2, inv.getTipoInvestimento());
@@ -37,8 +42,7 @@ public class InvestimentoDAO {
 		String sql = "SELECT * FROM INVESTIMENTOS WHERE id = ?";
 		Investimento investimento = null;
 
-		try (Connection conn = ConnectionSingleton.getInstance().getConnection();
-				PreparedStatement stmt = conn.prepareStatement(sql)) {
+		try (PreparedStatement stmt = connection.prepareStatement(sql)) {
 
 			stmt.setInt(1, id);
 
@@ -64,8 +68,7 @@ public class InvestimentoDAO {
 		List<Investimento> lista = new ArrayList<>();
 		String sql = "SELECT * FROM INVESTIMENTOS WHERE conta_id = ?";
 
-		try (Connection conn = ConnectionSingleton.getInstance().getConnection();
-				PreparedStatement stmt = conn.prepareStatement(sql)) {
+		try (PreparedStatement stmt = connection.prepareStatement(sql)) {
 
 			stmt.setInt(1, idConta);
 
@@ -93,8 +96,7 @@ public class InvestimentoDAO {
 		String sql = "UPDATE INVESTIMENTOS SET conta_id = ?, tipo_investimento = ?, status = ?, valor_investido = ?, data_inicio = ?, data_fim = ? "
 				+ "WHERE id = ?";
 
-		try (Connection conn = ConnectionSingleton.getInstance().getConnection();
-				PreparedStatement stmt = conn.prepareStatement(sql)) {
+		try (PreparedStatement stmt = connection.prepareStatement(sql)) {
 
 			stmt.setInt(1, inv.getIdConta());
 			stmt.setString(2, inv.getTipoInvestimento());
@@ -120,8 +122,7 @@ public class InvestimentoDAO {
 
 		String sql = "UPDATE INVESTIMENTOS SET status = ?, data_fim = ? WHERE id = ?";
 
-		try (Connection conn = ConnectionSingleton.getInstance().getConnection();
-				PreparedStatement stmt = conn.prepareStatement(sql)) {
+		try (PreparedStatement stmt = connection.prepareStatement(sql)) {
 
 			stmt.setString(1, StatusInvestimento.ENCERRADO.getValor());
 			stmt.setTimestamp(2, dataFim);
@@ -143,8 +144,7 @@ public class InvestimentoDAO {
 
 		String sql = "DELETE FROM INVESTIMENTOS WHERE id = ?";
 
-		try (Connection conn = ConnectionSingleton.getInstance().getConnection();
-				PreparedStatement stmt = conn.prepareStatement(sql)) {
+		try (PreparedStatement stmt = connection.prepareStatement(sql)) {
 
 			stmt.setInt(1, id);
 

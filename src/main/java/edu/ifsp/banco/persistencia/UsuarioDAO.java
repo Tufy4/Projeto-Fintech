@@ -10,11 +10,16 @@ import edu.ifsp.banco.modelo.enums.StatusUsuario;
 
 public class UsuarioDAO {
 
+	private Connection connection;
+
+	public UsuarioDAO(Connection connection) {
+		this.connection = connection;
+	}
+
 	public Usuario buscarPorEmail(String email) throws DataAccessException {
 		String sql = "SELECT * FROM USUARIOS WHERE EMAIL = ?";
 
-		try (Connection conn = ConnectionSingleton.getInstance().getConnection();
-				PreparedStatement ps = conn.prepareStatement(sql)) {
+		try (PreparedStatement ps = connection.prepareStatement(sql)) {
 
 			ps.setString(1, email);
 
@@ -45,8 +50,7 @@ public class UsuarioDAO {
 	public Usuario buscarPorId(int id) throws DataAccessException {
 		String sql = "SELECT * FROM USUARIOS WHERE ID = ?";
 
-		try (Connection conn = ConnectionSingleton.getInstance().getConnection();
-				PreparedStatement ps = conn.prepareStatement(sql)) {
+		try (PreparedStatement ps = connection.prepareStatement(sql)) {
 
 			ps.setInt(1, id);
 
@@ -66,7 +70,7 @@ public class UsuarioDAO {
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
-			throw new DataAccessException("Erro ao buscar usuário por email.");
+			throw new DataAccessException("Erro ao buscar usuário por ID.");
 		} catch (IllegalArgumentException e) {
 			e.printStackTrace();
 			throw new DataAccessException("Erro de consistência: Enum inválido no banco de dados.");
@@ -91,8 +95,7 @@ public class UsuarioDAO {
 			throw new IllegalArgumentException("Senha não pode ser vazia.");
 		}
 
-		try (Connection conn = ConnectionSingleton.getInstance().getConnection();
-				PreparedStatement ps = conn.prepareStatement(sql)) {
+		try (PreparedStatement ps = connection.prepareStatement(sql)) {
 
 			ps.setString(1, usuario.getNome());
 			ps.setString(2, usuario.getEmail());
@@ -108,15 +111,14 @@ public class UsuarioDAO {
 		}
 	}
 
-	public void atualizar(Usuario usuario, int id) {
+	public void atualizar(Usuario usuario, int id) throws DataAccessException {
 		String sql = """
 				    UPDATE USUARIOS
 				       SET NOME = ?, EMAIL = ?, SENHA = ?, TELEFONE = ?, ENDERECO = ?, DATA_ULTIMA_ATUALIZACAO = CURRENT_TIMESTAMP
 				     WHERE ID = ?
 				""";
 
-		try (Connection conn = ConnectionSingleton.getInstance().getConnection();
-				PreparedStatement ps = conn.prepareStatement(sql)) {
+		try (PreparedStatement ps = connection.prepareStatement(sql)) {
 
 			ps.setString(1, usuario.getNome());
 			ps.setString(2, usuario.getEmail());
@@ -133,11 +135,10 @@ public class UsuarioDAO {
 		}
 	}
 
-	public void excluir(int id) {
+	public void excluir(int id) throws DataAccessException {
 		String sql = "DELETE FROM USUARIOS WHERE ID = ?";
 
-		try (Connection conn = ConnectionSingleton.getInstance().getConnection();
-				PreparedStatement ps = conn.prepareStatement(sql)) {
+		try (PreparedStatement ps = connection.prepareStatement(sql)) {
 
 			ps.setInt(1, id);
 			ps.executeUpdate();
@@ -149,8 +150,7 @@ public class UsuarioDAO {
 	public void atualizarSenha(int id, String novaSenha) throws DataAccessException {
 		String sql = "UPDATE USUARIOS SET SENHA = ?, DATA_ULTIMA_ATUALIZACAO = CURRENT_TIMESTAMP WHERE ID = ?";
 
-		try (Connection conn = ConnectionSingleton.getInstance().getConnection();
-				PreparedStatement ps = conn.prepareStatement(sql)) {
+		try (PreparedStatement ps = connection.prepareStatement(sql)) {
 
 			ps.setString(1, novaSenha);
 			ps.setInt(2, id);
@@ -166,5 +166,4 @@ public class UsuarioDAO {
 			throw new DataAccessException("Erro ao atualizar a senha do usuário: " + e.getMessage());
 		}
 	}
-
 }

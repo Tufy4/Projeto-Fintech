@@ -2,11 +2,7 @@ package edu.ifsp.banco.web.usuario;
 
 import java.io.IOException;
 
-import edu.ifsp.banco.modelo.Conta;
 import edu.ifsp.banco.modelo.Usuario;
-import edu.ifsp.banco.modelo.enums.TiposConta;
-import edu.ifsp.banco.persistencia.UsuarioDAO;
-import edu.ifsp.banco.service.ContaSERVICE;
 import edu.ifsp.banco.service.UsuarioSERVICE;
 import edu.ifsp.banco.web.Command;
 import jakarta.servlet.RequestDispatcher;
@@ -28,23 +24,17 @@ public class CadastrarUsuarioCommand implements Command {
 
 		Usuario usuario = new Usuario(nome, email, senha, telefone, endereco);
 		UsuarioSERVICE service = new UsuarioSERVICE();
-		UsuarioDAO dao = new UsuarioDAO();
-		ContaSERVICE ContaServ = new ContaSERVICE();
 
 		try {
-			service.criarConta(usuario);
+			service.cadastrarNovoUsuario(usuario);
 
-			Usuario userBancoDados = dao.buscarPorEmail(usuario.getEmail());
-			Conta conta = new Conta();
-			conta.setUsuarioId(userBancoDados.getId());
-			conta.setTipo(TiposConta.CLIENTE);
-			ContaServ.criarConta(conta);
+			request.setAttribute("msg", "Cadastro realizado com sucesso! Faça login.");
+			rd = request.getRequestDispatcher("/auth/login.jsp");
 
-			rd = request.getRequestDispatcher("index.jsp");
 		} catch (Exception e) {
 			e.printStackTrace();
 			request.setAttribute("erro", e.getMessage());
-			rd = request.getRequestDispatcher("/app/movimentacao/erro.jsp");
+			rd = request.getRequestDispatcher("/auth/cadastro.jsp");
 		}
 
 		try {

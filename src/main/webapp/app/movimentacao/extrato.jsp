@@ -146,8 +146,8 @@ body {
 							for (Movimentacoes mov : lista) {
 								boolean isEntrada = false;
 								String descricaoExtra = "";
-
-								if (mov.getTipo() == TipoMovimentacao.DEPOSITO || mov.getTipo() == TipoMovimentacao.TRANSFERENCIA_RECEBIDA) {
+								if (mov.getTipo() == TipoMovimentacao.DEPOSITO || mov.getTipo() == TipoMovimentacao.TRANSFERENCIA_RECEBIDA
+								|| mov.getTipo() == TipoMovimentacao.EMPRESTIMO) {
 									isEntrada = true;
 								}
 
@@ -161,14 +161,23 @@ body {
 								String sinal = isEntrada ? "+" : "-";
 							%>
 							<tr>
+								<td class="ps-4 text-muted small" style="white-space: nowrap;">
+									<%=(mov.getDataTransacao() != null) ? sdf.format(mov.getDataTransacao()) : "-"%>
+								</td>
+
 								<td><span class="fw-bold text-dark d-block"><%=mov.getDescricao()%></span>
 									<small class="text-muted"><%=descricaoExtra%></small></td>
 
-								<td class="text-center hist-saldo"><%=nf.format(mov.getSaldoAnterior())%></td>
+								<td class="text-center hist-saldo d-none d-md-table-cell">
+									<%=nf.format(mov.getSaldoAnterior())%>
+								</td>
 
-								<td class="text-end pe-4 <%=classeCor%>"><%=sinal%> <%=nf.format(mov.getValor())%></td>
+								<td class="text-end pe-4 <%=classeCor%>"><%=sinal%> <%=nf.format(mov.getValor())%>
+								</td>
 
-								<td class="text-center hist-saldo"><strong><%=nf.format(mov.getSaldoPosterior())%></strong></td>
+								<td class="text-center hist-saldo d-none d-md-table-cell">
+									<strong><%=nf.format(mov.getSaldoPosterior())%></strong>
+								</td>
 							</tr>
 							<%
 							}

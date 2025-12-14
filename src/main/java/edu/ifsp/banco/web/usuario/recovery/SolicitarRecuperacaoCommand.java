@@ -1,10 +1,8 @@
 package edu.ifsp.banco.web.usuario.recovery;
 
 import java.io.IOException;
-import edu.ifsp.banco.modelo.Usuario;
-import edu.ifsp.banco.persistencia.TokenDAO;
-import edu.ifsp.banco.persistencia.UsuarioDAO;
-import edu.ifsp.banco.service.EmailService;
+
+import edu.ifsp.banco.service.UsuarioSERVICE;
 import edu.ifsp.banco.web.Command;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -14,26 +12,22 @@ public class SolicitarRecuperacaoCommand implements Command {
 	@Override
 	public void execute(HttpServletRequest req, HttpServletResponse resp) {
 		String email = req.getParameter("email");
+		UsuarioSERVICE service = new UsuarioSERVICE();
 
-		UsuarioDAO usuarioDAO = new UsuarioDAO();
-		Usuario usuario = usuarioDAO.buscarPorEmail(email);
-
-		if (usuario != null) {
-			String token = java.util.UUID.randomUUID().toString();
-			TokenDAO tokenDAO = new TokenDAO();
-			tokenDAO.salvarToken(usuario.getId(), token);
-
-			EmailService emailService = new EmailService();
-			emailService.enviarEmailRecuperacao(usuario.getEmail(), token);
-		}
-
-		req.setAttribute("msg", "Se o e-mail existir, um link foi enviado.");
 		try {
+			service.solicitarRecuperacaoSenha(email);
+
+			req.setAttribute("msg", "Se o e-mail existir, um link foi enviado.");
 			req.getRequestDispatcher("/auth/login.jsp").forward(req, resp);
-		} catch (ServletException e) {
+
+		} catch (Exception e) {
 			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
+			req.setAttribute("erro", "Erro ao processar solicitação. Tente novamente.");
+			try {
+				req.getRequestDispatcher("/auth/recuperar_senha.jsp").forward(req, resp);
+			} catch (ServletException | IOException ex) {
+				ex.printStackTrace();
+			}
 		}
 	}
 }

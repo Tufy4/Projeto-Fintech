@@ -2,6 +2,7 @@ package edu.ifsp.banco.service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.sql.Connection;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -15,6 +16,7 @@ import edu.ifsp.banco.modelo.enums.StatusEmprestimo;
 import edu.ifsp.banco.modelo.enums.StatusMovimentacao;
 import edu.ifsp.banco.modelo.enums.StatusParcela;
 import edu.ifsp.banco.modelo.enums.TipoMovimentacao;
+import edu.ifsp.banco.persistencia.ConnectionSingleton;
 import edu.ifsp.banco.persistencia.ContaDAO;
 import edu.ifsp.banco.persistencia.DataAccessException;
 import edu.ifsp.banco.persistencia.EmprestimoDAO;
@@ -23,132 +25,177 @@ import edu.ifsp.banco.persistencia.ParcelaEmprestimoDAO;
 
 public class EmprestimoSERVICE {
 
-	private EmprestimoDAO emprestimoDAO;
-	private ParcelaEmprestimoDAO parcelaDAO;
-	private ContaDAO contaDAO;
-	private MovimentacaoDAO movimentacaoDAO;
-
-	public EmprestimoSERVICE() {
-		this.emprestimoDAO = new EmprestimoDAO();
-		this.parcelaDAO = new ParcelaEmprestimoDAO();
-		this.contaDAO = new ContaDAO();
-		this.movimentacaoDAO = new MovimentacaoDAO();
-	}
-
 	public List<ParcelaEmprestimo> simularCondicoes(BigDecimal valor, int parcelas, BigDecimal taxaJuros) {
 		Emprestimo temp = new Emprestimo(0, 0, valor, taxaJuros, parcelas, StatusEmprestimo.SIMULADO, null);
 		return calcularCronogramaSAC(temp);
 	}
 
 	public List<Emprestimo> buscarPorConta(int idConta) throws Exception {
-		try {
+		try (Connection conn = ConnectionSingleton.getInstance().getConnection()) {
+			EmprestimoDAO emprestimoDAO = new EmprestimoDAO(conn);
+			ParcelaEmprestimoDAO parcelaDAO = new ParcelaEmprestimoDAO(conn);
+
 			List<Emprestimo> emprestimos = emprestimoDAO.listarPorConta(idConta);
 			for (Emprestimo emp : emprestimos) {
 				List<ParcelaEmprestimo> parcelas = parcelaDAO.listarPorEmprestimo(emp.getId());
 				emp.setListaParcelas(parcelas);
 			}
 			return emprestimos;
-		} catch (DataAccessException e) {
+		} catch (Exception e) {
 			throw new Exception("Erro ao buscar empréstimos do cliente.");
 		}
 	}
 
 	public void solicitarEmprestimo(Emprestimo emp) throws Exception {
-		validarDadosIniciais(emp);
-		emp.setStatus(StatusEmprestimo.SOLICITADO);
-		emp.setData_solicitacao(new Timestamp(System.currentTimeMillis()));
-		try {
+		try (Connection conn = ConnectionSingleton.getInstance().getConnection()) {
+			validarDadosIniciais(emp, conn);
+
+			EmprestimoDAO emprestimoDAO = new EmprestimoDAO(conn);
+
+			emp.setStatus(StatusEmprestimo.SOLICITADO);
+			emp.setData_solicitacao(new Timestamp(System.currentTimeMillis()));
+
 			int idGerado = emprestimoDAO.inserir(emp);
 			emp.setId(idGerado);
-		} catch (DataAccessException e) {
+		} catch (Exception e) {
 			throw new Exception("Erro ao registrar solicitação: " + e.getMessage());
 		}
 	}
 
 	public void aprovarEmprestimo(int idEmprestimo) throws Exception {
-		Emprestimo emp = emprestimoDAO.buscarPorId(idEmprestimo);
-		if (emp == null)
-			throw new Exception("Empréstimo não encontrado.");
+		try (Connection conn = ConnectionSingleton.getInstance().getConnection()) {
+			conn.setAutoCommit(false);
 
-		Conta conta = contaDAO.buscarPorId(emp.getConta_id());
-		if (emp.getStatus() != StatusEmprestimo.SOLICITADO) {
-			throw new Exception("Apenas empréstimos com status SOLICITADO podem ser aprovados.");
-		}
+			try {
+				EmprestimoDAO emprestimoDAO = new EmprestimoDAO(conn);
+				ContaDAO contaDAO = new ContaDAO(conn);
+				MovimentacaoDAO movimentacaoDAO = new MovimentacaoDAO(conn);
+				ParcelaEmprestimoDAO parcelaDAO = new ParcelaEmprestimoDAO(conn);
 
-		List<ParcelaEmprestimo> cronogramaDefinitivo = calcularCronogramaSAC(emp);
+				Emprestimo emp = emprestimoDAO.buscarPorId(idEmprestimo);
+				if (emp == null)
+					throw new Exception("Empréstimo não encontrado.");
 
-		BigDecimal saldoAnterior = conta.getSaldo();
-		BigDecimal novoSaldo = saldoAnterior.add(emp.getValor_emprestimo());
+				Conta conta = contaDAO.buscarPorId(emp.getConta_id());
+				if (emp.getStatus() != StatusEmprestimo.SOLICITADO) {
+					throw new Exception("Apenas empréstimos com status SOLICITADO podem ser aprovados.");
+				}
 
-		Movimentacoes mov = new Movimentacoes(0, 0, conta.getId(), emp.getValor_emprestimo(), saldoAnterior, novoSaldo,
-				TipoMovimentacao.EMPRESTIMO, new Timestamp(System.currentTimeMillis()), "Empréstimo Bancário Aprovado",
-				StatusMovimentacao.CONCLUIDA);
+				List<ParcelaEmprestimo> cronogramaDefinitivo = calcularCronogramaSAC(emp);
 
-		try {
-			movimentacaoDAO.inserir(mov);
-			emprestimoDAO.aprovarEmprestimo(idEmprestimo);
-			parcelaDAO.inserirLote(cronogramaDefinitivo);
-			contaDAO.atualizarSaldo(conta.getId(), novoSaldo.doubleValue());
-		} catch (DataAccessException e) {
-			throw new Exception("Erro técnico ao processar aprovação: " + e.getMessage());
+				BigDecimal saldoAnterior = conta.getSaldo();
+				BigDecimal novoSaldo = saldoAnterior.add(emp.getValor_emprestimo());
+
+				Movimentacoes mov = new Movimentacoes(0, 0, conta.getId(), emp.getValor_emprestimo(), saldoAnterior,
+						novoSaldo, TipoMovimentacao.EMPRESTIMO, new Timestamp(System.currentTimeMillis()),
+						"Empréstimo Bancário Aprovado", StatusMovimentacao.CONCLUIDA);
+
+				movimentacaoDAO.inserir(mov);
+				emprestimoDAO.aprovarEmprestimo(idEmprestimo);
+				parcelaDAO.inserirLote(cronogramaDefinitivo);
+				contaDAO.atualizarSaldo(conta.getId(), novoSaldo.doubleValue());
+
+				conn.commit();
+			} catch (Exception e) {
+				conn.rollback();
+				throw new Exception("Erro técnico ao processar aprovação: " + e.getMessage());
+			}
 		}
 	}
 
 	public void pagarParcela(int idParcela) throws Exception {
-		ParcelaEmprestimo parcela = parcelaDAO.buscarPorId(idParcela);
-		if (parcela == null)
-			throw new Exception("Parcela não encontrada.");
-		if (parcela.getStatus() == StatusParcela.PAGO)
-			throw new Exception("Esta parcela já foi paga.");
+		try (Connection conn = ConnectionSingleton.getInstance().getConnection()) {
+			conn.setAutoCommit(false);
 
-		Emprestimo emprestimo = emprestimoDAO.buscarPorId(parcela.getEmprestimoId());
-		Conta conta = contaDAO.buscarPorId(emprestimo.getConta_id());
-		BigDecimal valorPagamento = parcela.getValorParcela();
+			try {
+				ParcelaEmprestimoDAO parcelaDAO = new ParcelaEmprestimoDAO(conn);
+				EmprestimoDAO emprestimoDAO = new EmprestimoDAO(conn);
+				ContaDAO contaDAO = new ContaDAO(conn);
+				MovimentacaoDAO movimentacaoDAO = new MovimentacaoDAO(conn);
 
-		if (conta.getSaldo().compareTo(valorPagamento) < 0) {
-			throw new Exception("Saldo insuficiente para pagar esta parcela.");
-		}
+				ParcelaEmprestimo parcela = parcelaDAO.buscarPorId(idParcela);
+				if (parcela == null)
+					throw new Exception("Parcela não encontrada.");
+				if (parcela.getStatus() == StatusParcela.PAGO)
+					throw new Exception("Esta parcela já foi paga.");
 
-		try {
-			BigDecimal saldoAnterior = conta.getSaldo();
-			BigDecimal novoSaldo = saldoAnterior.subtract(valorPagamento);
+				Emprestimo emprestimo = emprestimoDAO.buscarPorId(parcela.getEmprestimoId());
+				Conta conta = contaDAO.buscarPorId(emprestimo.getConta_id());
+				BigDecimal valorPagamento = parcela.getValorParcela();
 
-			conta.setSaldo(novoSaldo);
-			contaDAO.atualizarSaldo(conta.getId(), novoSaldo.doubleValue());
+				if (conta.getSaldo().compareTo(valorPagamento) < 0) {
+					throw new Exception("Saldo insuficiente para pagar esta parcela.");
+				}
 
-			Movimentacoes mov = new Movimentacoes();
-			mov.setContaOrigemId(conta.getId());
-			mov.setContaDestinoId(0);
-			mov.setValor(valorPagamento);
-			mov.setSaldoAnterior(saldoAnterior);
-			mov.setSaldoPosterior(novoSaldo);
-			mov.setTipo(TipoMovimentacao.SAQUE);
-			mov.setDescricao("Pagamento Empréstimo #" + emprestimo.getId() + " - Parc. " + parcela.getNumeroParcela());
-			mov.setDataTransacao(new Timestamp(System.currentTimeMillis()));
-			mov.setStatus(StatusMovimentacao.CONCLUIDA);
+				BigDecimal saldoAnterior = conta.getSaldo();
+				BigDecimal novoSaldo = saldoAnterior.subtract(valorPagamento);
 
-			movimentacaoDAO.inserir(mov);
+				conta.setSaldo(novoSaldo);
+				contaDAO.atualizarSaldo(conta.getId(), novoSaldo.doubleValue());
 
-			parcelaDAO.pagarParcela(idParcela);
-			emprestimoDAO.registrarPagamento(parcela.getEmprestimoId(), new Timestamp(System.currentTimeMillis()));
-			verificarQuitacao(parcela.getEmprestimoId());
+				Movimentacoes mov = new Movimentacoes();
+				mov.setContaOrigemId(conta.getId());
+				mov.setContaDestinoId(0);
+				mov.setValor(valorPagamento);
+				mov.setSaldoAnterior(saldoAnterior);
+				mov.setSaldoPosterior(novoSaldo);
+				mov.setTipo(TipoMovimentacao.SAQUE);
+				mov.setDescricao(
+						"Pagamento Empréstimo #" + emprestimo.getId() + " - Parc. " + parcela.getNumeroParcela());
+				mov.setDataTransacao(new Timestamp(System.currentTimeMillis()));
+				mov.setStatus(StatusMovimentacao.CONCLUIDA);
 
-		} catch (DataAccessException e) {
-			throw new Exception("Erro técnico ao processar pagamento: " + e.getMessage());
+				movimentacaoDAO.inserir(mov);
+
+				parcelaDAO.pagarParcela(idParcela);
+				emprestimoDAO.registrarPagamento(parcela.getEmprestimoId(), new Timestamp(System.currentTimeMillis()));
+
+				verificarQuitacao(parcela.getEmprestimoId(), emprestimoDAO, parcelaDAO);
+
+				conn.commit();
+
+			} catch (Exception e) {
+				conn.rollback();
+				throw new Exception("Erro técnico ao processar pagamento, aplicando rollback: " + e.getMessage());
+			}
 		}
 	}
 
 	public void rejeitarEmprestimo(int idEmprestimo) throws Exception {
-		try {
+		try (Connection conn = ConnectionSingleton.getInstance().getConnection()) {
+			EmprestimoDAO emprestimoDAO = new EmprestimoDAO(conn);
 			emprestimoDAO.atualizarStatus(idEmprestimo, StatusEmprestimo.REJEITADO);
-		} catch (DataAccessException e) {
+		} catch (Exception e) {
 			throw new Exception("Erro ao rejeitar empréstimo.");
 		}
 	}
 
 	public BigDecimal buscarTaxaPadrao() {
-		BigDecimal taxa = emprestimoDAO.buscarTaxaEmprestimo();
-		return taxa;
+		try (Connection conn = ConnectionSingleton.getInstance().getConnection()) {
+			EmprestimoDAO emprestimoDAO = new EmprestimoDAO(conn);
+			return emprestimoDAO.buscarTaxaEmprestimo();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	public List<Emprestimo> listarPorStatus(StatusEmprestimo status) throws Exception {
+		try (Connection conn = ConnectionSingleton.getInstance().getConnection()) {
+			EmprestimoDAO emprestimoDAO = new EmprestimoDAO(conn);
+			return emprestimoDAO.listarPorStatus(status);
+		} catch (Exception e) {
+			throw new Exception("Erro ao listar empréstimos por status: " + e.getMessage());
+		}
+	}
+
+	public int obterQuantidadeSolicitacoes() throws Exception {
+		try (Connection conn = ConnectionSingleton.getInstance().getConnection()) {
+			EmprestimoDAO emprestimoDAO = new EmprestimoDAO(conn);
+			return emprestimoDAO.contarSolicitados();
+		} catch (Exception e) {
+			return 0;
+		}
 	}
 
 	private List<ParcelaEmprestimo> calcularCronogramaSAC(Emprestimo emp) {
@@ -179,7 +226,8 @@ public class EmprestimoSERVICE {
 		return parcelas;
 	}
 
-	private void verificarQuitacao(int emprestimoId) throws DataAccessException {
+	private void verificarQuitacao(int emprestimoId, EmprestimoDAO emprestimoDAO, ParcelaEmprestimoDAO parcelaDAO)
+			throws DataAccessException {
 		List<ParcelaEmprestimo> todasParcelas = parcelaDAO.listarPorEmprestimo(emprestimoId);
 		boolean todasPagas = true;
 
@@ -200,15 +248,7 @@ public class EmprestimoSERVICE {
 		}
 	}
 
-	public List<Emprestimo> listarPorStatus(StatusEmprestimo status) throws Exception {
-		try {
-			return emprestimoDAO.listarPorStatus(status);
-		} catch (DataAccessException e) {
-			throw new Exception("Erro ao listar empréstimos por status: " + e.getMessage());
-		}
-	}
-
-	private void validarDadosIniciais(Emprestimo emp) throws Exception {
+	private void validarDadosIniciais(Emprestimo emp, Connection conn) throws Exception {
 		if (emp.getValor_emprestimo() == null || emp.getValor_emprestimo().compareTo(BigDecimal.ZERO) <= 0) {
 			throw new Exception("Valor do empréstimo inválido.");
 		}
@@ -216,18 +256,12 @@ public class EmprestimoSERVICE {
 			throw new Exception("Taxa de juros inválida.");
 		}
 		if (emp.getParcelas() < 1) {
-			throw new Exception("Nsúmero de parcelas deve ser positivo.");
+			throw new Exception("Número de parcelas deve ser positivo.");
 		}
+
+		ContaDAO contaDAO = new ContaDAO(conn);
 		if (contaDAO.buscarPorId(emp.getConta_id()) == null) {
 			throw new Exception("Conta vinculada não encontrada.");
-		}
-	}
-
-	public int obterQuantidadeSolicitacoes() throws Exception {
-		try {
-			return emprestimoDAO.contarSolicitados();
-		} catch (DataAccessException e) {
-			return 0;
 		}
 	}
 }

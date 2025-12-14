@@ -21,7 +21,6 @@ public class SolicitarEmprestimoCommand implements Command {
 			String valorStr = request.getParameter("valor");
 			String parcelasStr = request.getParameter("parcelas");
 			String taxaStr = request.getParameter("taxa");
-			System.out.println("Id da conta no o se command: " + idContaStr);
 			if (idContaStr == null || valorStr == null) {
 				throw new Exception("Dados inválidos na requisição.");
 			}

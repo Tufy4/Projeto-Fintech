@@ -3,7 +3,7 @@ package edu.ifsp.banco.web.movimentacao;
 import java.io.IOException;
 import java.math.BigDecimal;
 import edu.ifsp.banco.modelo.Conta;
-import edu.ifsp.banco.persistencia.ContaDAO;
+import edu.ifsp.banco.service.ContaSERVICE;
 import edu.ifsp.banco.service.MovimentacaoSERVICE;
 import edu.ifsp.banco.web.Command;
 import jakarta.servlet.RequestDispatcher;
@@ -29,13 +29,13 @@ public class TransferenciaCommand implements Command {
 				throw new Exception("Sessão expirada. Faça login novamente.");
 			}
 
-			MovimentacaoSERVICE service = new MovimentacaoSERVICE();
-			service.realizarTransferencia(contaOrigem, numeroDestino, valor);
+			MovimentacaoSERVICE movService = new MovimentacaoSERVICE();
+			movService.realizarTransferencia(contaOrigem, numeroDestino, valor);
 
-			ContaDAO contaDAO = new ContaDAO();
-			Conta contaAtualizada = contaDAO.buscarPorNumero(contaOrigem.getNumero_conta());
+			ContaSERVICE contaService = new ContaSERVICE();
+			Conta contaAtualizada = contaService.buscarPorNumero(contaOrigem.getNumero_conta());
 
-			session.setAttribute("conta", contaAtualizada);
+			session.setAttribute("contaLogado", contaAtualizada);
 			session.setAttribute("saldoConta", contaAtualizada.getSaldo());
 
 			request.setAttribute("msg", "Transferência de R$ " + valor + " realizada com sucesso!");

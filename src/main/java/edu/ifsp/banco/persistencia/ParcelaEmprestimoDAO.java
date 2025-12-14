@@ -8,13 +8,18 @@ import java.util.List;
 
 public class ParcelaEmprestimoDAO {
 
+	private Connection connection;
+
+	public ParcelaEmprestimoDAO(Connection connection) {
+		this.connection = connection;
+	}
+
 	public void inserir(ParcelaEmprestimo parcela) throws DataAccessException {
 		String sql = "INSERT INTO parcelas_emprestimo (id, emprestimo_id, numero_parcela, valor_parcela, "
 				+ "valor_amortizacao, valor_juros, data_vencimento, status) "
 				+ "VALUES (SEQ_PARCELAS.NEXTVAL, ?, ?, ?, ?, ?, ?, ?)";
 
-		try (Connection conn = ConnectionSingleton.getInstance().getConnection();
-				PreparedStatement stmt = conn.prepareStatement(sql)) {
+		try (PreparedStatement stmt = connection.prepareStatement(sql)) {
 
 			configurarStatementInsercao(stmt, parcela);
 			stmt.executeUpdate();
@@ -29,15 +34,12 @@ public class ParcelaEmprestimoDAO {
 				+ "valor_amortizacao, valor_juros, data_vencimento, status) "
 				+ "VALUES (seq_parcelas_emprestimo.NEXTVAL, ?, ?, ?, ?, ?, ?, ?)";
 
-		try (Connection conn = ConnectionSingleton.getInstance().getConnection();
-				PreparedStatement stmt = conn.prepareStatement(sql)) {
-			conn.setAutoCommit(false);
+		try (PreparedStatement stmt = connection.prepareStatement(sql)) {
 			for (ParcelaEmprestimo parcela : parcelas) {
 				configurarStatementInsercao(stmt, parcela);
 				stmt.addBatch();
 			}
 			stmt.executeBatch();
-			conn.commit();
 
 		} catch (SQLException e) {
 			throw new DataAccessException("Erro ao inserir lote de parcelas: " + e.getMessage());
@@ -48,8 +50,7 @@ public class ParcelaEmprestimoDAO {
 		List<ParcelaEmprestimo> lista = new ArrayList<>();
 		String sql = "SELECT * FROM parcelas_emprestimo WHERE emprestimo_id = ? ORDER BY numero_parcela ASC";
 
-		try (Connection conn = ConnectionSingleton.getInstance().getConnection();
-				PreparedStatement stmt = conn.prepareStatement(sql)) {
+		try (PreparedStatement stmt = connection.prepareStatement(sql)) {
 
 			stmt.setInt(1, emprestimoId);
 			ResultSet rs = stmt.executeQuery();
@@ -68,8 +69,7 @@ public class ParcelaEmprestimoDAO {
 	public ParcelaEmprestimo buscarPorId(int id) throws DataAccessException {
 		String sql = "SELECT * FROM parcelas_emprestimo WHERE id = ?";
 
-		try (Connection conn = ConnectionSingleton.getInstance().getConnection();
-				PreparedStatement stmt = conn.prepareStatement(sql)) {
+		try (PreparedStatement stmt = connection.prepareStatement(sql)) {
 
 			stmt.setInt(1, id);
 			ResultSet rs = stmt.executeQuery();
@@ -87,8 +87,7 @@ public class ParcelaEmprestimoDAO {
 	public void pagarParcela(int id) throws DataAccessException {
 		String sql = "UPDATE parcelas_emprestimo SET status = ?, data_pagamento = ? WHERE id = ?";
 
-		try (Connection conn = ConnectionSingleton.getInstance().getConnection();
-				PreparedStatement stmt = conn.prepareStatement(sql)) {
+		try (PreparedStatement stmt = connection.prepareStatement(sql)) {
 
 			stmt.setString(1, StatusParcela.PAGO.name());
 			stmt.setDate(2, new java.sql.Date(System.currentTimeMillis()));
@@ -103,8 +102,7 @@ public class ParcelaEmprestimoDAO {
 	public void atualizarValores(ParcelaEmprestimo parcela) throws DataAccessException {
 		String sql = "UPDATE parcelas_emprestimo SET valor_parcela = ?, valor_amortizacao = ?, valor_juros = ? "
 				+ "WHERE id = ?";
-		try (Connection conn = ConnectionSingleton.getInstance().getConnection();
-				PreparedStatement stmt = conn.prepareStatement(sql)) {
+		try (PreparedStatement stmt = connection.prepareStatement(sql)) {
 
 			stmt.setBigDecimal(1, parcela.getValorParcela());
 			stmt.setBigDecimal(2, parcela.getValorAmortizacao());
