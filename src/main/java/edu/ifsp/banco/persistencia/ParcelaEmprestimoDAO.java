@@ -24,9 +24,7 @@ public class ParcelaEmprestimoDAO {
 		}
 	}
 
-	public void inserirLote(List<ParcelaEmprestimo> parcelas) throws DataAccessException { // Assim fica melhor na hora
-																							// de criar o emprestimos
-																							// longos :)
+	public void inserirLote(List<ParcelaEmprestimo> parcelas) throws DataAccessException {
 		String sql = "INSERT INTO parcelas_emprestimo (id, emprestimo_id, numero_parcela, valor_parcela, "
 				+ "valor_amortizacao, valor_juros, data_vencimento, status) "
 				+ "VALUES (seq_parcelas_emprestimo.NEXTVAL, ?, ?, ?, ?, ?, ?, ?)";
@@ -93,7 +91,7 @@ public class ParcelaEmprestimoDAO {
 				PreparedStatement stmt = conn.prepareStatement(sql)) {
 
 			stmt.setString(1, StatusParcela.PAGO.name());
-			stmt.setDate(2, new java.sql.Date(System.currentTimeMillis())); // Data atual
+			stmt.setDate(2, new java.sql.Date(System.currentTimeMillis()));
 			stmt.setInt(3, id);
 			stmt.executeUpdate();
 

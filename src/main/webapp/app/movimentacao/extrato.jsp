@@ -4,6 +4,7 @@
 <%@ page import="java.text.NumberFormat"%>
 <%@ page import="java.util.Locale"%>
 <%@ page import="java.text.SimpleDateFormat"%>
+<%@ page import="java.math.BigDecimal"%>
 <%@ page import="edu.ifsp.banco.modelo.Movimentacoes"%>
 <%@ page import="edu.ifsp.banco.modelo.Conta"%>
 <%@ page import="edu.ifsp.banco.modelo.enums.TipoMovimentacao"%>
@@ -11,6 +12,9 @@
 <%
 Conta conta = (Conta) session.getAttribute("contaLogado");
 List<Movimentacoes> lista = (List<Movimentacoes>) request.getAttribute("listaExtrato");
+
+String filtroInicio = (String) request.getAttribute("filtroInicio");
+String filtroFim = (String) request.getAttribute("filtroFim");
 
 NumberFormat nf = NumberFormat.getCurrencyInstance(new Locale("pt", "BR"));
 SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
@@ -35,13 +39,22 @@ body {
 .text-entrada {
 	color: #198754;
 	font-weight: bold;
-} /* Verde */
+}
+
 .text-saida {
 	color: #dc3545;
 	font-weight: bold;
-} /* Vermelho */
-.table-hover tbody tr:hover {
-	background-color: rgba(0, 0, 0, 0.02);
+}
+
+.hist-saldo {
+	font-size: 0.85em;
+	color: #6c757d;
+}
+
+.hist-label {
+	font-size: 0.75em;
+	color: #adb5bd;
+	text-transform: uppercase;
 }
 </style>
 </head>
@@ -57,17 +70,48 @@ body {
 	</nav>
 
 	<div class="container pb-5">
-		<div class="row mb-4">
-			<div class="col-md-8">
-				<h2 class="fw-bold text-secondary">
-					<i class="bi bi-list-columns-reverse me-2"></i>Extrato de
-					Movimentações
+
+		<div
+			class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+			<div>
+				<h2 class="fw-bold text-secondary mb-0">
+					<i class="bi bi-list-columns-reverse me-2"></i>Extrato
 				</h2>
 			</div>
-			<div class="col-md-4 text-md-end">
+
+			<form action="app" method="get" class="d-flex gap-2 align-items-end">
+				<input type="hidden" name="command" value="extrato">
+
+				<div>
+					<label class="form-label small mb-0 text-muted">Início</label> <input
+						type="date" class="form-control form-control-sm" name="dataInicio"
+						value="<%=filtroInicio != null ? filtroInicio : ""%>">
+				</div>
+				<div>
+					<label class="form-label small mb-0 text-muted">Fim</label> <input
+						type="date" class="form-control form-control-sm" name="dataFim"
+						value="<%=filtroFim != null ? filtroFim : ""%>">
+				</div>
+				<button type="submit" class="btn btn-primary btn-sm">
+					<i class="bi bi-filter"></i> Filtrar
+				</button>
+				<%
+				if (filtroInicio != null || filtroFim != null) {
+				%>
+				<a href="app?command=extrato"
+					class="btn btn-outline-secondary btn-sm">Limpar</a>
+				<%
+				}
+				%>
+			</form>
+		</div>
+
+		<div class="row mb-4">
+			<div class="col-12">
 				<div class="card border-0 shadow-sm bg-primary text-white">
-					<div class="card-body py-2">
-						<small class="d-block opacity-75">Saldo Atual</small> <span
+					<div
+						class="card-body py-3 d-flex justify-content-between align-items-center">
+						<span class="opacity-75">Saldo Atual Disponível</span> <span
 							class="fs-4 fw-bold"><%=nf.format(conta.getSaldo())%></span>
 					</div>
 				</div>
@@ -80,51 +124,51 @@ body {
 				if (lista == null || lista.isEmpty()) {
 				%>
 				<div class="p-5 text-center text-muted">
-					<i class="bi bi-receipt display-1 mb-3"></i>
-					<h4>Nenhuma movimentação encontrada.</h4>
+					<i class="bi bi-calendar-x display-1 mb-3"></i>
+					<h4>Nenhuma movimentação encontrada para o período.</h4>
 				</div>
 				<%
 				} else {
 				%>
 				<div class="table-responsive">
 					<table class="table table-hover mb-0 align-middle">
-						<thead class="table-light">
+						<thead class="table-light small text-uppercase text-muted">
 							<tr>
 								<th class="ps-4">Data</th>
 								<th>Descrição</th>
-								<th>Tipo</th>
+								<th class="text-center d-none d-md-table-cell">Saldo Ant.</th>
 								<th class="text-end pe-4">Valor</th>
+								<th class="text-center d-none d-md-table-cell">Saldo Post.</th>
 							</tr>
 						</thead>
 						<tbody>
 							<%
 							for (Movimentacoes mov : lista) {
 								boolean isEntrada = false;
+								String descricaoExtra = "";
 
-								if (mov.getTipo() == TipoMovimentacao.DEPOSITO) {
+								if (mov.getTipo() == TipoMovimentacao.DEPOSITO || mov.getTipo() == TipoMovimentacao.TRANSFERENCIA_RECEBIDA) {
 									isEntrada = true;
-								} else if (mov.getContaDestinoId() == conta.getId()) {
-									isEntrada = true;
-								} else {
-									isEntrada = false; // Transferência, Saque, Pagamento
+								}
+
+								if (mov.getTipo() == TipoMovimentacao.TRANSFERENCIA_ENVIADA) {
+									descricaoExtra = "Para: Conta ID " + mov.getContaDestinoId();
+								} else if (mov.getTipo() == TipoMovimentacao.TRANSFERENCIA_RECEBIDA) {
+									descricaoExtra = "De: Conta ID " + mov.getContaOrigemId();
 								}
 
 								String classeCor = isEntrada ? "text-entrada" : "text-saida";
 								String sinal = isEntrada ? "+" : "-";
 							%>
 							<tr>
-								<td class="ps-4 text-muted small"><%=(mov.getDataTransacao() != null) ? sdf.format(mov.getDataTransacao()) : "-"%>
-								</td>
-								<td><span class="fw-bold text-dark"><%=mov.getDescricao()%></span>
-									<%
-									if (mov.getTipo() == TipoMovimentacao.TRANSFERENCIA) {
-									%> <br> <small class="text-muted"> <%=isEntrada ? "De: Conta " + mov.getContaOrigemId() : "Para: Conta " + mov.getContaDestinoId()%>
-								</small> <%
- }
- %></td>
-								<td><span class="badge bg-light text-dark border"><%=mov.getTipo()%></span></td>
-								<td class="text-end pe-4 <%=classeCor%>"><%=sinal%> <%=nf.format(mov.getValor())%>
-								</td>
+								<td><span class="fw-bold text-dark d-block"><%=mov.getDescricao()%></span>
+									<small class="text-muted"><%=descricaoExtra%></small></td>
+
+								<td class="text-center hist-saldo"><%=nf.format(mov.getSaldoAnterior())%></td>
+
+								<td class="text-end pe-4 <%=classeCor%>"><%=sinal%> <%=nf.format(mov.getValor())%></td>
+
+								<td class="text-center hist-saldo"><strong><%=nf.format(mov.getSaldoPosterior())%></strong></td>
 							</tr>
 							<%
 							}

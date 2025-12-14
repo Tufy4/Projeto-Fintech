@@ -32,7 +32,7 @@ body {
 	padding: 40px;
 	box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
 	width: 100%;
-	max-width: 500px; /* Um pouco mais largo para o cadastro */
+	max-width: 500px;
 }
 
 .brand-logo {

@@ -2,17 +2,14 @@
 	pageEncoding="UTF-8"%>
 <%@ page import="edu.ifsp.banco.modelo.Usuario"%>
 <%
-	// 1. Recupera os contadores
 	Integer countBloqueados = (Integer) request.getAttribute("countBloqueados");
 	Integer countEmprestimos = (Integer) request.getAttribute("countEmprestimos");
 	Integer countContas = (Integer) request.getAttribute("countContas");
 
-	// Tratamento de nulos
 	if (countBloqueados == null) countBloqueados = 0;
 	if (countEmprestimos == null) countEmprestimos = 0;
 	if (countContas == null) countContas = 0;
 
-	// 2. Usuário da sessão
 	Usuario usuarioLogado = (Usuario) session.getAttribute("usuarioLogado");
 	String nomeUsuario = (usuarioLogado != null) ? usuarioLogado.getNome() : "Administrador";
 %>
@@ -38,7 +35,6 @@ body {
 	margin-bottom: 1rem;
 }
 
-/* Card Interativo (Clicável) */
 .admin-card {
 	transition: transform 0.2s;
 	cursor: pointer;
@@ -51,14 +47,12 @@ body {
 	border-color: #0d6efd;
 }
 
-/* Card Estático (Métrica) */
 .metric-card {
 	cursor: default;
 	background-color: #fff;
 	border: 1px solid #e9ecef;
 }
 
-/* Estilo da Bolinha Laranja */
 .notification-badge {
 	position: absolute;
 	top: -10px;

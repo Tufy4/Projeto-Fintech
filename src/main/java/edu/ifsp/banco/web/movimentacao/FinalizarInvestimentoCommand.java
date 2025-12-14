@@ -21,7 +21,6 @@ public class FinalizarInvestimentoCommand implements Command {
 		RequestDispatcher rd;
 
 		try {
-			// 1. Pega conta da sessão (Segurança)
 			HttpSession session = req.getSession();
 			Conta contaSessao = (Conta) session.getAttribute("contaLogado");
 
@@ -30,15 +29,12 @@ public class FinalizarInvestimentoCommand implements Command {
 			}
 
 			int numeroConta = contaSessao.getNumero_conta();
-
-			// 2. Valida Produto (Evita ORA-01400)
 			String produto = req.getParameter("produto");
 
 			if (produto == null || produto.trim().isEmpty()) {
 				throw new Exception("O tipo de investimento (produto) não foi informado.");
 			}
 
-			// 3. Valida Valor
 			String valorStr = req.getParameter("valor");
 			if (valorStr == null || valorStr.isEmpty()) {
 				throw new Exception("O valor do investimento é obrigatório.");
@@ -46,11 +42,8 @@ public class FinalizarInvestimentoCommand implements Command {
 
 			BigDecimal valor = new BigDecimal(valorStr.replace(",", "."));
 
-			// 4. Executa Serviço
 			InvestimentoSERVICE service = new InvestimentoSERVICE();
 			service.montarInvestimento(numeroConta, produto, valor);
-
-			// 5. Atualiza Sessão (Saldo Visual)
 			ContaDAO contaDAO = new ContaDAO();
 			Conta contaAtualizada = contaDAO.buscarPorNumero(numeroConta);
 

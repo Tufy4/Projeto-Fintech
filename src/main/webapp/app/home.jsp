@@ -26,9 +26,11 @@ body {
 	background-color: #f8f9fa;
 	font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
-a{
-text-decoration: none;
+
+a {
+	text-decoration: none;
 }
+
 .hero-dashboard {
 	background: linear-gradient(135deg, rgba(0, 0, 0, 0.8) 0%,
 		rgba(13, 110, 253, 0.6) 100%),
@@ -78,7 +80,6 @@ text-decoration: none;
 </style>
 </head>
 <body>
-
 	<nav class="navbar navbar-expand-lg navbar-dark bg-dark py-3">
 		<div class="container">
 			<a class="navbar-brand fw-bold" href="#">BitPay <span
@@ -101,7 +102,6 @@ text-decoration: none;
 			</div>
 		</div>
 	</nav>
-
 	<header class="hero-dashboard text-center">
 		<div class="container">
 			<p class="lead mb-1 text-white-50 text-uppercase small ls-1">Saldo
@@ -109,7 +109,6 @@ text-decoration: none;
 			<h1 class="display-1 fw-bold mb-4">
 				R$
 				<%=saldoFormatado%></h1>
-
 			<div class="d-flex justify-content-center">
 				<a
 					href="${pageContext.request.contextPath}/app?command=redirect&url=app/movimentacao/deposito.jsp"
@@ -119,7 +118,6 @@ text-decoration: none;
 			</div>
 		</div>
 	</header>
-
 	<section class="container py-5">
 		<div class="row g-4 row-cols-1 row-cols-md-2 row-cols-lg-4">
 
@@ -134,7 +132,6 @@ text-decoration: none;
 						movimentações.</p>
 				</a>
 			</div>
-
 			<div class="col">
 				<a
 					href="${pageContext.request.contextPath}/app?command=redirect&url=app/movimentacao/deposito.jsp"
@@ -147,7 +144,6 @@ text-decoration: none;
 						instantaneamente.</p>
 				</a>
 			</div>
-
 			<div class="col">
 				<a
 					href="${pageContext.request.contextPath}/app/movimentacao/investir.jsp"
@@ -160,7 +156,6 @@ text-decoration: none;
 						liquidez diária.</p>
 				</a>
 			</div>
-
 			<div class="col">
 				<a
 					href="${pageContext.request.contextPath}/app?command=redirect&url=app/movimentacao/transferencia.jsp"
@@ -173,7 +168,6 @@ text-decoration: none;
 						contas.</p>
 				</a>
 			</div>
-
 			<div class="col">
 				<a
 					href="${pageContext.request.contextPath}/app?command=meusEmprestimos"
@@ -185,30 +179,17 @@ text-decoration: none;
 					<p class="small text-muted mb-0">Simulação de crédito SAC.</p>
 				</a>
 			</div>
-
-
-	
-	<div class="col">
-    <a
-        href="${pageContext.request.contextPath}/app?command=mostrarDadosUsuario&id=<%=conta.getUsuarioId() %>"
-        class="op-card">
-        <div class="op-icon">
-            <i class="bi bi-pencil-square"></i>
-        </div>
-        <h3 class="h4 fw-bold">Editar Usuário</h3>
-        <p class="small text-muted mb-0">Altere os dados do usuário.</p>
-    </a>
-</div>
-
-
-
-
-
-
-
-
-
-
+			<div class="col">
+				<a
+					href="${pageContext.request.contextPath}/app?command=mostrarDadosUsuario&id=<%=conta.getUsuarioId() %>"
+					class="op-card">
+					<div class="op-icon">
+						<i class="bi bi-pencil-square"></i>
+					</div>
+					<h3 class="h4 fw-bold">Editar Usuário</h3>
+					<p class="small text-muted mb-0">Altere os dados do usuário.</p>
+				</a>
+			</div>
 		</div>
 
 		<div class="mt-5 text-center text-muted small">

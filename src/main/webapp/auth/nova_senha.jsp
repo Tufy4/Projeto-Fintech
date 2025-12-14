@@ -101,7 +101,6 @@ body {
 					Alterar Senha</button>
 			</div>
 		</form>
-
 		<div class="text-center mt-4">
 			<a href="${pageContext.request.contextPath}/auth/login.jsp"
 				class="text-decoration-none text-muted small"> <i
@@ -109,7 +108,6 @@ body {
 			</a>
 		</div>
 	</div>
-
 	<script>
 		function validarSenhas() {
 			var senha = document.getElementById("senha").value;
@@ -124,6 +122,5 @@ body {
 			return true;
 		}
 	</script>
-
 </body>
 </html>

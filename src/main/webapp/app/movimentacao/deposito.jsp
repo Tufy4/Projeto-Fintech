@@ -80,7 +80,7 @@
 }
 
 .center-wrapper {
-	min-height: calc(100vh - 80px); /* altura total menos a navbar */
+	min-height: calc(100vh - 80px);
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -120,9 +120,7 @@ sessionScope.usuarioLogado.getNome() : 'Cliente'}</strong>
 			</div>
 		</div>
 	</nav>
-
 	<section id="deposito" class="container center-wrapper">
-
 		<h2>
 			Seja Bem-vindo, <strong>${sessionScope.usuarioLogado != null ?
 sessionScope.usuarioLogado.getNome() : 'Cliente'}</strong>
@@ -141,8 +139,6 @@ sessionScope.usuarioLogado.getNome() : 'Cliente'}</strong>
 				<button type="submit">Depositar</button>
 			</form>
 		</div>
-
 	</section>
-
 </body>
 </html>

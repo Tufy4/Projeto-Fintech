@@ -83,8 +83,6 @@ body {
 		</div>
 
 		<h4 class="text-center mb-4 text-secondary">Acesse sua conta</h4>
-
-		<%-- Bloco de Mensagem de Sucesso (Ex: Senha alterada) --%>
 		<%
 		String msg = (String) request.getAttribute("msg");
 		if (msg != null) {
@@ -97,8 +95,6 @@ body {
 		<%
 		}
 		%>
-
-		<%-- Bloco de Mensagem de Erro --%>
 		<%
 		if (request.getAttribute("erro") != null) {
 		%>

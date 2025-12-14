@@ -21,19 +21,11 @@ import jakarta.servlet.http.HttpSession;
 public class FiltroSeguranca extends HttpFilter implements Filter {
 
 	private static final long serialVersionUID = 1L;
-
-	// Adicionados os comandos de recuperação de senha aqui
 	private static final List<String> COMANDOS_PUBLICOS = Arrays.asList("login", "cadastro", "salvarUsuario",
-			"cadastrarUsuario", "redirect", "solicitarRecuperacao", // Novo
-			"validarToken", // Novo
-			"redefinirSenha" // Novo
-	);
+			"cadastrarUsuario", "redirect", "solicitarRecuperacao", "validarToken", "redefinirSenha");
 
-	// Adicionadas as páginas de recuperação aqui
 	private static final List<String> CAMINHOS_PUBLICOS = Arrays.asList("/index.jsp", "/auth/login.jsp",
-			"/auth/cadastro.jsp", "/auth/recuperar_senha.jsp", // Novo
-			"/auth/nova_senha.jsp" // Novo
-	);
+			"/auth/cadastro.jsp", "/auth/recuperar_senha.jsp", "/auth/nova_senha.jsp");
 
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
@@ -55,14 +47,12 @@ public class FiltroSeguranca extends HttpFilter implements Filter {
 			return;
 		}
 
-		// Verifica se a URL começa com algum caminho público
 		boolean isPublicPath = CAMINHOS_PUBLICOS.stream().anyMatch(path::startsWith);
 		if (isPublicPath) {
 			chain.doFilter(request, response);
 			return;
 		}
 
-		// Verifica se é um comando público no FrontController
 		if (path.equals("/app")) {
 			if (command == null || COMANDOS_PUBLICOS.contains(command)) {
 				chain.doFilter(request, response);
@@ -70,7 +60,6 @@ public class FiltroSeguranca extends HttpFilter implements Filter {
 			}
 		}
 
-		// Área Administrativa (Proteção Extra)
 		if (path.startsWith("/app/admin/")) {
 
 			if (!isLogado) {
@@ -78,7 +67,6 @@ public class FiltroSeguranca extends HttpFilter implements Filter {
 				return;
 			} else {
 				Conta conta = (Conta) session.getAttribute("contaLogado");
-				// Segurança contra NullPointer caso a conta não tenha sido selecionada ainda
 				if (conta == null || conta.getTipo() != TiposConta.GERENTE) {
 					res.sendRedirect(contextPath + "/auth/login.jsp");
 					return;

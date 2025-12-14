@@ -20,9 +20,9 @@ public class DadosUsuarioCommand implements Command {
 		HttpSession session = request.getSession(false);
 		request.setAttribute("userEditar", user);
 		try {
-		    request.getRequestDispatcher("app/usuarios/EditarUser.jsp").forward(request, response);
+			request.getRequestDispatcher("app/usuarios/EditarUser.jsp").forward(request, response);
 		} catch (Exception e) {
-		    throw new RuntimeException(e);
+			throw new RuntimeException(e);
 		}
 
 	}

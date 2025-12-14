@@ -60,24 +60,56 @@ public class MovimentacaoSERVICE {
 
 		BigDecimal saldoAnteriorOrigem = contaOrigem.getSaldo();
 		BigDecimal novoSaldoOrigem = saldoAnteriorOrigem.subtract(valor);
-
 		BigDecimal saldoAnteriorDestino = contaDestino.getSaldo();
 		BigDecimal novoSaldoDestino = saldoAnteriorDestino.add(valor);
 
 		contaDAO.atualizarSaldo(contaOrigem.getId(), novoSaldoOrigem.doubleValue());
 		contaDAO.atualizarSaldo(contaDestino.getId(), novoSaldoDestino.doubleValue());
 
-		Movimentacoes mov = new Movimentacoes(0, contaOrigem.getId(), contaDestino.getId(), valor, saldoAnteriorOrigem,
-				novoSaldoOrigem, TipoMovimentacao.TRANSFERENCIA, new Timestamp(System.currentTimeMillis()),
-				"Transferência para " + numeroContaDestino, StatusMovimentacao.CONCLUIDA);
+		Timestamp dataAgora = new Timestamp(System.currentTimeMillis());
 
-		movimentacaoDAO.inserir(mov);
+		Movimentacoes movSaida = new Movimentacoes(0, contaOrigem.getId(), contaDestino.getId(), valor,
+				saldoAnteriorOrigem, novoSaldoOrigem, TipoMovimentacao.TRANSFERENCIA_ENVIADA, dataAgora,
+				"Transferência enviada", StatusMovimentacao.CONCLUIDA);
+
+		movimentacaoDAO.inserir(movSaida);
+
+		Movimentacoes movEntrada = new Movimentacoes(0, contaOrigem.getId(), contaDestino.getId(), valor,
+				saldoAnteriorDestino, novoSaldoDestino, TipoMovimentacao.TRANSFERENCIA_RECEBIDA, dataAgora,
+				"Transferência recebida", StatusMovimentacao.CONCLUIDA);
+
+		movimentacaoDAO.inserir(movEntrada);
 	}
 
 	public List<Movimentacoes> consultarExtrato(int idConta) throws DataAccessException {
 		try {
 			return movimentacaoDAO.listarMovimentacoes(idConta);
 		} catch (SQLException e) {
+			e.printStackTrace();
+			return new ArrayList<>();
+		}
+	}
+
+	public List<Movimentacoes> consultarExtrato(int idConta, String inicioStr, String fimStr)
+			throws DataAccessException {
+		try {
+			java.sql.Date dataInicio = null;
+			java.sql.Date dataFim = null;
+
+			if (inicioStr != null && !inicioStr.isEmpty()) {
+				dataInicio = java.sql.Date.valueOf(inicioStr);
+			}
+			if (fimStr != null && !fimStr.isEmpty()) {
+				dataFim = java.sql.Date.valueOf(fimStr);
+			}
+
+			if (dataInicio == null && dataFim == null) {
+				return movimentacaoDAO.listarMovimentacoes(idConta);
+			} else {
+				return movimentacaoDAO.listarMovimentacoes(idConta, dataInicio, dataFim);
+			}
+
+		} catch (Exception e) {
 			e.printStackTrace();
 			return new ArrayList<>();
 		}

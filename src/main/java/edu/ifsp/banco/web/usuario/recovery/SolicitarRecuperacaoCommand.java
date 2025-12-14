@@ -12,7 +12,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 public class SolicitarRecuperacaoCommand implements Command {
 	@Override
-	public void execute(HttpServletRequest req, HttpServletResponse resp){
+	public void execute(HttpServletRequest req, HttpServletResponse resp) {
 		String email = req.getParameter("email");
 
 		UsuarioDAO usuarioDAO = new UsuarioDAO();
@@ -27,7 +27,7 @@ public class SolicitarRecuperacaoCommand implements Command {
 			emailService.enviarEmailRecuperacao(usuario.getEmail(), token);
 		}
 
- 		req.setAttribute("msg", "Se o e-mail existir, um link foi enviado.");
+		req.setAttribute("msg", "Se o e-mail existir, um link foi enviado.");
 		try {
 			req.getRequestDispatcher("/auth/login.jsp").forward(req, resp);
 		} catch (ServletException e) {

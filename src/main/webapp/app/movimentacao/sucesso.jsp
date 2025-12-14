@@ -43,19 +43,14 @@
 						<h4 class="card-title text-success">Depósito realizado com
 							sucesso!</h4>
 						<p class="card-text">${msg}</p>
-						<a href="${pageContext.request.contextPath}/app?command=dashboardCliente"
+						<a
+							href="${pageContext.request.contextPath}/app?command=dashboardCliente"
 							class="btn btn-primary w-100">Voltar para a Home</a>
 					</div>
 				</div>
 			</div>
 		</div>
 	</div>
-
-
-
-
-
-	<!--funcionalidade do navbar-->
 	<script
 		src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
 	<script

@@ -36,7 +36,6 @@ body {
 	box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
 	width: 100%;
 	max-width: 450px;
-	/* Um pouco mais largo para caber os dados da conta */
 	position: relative;
 }
 

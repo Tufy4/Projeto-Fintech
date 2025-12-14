@@ -29,6 +29,11 @@ BEGIN
     EXECUTE IMMEDIATE 'DROP TABLE USUARIOS CASCADE CONSTRAINTS';
 EXCEPTION WHEN OTHERS THEN NULL; END;
 /
+BEGIN
+    EXECUTE IMMEDIATE 'DROP TABLE TOKENS_RECUPERACAO CASCADE CONSTRAINTS';
+EXCEPTION WHEN OTHERS THEN NULL; END;
+/
+
 -- Drops de Sequences
 BEGIN EXECUTE IMMEDIATE 'DROP SEQUENCE SEQ_USUARIOS'; EXCEPTION WHEN OTHERS THEN NULL; END;
 /
@@ -46,6 +51,8 @@ BEGIN EXECUTE IMMEDIATE 'DROP SEQUENCE SEQ_NUM_CONTA'; EXCEPTION WHEN OTHERS THE
 /
 BEGIN EXECUTE IMMEDIATE 'DROP SEQUENCE SEQ_CONFIG_EMPRESTIMO'; EXCEPTION WHEN OTHERS THEN NULL; END;
 /
+BEGIN EXECUTE IMMEDIATE 'DROP SEQUENCE SEQ_TOKENS'; EXCEPTION WHEN OTHERS THEN NULL; END;
+/
 
 /* =========================================================
    TABELAS E SEQUENCES
@@ -59,6 +66,7 @@ CREATE SEQUENCE seq_config_emprestimo START WITH 1 INCREMENT BY 1 NOCACHE NOCYCL
 CREATE SEQUENCE seq_emprestimos START WITH 1 INCREMENT BY 1 NOCACHE NOCYCLE;
 CREATE SEQUENCE seq_parcelas_emprestimo START WITH 1 INCREMENT BY 1 NOCACHE NOCYCLE;
 CREATE SEQUENCE seq_num_conta START WITH 1000 INCREMENT BY 1 NOCACHE NOCYCLE;
+CREATE SEQUENCE seq_tokens START WITH 1 INCREMENT BY 1 NOCACHE NOCYCLE;
 
 CREATE TABLE usuarios (
     id                          INT NOT NULL PRIMARY KEY,
@@ -84,19 +92,21 @@ CREATE TABLE contas (
 );
 
 CREATE TABLE movimentacoes (
-    id                INT NOT NULL PRIMARY KEY,
-    conta_origem_id   INT,
-    conta_destino_id  INT, 
-    valor             NUMBER(15, 2) NOT NULL,
-    saldo_anterior    NUMBER(15, 2) NOT NULL,
-    saldo_posterior   NUMBER(15, 2) NOT NULL,
-    tipo              VARCHAR2(30) CHECK ( tipo IN ( 'DEPOSITO', 'TRANSFERENCIA', 'INVESTIMENTO', 'SAQUE', 'EMPRESTIMO' ) ),
-    data_transacao    TIMESTAMP DEFAULT current_timestamp,
-    descricao         VARCHAR(200),
-    status            VARCHAR2(20) DEFAULT 'PENDENTE' CHECK ( status IN ( 'PENDENTE', 'CONCLUIDA', 'FALHA' ) ),
-    
-    CONSTRAINT fk_mov_conta_origem FOREIGN KEY ( conta_origem_id ) REFERENCES contas ( id ),
-    CONSTRAINT fk_mov_conta_destino FOREIGN KEY ( conta_destino_id ) REFERENCES contas ( id )
+    id               INT NOT NULL PRIMARY KEY,
+    conta_origem_id  INT,
+    conta_destino_id INT,
+    valor            NUMBER(15, 2) NOT NULL,
+    saldo_anterior   NUMBER(15, 2) NOT NULL,
+    saldo_posterior  NUMBER(15, 2) NOT NULL,
+    tipo             VARCHAR2(50) CHECK ( tipo IN ( 'DEPOSITO', 'SAQUE', 'INVESTIMENTO', 'EMPRESTIMO', 'TRANSFERENCIA_ENVIADA',
+                                        'TRANSFERENCIA_RECEBIDA', 'PAGAMENTO' ) ),
+    data_transacao   TIMESTAMP DEFAULT current_timestamp,
+    descricao        VARCHAR(200),
+    status           VARCHAR2(20) DEFAULT 'PENDENTE' CHECK ( status IN ( 'PENDENTE', 'CONCLUIDA', 'FALHA' ) ),
+    CONSTRAINT fk_mov_conta_origem FOREIGN KEY ( conta_origem_id )
+        REFERENCES contas ( id ),
+    CONSTRAINT fk_mov_conta_destino FOREIGN KEY ( conta_destino_id )
+        REFERENCES contas ( id )
 );
 
 CREATE TABLE investimentos (
@@ -151,7 +161,6 @@ CREATE TABLE tokens_recuperacao (
     CONSTRAINT fk_token_user FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
 );
 
-CREATE SEQUENCE seq_tokens START WITH 1 INCREMENT BY 1 NOCACHE NOCYCLE;
 
 /* =========================================================
    MOCKS
@@ -175,7 +184,7 @@ VALUES (
 INSERT INTO movimentacoes (id, conta_destino_id, valor, saldo_anterior, saldo_posterior, tipo, status, descricao)
 VALUES (
     seq_movimentacoes.NEXTVAL,
-    (SELECT id FROM contas WHERE usuario_id = (SELECT id FROM usuarios WHERE email = 'miguel.batista@gerente.com')),
+    (SELECT id FROM contas WHERE usuario_id = (SELECT id FROM usuarios WHERE email = '123')),
     5000.00,
     0.00,
     5000.00,
@@ -199,7 +208,7 @@ VALUES (
 INSERT INTO movimentacoes (id, conta_destino_id, valor, saldo_anterior, saldo_posterior, tipo, status, descricao)
 VALUES (
     seq_movimentacoes.NEXTVAL,
-    (SELECT id FROM contas WHERE usuario_id = (SELECT id FROM usuarios WHERE email = 'ana@cliente.com')),
+    (SELECT id FROM contas WHERE usuario_id = (SELECT id FROM usuarios WHERE email = 'ana')),
     1000.00,
     0.00,
     1000.00,

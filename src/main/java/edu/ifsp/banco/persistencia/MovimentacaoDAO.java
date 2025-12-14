@@ -77,24 +77,44 @@ public class MovimentacaoDAO {
 		return null;
 	}
 
-	public ArrayList<Movimentacoes> listarMovimentacoes(int idConta) throws SQLException {
-		// SQL atualizado
-		String sql = """
-				   SELECT m.ID, m.CONTA_ORIGEM_ID, m.CONTA_DESTINO_ID, m.VALOR,
-				          m.SALDO_ANTERIOR, m.SALDO_POSTERIOR,
-				          m.TIPO, m.DATA_TRANSACAO, m.DESCRICAO, m.STATUS
-				   FROM MOVIMENTACOES m
-				   WHERE m.CONTA_ORIGEM_ID = ? OR m.CONTA_DESTINO_ID = ?
-				   ORDER BY m.DATA_TRANSACAO DESC
-				""";
+	public ArrayList<Movimentacoes> listarMovimentacoes(int idConta, java.sql.Date dataInicio, java.sql.Date dataFim)
+			throws SQLException {
+		StringBuilder sql = new StringBuilder();
+
+		sql.append("SELECT m.ID, m.CONTA_ORIGEM_ID, m.CONTA_DESTINO_ID, m.VALOR, ");
+		sql.append("       m.SALDO_ANTERIOR, m.SALDO_POSTERIOR, ");
+		sql.append("       m.TIPO, m.DATA_TRANSACAO, m.DESCRICAO, m.STATUS ");
+		sql.append("FROM MOVIMENTACOES m ");
+		sql.append("WHERE ( ");
+		sql.append("  (m.CONTA_ORIGEM_ID = ? AND m.TIPO <> 'TRANSFERENCIA_RECEBIDA') ");
+		sql.append("  OR ");
+		sql.append("  (m.CONTA_DESTINO_ID = ? AND m.TIPO <> 'TRANSFERENCIA_ENVIADA') ");
+		sql.append(") ");
+
+		if (dataInicio != null) {
+			sql.append("AND TRUNC(m.DATA_TRANSACAO) >= ? ");
+		}
+		if (dataFim != null) {
+			sql.append("AND TRUNC(m.DATA_TRANSACAO) <= ? ");
+		}
+
+		sql.append("ORDER BY m.DATA_TRANSACAO DESC");
 
 		ArrayList<Movimentacoes> movimentacoesList = new ArrayList<>();
 
 		try (Connection conn = ConnectionSingleton.getInstance().getConnection();
-				PreparedStatement ps = conn.prepareStatement(sql)) {
+				PreparedStatement ps = conn.prepareStatement(sql.toString())) {
 
-			ps.setInt(1, idConta);
-			ps.setInt(2, idConta);
+			int index = 1;
+			ps.setInt(index++, idConta);
+			ps.setInt(index++, idConta);
+
+			if (dataInicio != null) {
+				ps.setDate(index++, dataInicio);
+			}
+			if (dataFim != null) {
+				ps.setDate(index++, dataFim);
+			}
 
 			try (ResultSet rs = ps.executeQuery()) {
 				while (rs.next()) {
@@ -103,10 +123,14 @@ public class MovimentacaoDAO {
 			}
 
 		} catch (SQLException e) {
-			throw new SQLException("Erro ao listar movimentações.", e);
+			throw new SQLException("Erro ao listar movimentações com filtro.", e);
 		}
 
 		return movimentacoesList;
+	}
+
+	public ArrayList<Movimentacoes> listarMovimentacoes(int idConta) throws SQLException {
+		return listarMovimentacoes(idConta, null, null);
 	}
 
 	public void AtualizarStatus(String StatusMovimentacao, int idMovimentacao) throws DataAccessException {

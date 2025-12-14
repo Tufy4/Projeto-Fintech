@@ -20,16 +20,12 @@ public class RealizarTransacaoCommand implements Command {
 		RequestDispatcher rd;
 
 		try {
-			// 1. Validação de Sessão
 			HttpSession session = request.getSession();
 			Conta contaOrigem = (Conta) session.getAttribute("contaLogado");
 
 			if (contaOrigem == null) {
 				throw new Exception("Sessão expirada. Faça login novamente.");
 			}
-
-			// 2. Parâmetros
-			// O input hidden no JSP deve ter name="tipoTransacao"
 			String tipo = request.getParameter("tipoTransacao");
 			String valorStr = request.getParameter("valor");
 
@@ -37,13 +33,11 @@ public class RealizarTransacaoCommand implements Command {
 				throw new Exception("Valor obrigatório.");
 			}
 
-			// Troca vírgula por ponto para evitar erro de conversão
 			BigDecimal valor = new BigDecimal(valorStr.replace(",", "."));
 
 			MovimentacaoSERVICE service = new MovimentacaoSERVICE();
 			String mensagemSucesso = "";
 
-			// 3. Decisão do Fluxo
 			if ("DEPOSITO".equalsIgnoreCase(tipo)) {
 
 				service.depositar(contaOrigem.getNumero_conta(), valor);
@@ -63,8 +57,6 @@ public class RealizarTransacaoCommand implements Command {
 			} else {
 				throw new Exception("Tipo de transação desconhecido.");
 			}
-
-			// 4. Atualização de Sessão (Saldo Visual)
 			ContaDAO contaDAO = new ContaDAO();
 			Conta contaAtualizada = contaDAO.buscarPorNumero(contaOrigem.getNumero_conta());
 

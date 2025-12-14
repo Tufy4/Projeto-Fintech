@@ -12,10 +12,9 @@ public class TokenDAO {
 
 			stmt.setInt(1, usuarioId);
 			stmt.setString(2, token);
-			// Expira em 30 min
-			stmt.setTimestamp(3, Timestamp.valueOf(LocalDateTime.now().plusMinutes(30)));
+			// Expira em 2 min
+			stmt.setTimestamp(3, Timestamp.valueOf(LocalDateTime.now().plusMinutes(2)));
 			stmt.executeUpdate();
-			// Se não for auto-commit, use conn.commit()
 		} catch (SQLException e) {
 			throw new DataAccessException("Erro ao salvar token");
 		}

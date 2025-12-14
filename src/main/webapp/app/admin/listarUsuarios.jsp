@@ -19,7 +19,6 @@ body {
 </style>
 </head>
 <body>
-
 	<nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
 		<div class="container">
 			<a class="navbar-brand fw-bold"
@@ -30,18 +29,15 @@ body {
 
 		</div>
 	</nav>
-
 	<div class="container">
 		<div class="d-flex justify-content-between align-items-center mb-4">
 			<h3 class="text-secondary">
 				<i class="bi bi-shield-lock"></i> Usuários Bloqueados
 			</h3>
 		</div>
-
 		<%
 		List<Usuario> lista = (List<Usuario>) request.getAttribute("ListaBloqueados");
 		%>
-
 		<div class="card shadow-sm border-0">
 			<div class="card-body p-0">
 				<div class="table-responsive">
@@ -92,6 +88,5 @@ body {
 			</div>
 		</div>
 	</div>
-
 </body>
 </html>

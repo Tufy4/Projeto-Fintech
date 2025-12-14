@@ -16,7 +16,6 @@ body {
 	font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-/* Navbar simples para manter consistência */
 .navbar-custom {
 	background-color: #343a40;
 	padding: 10px 0;
@@ -41,7 +40,6 @@ h2 {
 	margin-bottom: 30px;
 }
 
-/* Botões de Ação no Topo */
 .action-bar {
 	text-align: center;
 	margin-bottom: 40px;
@@ -56,7 +54,7 @@ h2 {
 }
 
 .btn-meus-investimentos {
-	background-color: #198754; /* Verde Sucesso */
+	background-color: #198754;
 	color: white;
 	padding: 12px 25px;
 	border-radius: 50px;
@@ -76,7 +74,6 @@ h2 {
 	box-shadow: 0 4px 8px rgba(25, 135, 84, 0.3);
 }
 
-/* Cards existentes (mantendo seu estilo original com melhorias) */
 .cards {
 	display: flex;
 	gap: 20px;
@@ -153,7 +150,6 @@ h2 {
 </style>
 </head>
 <body>
-
 	<nav class="navbar navbar-dark bg-dark mb-4">
 		<div
 			class="container container-custom d-flex justify-content-between align-items-center">
@@ -163,13 +159,10 @@ h2 {
 				class="btn btn-outline-light btn-sm">Voltar para Home</a>
 		</div>
 	</nav>
-
 	<div class="container-custom">
-
 		<h2>Central de Investimentos</h2>
 		<p class="subtitle">Faça seu dinheiro render com segurança e
 			liquidez.</p>
-
 		<div class="action-bar">
 			<div>
 				<h5 class="m-0 fw-bold text-muted" style="font-size: 1rem;">Já
@@ -182,9 +175,7 @@ h2 {
 				Ver Meus Investimentos
 			</a>
 		</div>
-
 		<div class="cards">
-
 			<a class="card-invest"
 				href="${pageContext.request.contextPath}/app?command=escolherInvestimento&produto=CDB_DI">
 				<div class="titulo">CDB Liquidez Diária</div>
@@ -204,10 +195,7 @@ h2 {
 				</div>
 				<div class="btn-investir">Investir Agora</div>
 			</a>
-
 		</div>
-
 	</div>
-
 </body>
 </html>

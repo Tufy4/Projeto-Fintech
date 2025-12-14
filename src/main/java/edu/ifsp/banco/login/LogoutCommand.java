@@ -14,14 +14,12 @@ public class LogoutCommand implements Command {
 
 	@Override
 	public void execute(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// Obtém a sessão atual (não cria uma nova se não existir)
 		HttpSession session = request.getSession(false);
 
 		if (session != null) {
-			session.invalidate(); // encerra a sessão
+			session.invalidate();
 		}
 
-		// Redireciona para a página de login ou home
 		response.sendRedirect(request.getContextPath() + "/index.jsp");
 	}
 }
