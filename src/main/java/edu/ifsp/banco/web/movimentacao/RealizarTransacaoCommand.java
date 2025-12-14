@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 
 import edu.ifsp.banco.modelo.Conta;
-import edu.ifsp.banco.persistencia.ContaDAO;
+import edu.ifsp.banco.service.ContaSERVICE;
 import edu.ifsp.banco.service.MovimentacaoSERVICE;
 import edu.ifsp.banco.web.Command;
 import jakarta.servlet.RequestDispatcher;
@@ -35,30 +35,29 @@ public class RealizarTransacaoCommand implements Command {
 
 			BigDecimal valor = new BigDecimal(valorStr.replace(",", "."));
 
-			MovimentacaoSERVICE service = new MovimentacaoSERVICE();
+			MovimentacaoSERVICE movService = new MovimentacaoSERVICE();
 			String mensagemSucesso = "";
 
 			if ("DEPOSITO".equalsIgnoreCase(tipo)) {
-
-				service.depositar(contaOrigem.getNumero_conta(), valor);
+				movService.depositar(contaOrigem.getNumero_conta(), valor);
 				mensagemSucesso = "Depósito realizado com sucesso!";
 
 			} else if ("TRANSFERENCIA".equalsIgnoreCase(tipo)) {
-
 				String contaDestinoStr = request.getParameter("contaDestino");
 				if (contaDestinoStr == null || contaDestinoStr.isEmpty()) {
 					throw new Exception("Conta de destino obrigatória.");
 				}
 				int numeroDestino = Integer.parseInt(contaDestinoStr);
 
-				service.realizarTransferencia(contaOrigem, numeroDestino, valor);
+				movService.realizarTransferencia(contaOrigem, numeroDestino, valor);
 				mensagemSucesso = "Transferência de R$ " + valorStr + " realizada com sucesso!";
 
 			} else {
 				throw new Exception("Tipo de transação desconhecido.");
 			}
-			ContaDAO contaDAO = new ContaDAO();
-			Conta contaAtualizada = contaDAO.buscarPorNumero(contaOrigem.getNumero_conta());
+
+			ContaSERVICE contaService = new ContaSERVICE();
+			Conta contaAtualizada = contaService.buscarPorNumero(contaOrigem.getNumero_conta());
 
 			if (contaAtualizada != null) {
 				session.setAttribute("contaLogado", contaAtualizada);

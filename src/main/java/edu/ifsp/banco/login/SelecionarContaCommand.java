@@ -36,12 +36,7 @@ public class SelecionarContaCommand implements Command {
 				session.invalidate();
 				throw new Exception("Tentativa de acesso a conta de terceiros. Porque tu fez isso hein???");
 			}
-
 			session.setAttribute("contaLogado", contaSelecionada);
-
-			System.out.println(
-					"Conta selecionada: " + contaSelecionada.getNumero_conta() + " - " + contaSelecionada.getTipo());
-
 			if (contaSelecionada.getTipo() == TiposConta.GERENTE) {
 				response.sendRedirect("app?command=dashboardAdmin");
 			} else {

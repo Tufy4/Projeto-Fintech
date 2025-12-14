@@ -1,28 +1,24 @@
 package edu.ifsp.banco.service;
 
 import java.math.BigDecimal;
+import java.sql.Connection;
 import java.util.List;
 
 import edu.ifsp.banco.modelo.Conta;
+import edu.ifsp.banco.persistencia.ConnectionSingleton;
 import edu.ifsp.banco.persistencia.ContaDAO;
-import edu.ifsp.banco.persistencia.DataAccessException;
 
 public class ContaSERVICE {
-
-	private ContaDAO contaDAO;
-
-	public ContaSERVICE() {
-		this.contaDAO = new ContaDAO();
-	}
 
 	public void criarConta(Conta conta) throws Exception {
 		if (conta == null) {
 			throw new Exception("Conta inválida");
 		}
 
-		try {
-			contaDAO.inserir(conta);
-		} catch (DataAccessException e) {
+		try (Connection conn = ConnectionSingleton.getInstance().getConnection()) {
+			ContaDAO dao = new ContaDAO(conn);
+			dao.inserir(conta);
+		} catch (Exception e) {
 			throw new Exception("Erro ao criar conta: " + e.getMessage());
 		}
 	}
@@ -32,34 +28,37 @@ public class ContaSERVICE {
 			throw new Exception("Número de conta inválido");
 		}
 
-		try {
-			return contaDAO.buscarPorNumero(numeroConta);
-		} catch (DataAccessException e) {
+		try (Connection conn = ConnectionSingleton.getInstance().getConnection()) {
+			ContaDAO dao = new ContaDAO(conn);
+			return dao.buscarPorNumero(numeroConta);
+		} catch (Exception e) {
 			throw new Exception("Erro ao buscar conta: " + e.getMessage());
 		}
 	}
 
 	public List<Conta> buscarContasPorUsuario(int idUsuario) throws Exception {
-		try {
-			return contaDAO.buscarPorIdUsuario(idUsuario);
-		} catch (DataAccessException e) {
+		try (Connection conn = ConnectionSingleton.getInstance().getConnection()) {
+			ContaDAO dao = new ContaDAO(conn);
+			return dao.buscarPorIdUsuario(idUsuario);
+		} catch (Exception e) {
 			throw new Exception("Erro ao buscar contas do usuário: " + e.getMessage());
 		}
 	}
 
 	public Conta buscarPorId(int idConta) throws Exception {
-		try {
-			return contaDAO.buscarPorId(idConta);
-		} catch (DataAccessException e) {
+		try (Connection conn = ConnectionSingleton.getInstance().getConnection()) {
+			ContaDAO dao = new ContaDAO(conn);
+			return dao.buscarPorId(idConta);
+		} catch (Exception e) {
 			throw new Exception("Erro ao buscar conta específica: " + e.getMessage());
 		}
 	}
 
 	public List<Conta> listarContas() throws Exception {
-
-		try {
-			return contaDAO.listar();
-		} catch (DataAccessException e) {
+		try (Connection conn = ConnectionSingleton.getInstance().getConnection()) {
+			ContaDAO dao = new ContaDAO(conn);
+			return dao.listar();
+		} catch (Exception e) {
 			throw new Exception("Erro ao listar contas: " + e.getMessage());
 		}
 	}
@@ -74,17 +73,19 @@ public class ContaSERVICE {
 			throw new Exception("Saldo inválido");
 		}
 
-		try {
-			contaDAO.atualizarSaldo(idConta, novoSaldo.doubleValue());
-		} catch (DataAccessException e) {
+		try (Connection conn = ConnectionSingleton.getInstance().getConnection()) {
+			ContaDAO dao = new ContaDAO(conn);
+			dao.atualizarSaldo(idConta, novoSaldo.doubleValue());
+		} catch (Exception e) {
 			throw new Exception("Erro ao atualizar saldo: " + e.getMessage());
 		}
 	}
 
 	public int obterTotalContas() throws Exception {
-		try {
-			return contaDAO.contarTotal();
-		} catch (DataAccessException e) {
+		try (Connection conn = ConnectionSingleton.getInstance().getConnection()) {
+			ContaDAO dao = new ContaDAO(conn);
+			return dao.contarTotal();
+		} catch (Exception e) {
 			return 0;
 		}
 	}

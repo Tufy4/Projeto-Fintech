@@ -5,8 +5,8 @@ import java.util.List;
 
 import edu.ifsp.banco.modelo.Conta;
 import edu.ifsp.banco.modelo.Usuario;
-import edu.ifsp.banco.persistencia.UsuarioDAO;
 import edu.ifsp.banco.service.ContaSERVICE;
+import edu.ifsp.banco.service.UsuarioSERVICE;
 import edu.ifsp.banco.web.Command;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -26,8 +26,8 @@ public class MostrarDadosUsuarioCommand implements Command {
 		try {
 			int idUsuario = Integer.parseInt(idParam);
 
-			UsuarioDAO usuarioDAO = new UsuarioDAO();
-			Usuario usuarioAlvo = usuarioDAO.buscarPorId(idUsuario);
+			UsuarioSERVICE usuarioService = new UsuarioSERVICE();
+			Usuario usuarioAlvo = usuarioService.buscarPorId(idUsuario);
 
 			ContaSERVICE contaService = new ContaSERVICE();
 			List<Conta> contasDoUsuario = contaService.buscarContasPorUsuario(idUsuario);

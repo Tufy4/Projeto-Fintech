@@ -13,12 +13,17 @@ import edu.ifsp.banco.modelo.enums.TiposConta;
 
 public class ContaDAO {
 
+	private Connection connection;
+
+	public ContaDAO(Connection connection) {
+		this.connection = connection;
+	}
+
 	public void inserir(Conta conta) throws DataAccessException {
 		String sql = "INSERT INTO CONTAS (ID, USUARIO_ID, NUMERO_CONTA, TIPO) "
 				+ "VALUES (seq_contas.NEXTVAL, ?, seq_num_conta.NEXTVAL, ?)";
 
-		try (Connection conn = ConnectionSingleton.getInstance().getConnection();
-				PreparedStatement stmt = conn.prepareStatement(sql)) {
+		try (PreparedStatement stmt = connection.prepareStatement(sql)) {
 
 			stmt.setInt(1, conta.getUsuarioId());
 			stmt.setString(2, conta.getTipo().getValor());
@@ -35,8 +40,7 @@ public class ContaDAO {
 		String sql = "SELECT * FROM CONTAS WHERE NUMERO_CONTA = ?";
 		Conta conta = null;
 
-		try (Connection conn = ConnectionSingleton.getInstance().getConnection();
-				PreparedStatement stmt = conn.prepareStatement(sql)) {
+		try (PreparedStatement stmt = connection.prepareStatement(sql)) {
 
 			stmt.setInt(1, numeroConta);
 			ResultSet rs = stmt.executeQuery();
@@ -59,8 +63,7 @@ public class ContaDAO {
 		String sql = "SELECT * FROM CONTAS WHERE id = ?";
 		Conta conta = null;
 
-		try (Connection conn = ConnectionSingleton.getInstance().getConnection();
-				PreparedStatement stmt = conn.prepareStatement(sql)) {
+		try (PreparedStatement stmt = connection.prepareStatement(sql)) {
 
 			stmt.setInt(1, idConta);
 			ResultSet rs = stmt.executeQuery();
@@ -70,8 +73,6 @@ public class ContaDAO {
 						rs.getInt("NUMERO_CONTA"), rs.getBigDecimal("SALDO"), TiposConta.valueOf(rs.getString("TIPO")),
 						rs.getTimestamp("DATA_CRIACAO"));
 			}
-
-			System.out.println("conta encontrada: " + conta.getId());
 
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -85,9 +86,7 @@ public class ContaDAO {
 		List<Conta> contas = new ArrayList<>();
 		String sql = "SELECT * FROM CONTAS";
 
-		try (Connection conn = ConnectionSingleton.getInstance().getConnection();
-				Statement stmt = conn.createStatement();
-				ResultSet rs = stmt.executeQuery(sql)) {
+		try (Statement stmt = connection.createStatement(); ResultSet rs = stmt.executeQuery(sql)) {
 
 			while (rs.next()) {
 				Conta c = new Conta(rs.getInt("ID"), rs.getInt("USUARIO_ID"), rs.getInt("AGENCIA"),
@@ -107,8 +106,7 @@ public class ContaDAO {
 	public void atualizarSaldo(int idConta, double novoSaldo) throws DataAccessException {
 		String sql = "UPDATE CONTAS SET SALDO = ? WHERE ID = ?";
 
-		try (Connection conn = ConnectionSingleton.getInstance().getConnection();
-				PreparedStatement stmt = conn.prepareStatement(sql)) {
+		try (PreparedStatement stmt = connection.prepareStatement(sql)) {
 
 			stmt.setDouble(1, novoSaldo);
 			stmt.setInt(2, idConta);
@@ -123,8 +121,7 @@ public class ContaDAO {
 		List<Conta> contas = new ArrayList<>();
 		String sql = "SELECT * FROM CONTAS WHERE USUARIO_ID = ?";
 
-		try (Connection conn = ConnectionSingleton.getInstance().getConnection();
-				PreparedStatement stmt = conn.prepareStatement(sql)) {
+		try (PreparedStatement stmt = connection.prepareStatement(sql)) {
 
 			stmt.setInt(1, idUser);
 			ResultSet rs = stmt.executeQuery();
@@ -146,9 +143,7 @@ public class ContaDAO {
 
 	public int contarTotal() throws DataAccessException {
 		String sql = "SELECT COUNT(*) AS TOTAL FROM CONTAS";
-		try (Connection conn = ConnectionSingleton.getInstance().getConnection();
-				PreparedStatement stmt = conn.prepareStatement(sql);
-				ResultSet rs = stmt.executeQuery()) {
+		try (PreparedStatement stmt = connection.prepareStatement(sql); ResultSet rs = stmt.executeQuery()) {
 			if (rs.next()) {
 				return rs.getInt("TOTAL");
 			}

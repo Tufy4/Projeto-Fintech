@@ -52,8 +52,6 @@ public class EmailService {
             message.setContent(htmlContent, "text/html; charset=utf-8");
 
             Transport.send(message);
-            System.out.println("Email enviado para: " + emailDestino);
-
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException("Erro ao enviar e-mail: " + e.getMessage());

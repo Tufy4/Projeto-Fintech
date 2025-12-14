@@ -10,6 +10,12 @@ import java.util.List;
 
 public class EmprestimoDAO {
 
+	private Connection connection;
+
+	public EmprestimoDAO(Connection connection) {
+		this.connection = connection;
+	}
+
 	public int inserir(Emprestimo emprestimo) throws DataAccessException {
 		String sql = "INSERT INTO emprestimos (id, conta_id, valor_emprestimo, taxa_juros_mensal, parcelas, status, "
 				+ "data_solicitacao, data_aprovacao, data_ultimo_pagamento) "
@@ -17,8 +23,7 @@ public class EmprestimoDAO {
 
 		String[] generatedColumns = { "ID" };
 
-		try (Connection conn = ConnectionSingleton.getInstance().getConnection();
-				PreparedStatement stmt = conn.prepareStatement(sql, generatedColumns)) {
+		try (PreparedStatement stmt = connection.prepareStatement(sql, generatedColumns)) {
 
 			stmt.setInt(1, emprestimo.getConta_id());
 			stmt.setBigDecimal(2, emprestimo.getValor_emprestimo());
@@ -53,8 +58,7 @@ public class EmprestimoDAO {
 		String sql = "SELECT * FROM emprestimos WHERE id = ?";
 		Emprestimo emp = null;
 
-		try (Connection conn = ConnectionSingleton.getInstance().getConnection();
-				PreparedStatement stmt = conn.prepareStatement(sql)) {
+		try (PreparedStatement stmt = connection.prepareStatement(sql)) {
 
 			stmt.setInt(1, id);
 			ResultSet rs = stmt.executeQuery();
@@ -74,9 +78,7 @@ public class EmprestimoDAO {
 		List<Emprestimo> lista = new ArrayList<>();
 		String sql = "SELECT * FROM emprestimos";
 
-		try (Connection conn = ConnectionSingleton.getInstance().getConnection();
-				Statement stmt = conn.createStatement();
-				ResultSet rs = stmt.executeQuery(sql)) {
+		try (Statement stmt = connection.createStatement(); ResultSet rs = stmt.executeQuery(sql)) {
 
 			while (rs.next()) {
 				lista.add(mapResultSetToEmprestimo(rs));
@@ -93,8 +95,7 @@ public class EmprestimoDAO {
 		List<Emprestimo> lista = new ArrayList<>();
 		String sql = "SELECT * FROM emprestimos WHERE conta_id = ? ORDER BY id DESC";
 
-		try (Connection conn = ConnectionSingleton.getInstance().getConnection();
-				PreparedStatement stmt = conn.prepareStatement(sql)) {
+		try (PreparedStatement stmt = connection.prepareStatement(sql)) {
 
 			stmt.setInt(1, idConta);
 			ResultSet rs = stmt.executeQuery();
@@ -112,8 +113,7 @@ public class EmprestimoDAO {
 		List<Emprestimo> lista = new ArrayList<>();
 		String sql = "SELECT * FROM emprestimos WHERE status = ? ORDER BY data_solicitacao ASC";
 
-		try (Connection conn = ConnectionSingleton.getInstance().getConnection();
-				PreparedStatement stmt = conn.prepareStatement(sql)) {
+		try (PreparedStatement stmt = connection.prepareStatement(sql)) {
 
 			stmt.setString(1, status.name());
 			ResultSet rs = stmt.executeQuery();
@@ -131,8 +131,7 @@ public class EmprestimoDAO {
 
 	public void atualizarStatus(int id, StatusEmprestimo novoStatus) throws DataAccessException {
 		String sql = "UPDATE emprestimos SET status = ? WHERE id = ?";
-		try (Connection conn = ConnectionSingleton.getInstance().getConnection();
-				PreparedStatement stmt = conn.prepareStatement(sql)) {
+		try (PreparedStatement stmt = connection.prepareStatement(sql)) {
 
 			stmt.setString(1, novoStatus.getValor());
 			stmt.setInt(2, id);
@@ -145,8 +144,7 @@ public class EmprestimoDAO {
 
 	public void aprovarEmprestimo(int id) throws DataAccessException {
 		String sql = "UPDATE emprestimos SET status = ?, data_aprovacao = ? WHERE id = ?";
-		try (Connection conn = ConnectionSingleton.getInstance().getConnection();
-				PreparedStatement stmt = conn.prepareStatement(sql)) {
+		try (PreparedStatement stmt = connection.prepareStatement(sql)) {
 
 			stmt.setString(1, StatusEmprestimo.APROVADO.getValor());
 			stmt.setTimestamp(2, new java.sql.Timestamp(System.currentTimeMillis()));
@@ -162,8 +160,7 @@ public class EmprestimoDAO {
 		String sql = "SELECT TAXA_JUROS_PADRAO FROM config_emprestimo ORDER BY id DESC FETCH FIRST 1 ROW ONLY";
 		BigDecimal taxa = null;
 
-		try (Connection conn = ConnectionSingleton.getInstance().getConnection();
-				PreparedStatement stmt = conn.prepareStatement(sql)) {
+		try (PreparedStatement stmt = connection.prepareStatement(sql)) {
 
 			ResultSet rs = stmt.executeQuery();
 
@@ -182,8 +179,7 @@ public class EmprestimoDAO {
 	public void registrarPagamento(int id, Timestamp dataPagamento) throws DataAccessException {
 		String sql = "UPDATE emprestimos SET data_ultimo_pagamento = ? WHERE id = ?";
 
-		try (Connection conn = ConnectionSingleton.getInstance().getConnection();
-				PreparedStatement stmt = conn.prepareStatement(sql)) {
+		try (PreparedStatement stmt = connection.prepareStatement(sql)) {
 
 			stmt.setTimestamp(1, dataPagamento);
 			stmt.setInt(2, id);
@@ -196,9 +192,7 @@ public class EmprestimoDAO {
 
 	public int contarSolicitados() throws DataAccessException {
 		String sql = "SELECT COUNT(*) AS TOTAL FROM EMPRESTIMOS WHERE STATUS = 'SOLICITADO'";
-		try (Connection conn = ConnectionSingleton.getInstance().getConnection();
-				PreparedStatement stmt = conn.prepareStatement(sql);
-				ResultSet rs = stmt.executeQuery()) {
+		try (PreparedStatement stmt = connection.prepareStatement(sql); ResultSet rs = stmt.executeQuery()) {
 			if (rs.next()) {
 				return rs.getInt("TOTAL");
 			}

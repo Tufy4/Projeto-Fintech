@@ -19,7 +19,9 @@ public class AtualizarDadosUsuarioCommand implements Command {
 		String nome = request.getParameter("nome");
 		String endereco = request.getParameter("endereco");
 		String telefone = request.getParameter("telefone");
-		int id = Integer.parseInt(request.getParameter("id"));
+		
+		String idParam = request.getParameter("id");
+		int id = Integer.parseInt(idParam);
 
 		if (isNullOrEmpty(email) || isNullOrEmpty(password) || isNullOrEmpty(nome)) {
 			request.getSession().setAttribute("erroAtualizar", "Email, nome e senha são obrigatórios.");
@@ -33,21 +35,23 @@ public class AtualizarDadosUsuarioCommand implements Command {
 		user.setNome(nome);
 		user.setEndereco(endereco);
 		user.setTelefone(telefone);
+		user.setId(id); 
 
 		UsuarioSERVICE service = new UsuarioSERVICE();
 
 		try {
-			service.AtualizarConta(user, id);
+			service.atualizarDados(user, id);			
+			HttpSession session = request.getSession(false);
+			if (session != null) {
+				session.setAttribute("usuarioLogado", user);
+			}
+			response.sendRedirect(request.getContextPath() + "/app?command=dashboardCliente");
+			
 		} catch (Exception e) {
-			request.getSession().setAttribute("erroAtualizar", "Erro ao atualizar os dados.");
+			e.printStackTrace();
+			request.getSession().setAttribute("erroAtualizar", "Erro ao atualizar: " + e.getMessage());
 			response.sendRedirect(request.getContextPath() + "/app/usuarios/EditarUser.jsp?id=" + id);
-			return;
 		}
-
-		HttpSession session = request.getSession(false);
-		session.setAttribute("usuarioLogado", user);
-
-		response.sendRedirect(request.getContextPath() + "/app?command=dashboardCliente");
 	}
 
 	private boolean isNullOrEmpty(String value) {

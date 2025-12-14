@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 
 import edu.ifsp.banco.modelo.Conta;
-import edu.ifsp.banco.persistencia.ContaDAO;
+import edu.ifsp.banco.service.ContaSERVICE;
 import edu.ifsp.banco.service.InvestimentoSERVICE;
 import edu.ifsp.banco.web.Command;
 import jakarta.servlet.RequestDispatcher;
@@ -41,11 +41,10 @@ public class FinalizarInvestimentoCommand implements Command {
 			}
 
 			BigDecimal valor = new BigDecimal(valorStr.replace(",", "."));
-
-			InvestimentoSERVICE service = new InvestimentoSERVICE();
-			service.montarInvestimento(numeroConta, produto, valor);
-			ContaDAO contaDAO = new ContaDAO();
-			Conta contaAtualizada = contaDAO.buscarPorNumero(numeroConta);
+			InvestimentoSERVICE investService = new InvestimentoSERVICE();
+			investService.montarInvestimento(numeroConta, produto, valor);
+			ContaSERVICE contaService = new ContaSERVICE();
+			Conta contaAtualizada = contaService.buscarPorNumero(numeroConta);
 
 			if (contaAtualizada != null) {
 				session.setAttribute("contaLogado", contaAtualizada);

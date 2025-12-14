@@ -11,6 +11,12 @@ import edu.ifsp.banco.modelo.Movimentacoes;
 
 public class MovimentacaoDAO {
 
+	private Connection connection;
+
+	public MovimentacaoDAO(Connection connection) {
+		this.connection = connection;
+	}
+
 	public void inserir(Movimentacoes mov) throws DataAccessException {
 		String sql = """
 				   INSERT INTO MOVIMENTACOES
@@ -18,8 +24,7 @@ public class MovimentacaoDAO {
 				   VALUES (SEQ_MOVIMENTACOES.NEXTVAL, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 				""";
 
-		try (Connection conn = ConnectionSingleton.getInstance().getConnection();
-				PreparedStatement ps = conn.prepareStatement(sql)) {
+		try (PreparedStatement ps = connection.prepareStatement(sql)) {
 
 			if (mov.getContaOrigemId() == 0) {
 				ps.setNull(1, Types.INTEGER);
@@ -58,8 +63,7 @@ public class MovimentacaoDAO {
 				   WHERE ID = ?
 				""";
 
-		try (Connection conn = ConnectionSingleton.getInstance().getConnection();
-				PreparedStatement ps = conn.prepareStatement(sql)) {
+		try (PreparedStatement ps = connection.prepareStatement(sql)) {
 
 			ps.setInt(1, id);
 
@@ -102,8 +106,7 @@ public class MovimentacaoDAO {
 
 		ArrayList<Movimentacoes> movimentacoesList = new ArrayList<>();
 
-		try (Connection conn = ConnectionSingleton.getInstance().getConnection();
-				PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+		try (PreparedStatement ps = connection.prepareStatement(sql.toString())) {
 
 			int index = 1;
 			ps.setInt(index++, idConta);
@@ -140,8 +143,7 @@ public class MovimentacaoDAO {
 				   WHERE ID = ?
 				""";
 
-		try (Connection conn = ConnectionSingleton.getInstance().getConnection();
-				PreparedStatement ps = conn.prepareStatement(sql)) {
+		try (PreparedStatement ps = connection.prepareStatement(sql)) {
 
 			ps.setString(1, StatusMovimentacao);
 			ps.setInt(2, idMovimentacao);
