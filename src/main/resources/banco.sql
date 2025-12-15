@@ -159,62 +159,6 @@ CREATE TABLE tokens_recuperacao (
     data_expiracao TIMESTAMP NOT NULL,
     utilizado    NUMBER(1) DEFAULT 0, -- 0=Não, 1=Sim
     CONSTRAINT fk_token_user FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
-);
-
-
-/* =========================================================
-   MOCKS
-   ========================================================= */
-
--- 1. Configuração Base da taxa de juros do Empréstimo
-INSERT INTO config_emprestimo (id, taxa_juros_padrao) VALUES (seq_config_emprestimo.NEXTVAL, 1.99);
-
-
--- 2. USUÁRIO MIGUEL (GERENTE)
-INSERT INTO usuarios (id, nome, email, senha, telefone, endereco, status) 
-VALUES (seq_usuarios.NEXTVAL, 'Miguel Batista', '123', '1', '(11) 98765-4321', 'Rua Gerente, 123', 'ATIVO');
-
-INSERT INTO contas (id, agencia, numero_conta, usuario_id, saldo, tipo)
-VALUES (
-    seq_contas.NEXTVAL, 0001, seq_num_conta.NEXTVAL, 
-    (SELECT id FROM usuarios WHERE email = '123'), 
-    5000.00, 'GERENTE'
-);
-
-INSERT INTO movimentacoes (id, conta_destino_id, valor, saldo_anterior, saldo_posterior, tipo, status, descricao)
-VALUES (
-    seq_movimentacoes.NEXTVAL,
-    (SELECT id FROM contas WHERE usuario_id = (SELECT id FROM usuarios WHERE email = '123')),
-    5000.00,
-    0.00,
-    5000.00,
-    'DEPOSITO',
-    'CONCLUIDA',
-    'Deposito Inicial de Abertura'
-);
-
-
--- 3. USUÁRIO ANA (CLIENTE)
-INSERT INTO usuarios (id, nome, email, senha, telefone, endereco, status)
-VALUES (seq_usuarios.NEXTVAL, 'Ana Silva', 'ana', '1', '(11) 90000-0000', 'Rua Cliente, 10', 'ATIVO');
-
-INSERT INTO contas (id, agencia, numero_conta, usuario_id, saldo, tipo)
-VALUES (
-    seq_contas.NEXTVAL, 0001, seq_num_conta.NEXTVAL,
-    (SELECT id FROM usuarios WHERE email = 'ana'),
-    1000.00, 'CLIENTE'
-);
-
-INSERT INTO movimentacoes (id, conta_destino_id, valor, saldo_anterior, saldo_posterior, tipo, status, descricao)
-VALUES (
-    seq_movimentacoes.NEXTVAL,
-    (SELECT id FROM contas WHERE usuario_id = (SELECT id FROM usuarios WHERE email = 'ana')),
-    1000.00,
-    0.00,
-    1000.00,
-    'DEPOSITO',
-    'CONCLUIDA',
-    'Deposito Inicial de Abertura'
-);
+);	
 
 COMMIT;
