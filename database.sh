@@ -10,9 +10,9 @@ if [ ! -f "$DBFILE" ]; then
 fi
 
 ORACLE_USER=system
-ORACLE_PASS=oracle
-ORACLE_PORT=1521
-ORACLE_SVC=XEPDB1   # altere se seu service name for outro
+ORACLE_PASS=root
+ORACLE_PORT=1539
+ORACLE_SVC=FREE   # altere se seu service name for outro
 
 # Rodando o script SQL
 echo "Creating database schema..."
