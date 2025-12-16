@@ -42,7 +42,7 @@ public class EmailService {
             message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(emailDestino));
             message.setSubject("BitPay - Recuperação de Senha");
 
-            String link = "http://localhost:8080/seu-projeto/app?command=validarToken&token=" + token;
+            String link = "http://localhost:8080/Projeto-Fintech/app?command=validarToken&token=" + token;
             
             String htmlContent = "<h3>Recuperação de Senha</h3>"
                     + "<p>Clique no link abaixo para redefinir sua senha:</p>"
