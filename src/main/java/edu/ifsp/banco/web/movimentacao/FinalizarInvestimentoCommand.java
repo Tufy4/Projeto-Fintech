@@ -17,24 +17,19 @@ public class FinalizarInvestimentoCommand implements Command {
 
 	@Override
 	public void execute(HttpServletRequest req, HttpServletResponse resp) {
-
 		RequestDispatcher rd;
 
 		try {
 			HttpSession session = req.getSession();
 			Conta contaSessao = (Conta) session.getAttribute("contaLogado");
-
 			if (contaSessao == null) {
 				throw new Exception("Sessão expirada. Faça login novamente.");
 			}
-
 			int numeroConta = contaSessao.getNumero_conta();
 			String produto = req.getParameter("produto");
-
 			if (produto == null || produto.trim().isEmpty()) {
 				throw new Exception("O tipo de investimento (produto) não foi informado.");
 			}
-
 			String valorStr = req.getParameter("valor");
 			if (valorStr == null || valorStr.isEmpty()) {
 				throw new Exception("O valor do investimento é obrigatório.");
@@ -51,16 +46,27 @@ public class FinalizarInvestimentoCommand implements Command {
 				session.setAttribute("saldoConta", contaAtualizada.getSaldo());
 			}
 
-			req.setAttribute("msg", "Investimento em " + produto + " realizado com sucesso!");
-			rd = req.getRequestDispatcher("/app/movimentacao/sucesso.jsp");
+			req.setAttribute("titulo", "Investimento Realizado");
+			req.setAttribute("msg", "Sua aplicação em <strong>" + produto + "</strong> no valor de R$ " + valorStr
+					+ " foi concluída com sucesso!");
+			req.setAttribute("linkDestino", "app?command=dashboardCliente");
+			req.setAttribute("textoBotao", "Voltar ao Dashboard");
+			rd = req.getRequestDispatcher("/app/sucesso.jsp");
 
 		} catch (NumberFormatException e) {
-			req.setAttribute("erro", "Formato de valor inválido.");
-			rd = req.getRequestDispatcher("/app/movimentacao/erro.jsp");
+			req.setAttribute("titulo", "Valor Inválido");
+			req.setAttribute("erro", "O formato do valor informado está incorreto. Use apenas números e vírgula.");
+			req.setAttribute("linkDestino", "app?command=investimento");
+			req.setAttribute("textoBotao", "Tentar Novamente");
+			rd = req.getRequestDispatcher("/app/erro.jsp");
+
 		} catch (Exception e) {
 			e.printStackTrace();
-			req.setAttribute("erro", "Erro ao investir: " + e.getMessage());
-			rd = req.getRequestDispatcher("/app/movimentacao/erro.jsp");
+			req.setAttribute("titulo", "Falha no Investimento");
+			req.setAttribute("erro", "Não foi possível realizar a aplicação: " + e.getMessage());
+			req.setAttribute("linkDestino", "app?command=investimento");
+			req.setAttribute("textoBotao", "Voltar para Investimentos");
+			rd = req.getRequestDispatcher("/app/erro.jsp");
 		}
 
 		try {

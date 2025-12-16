@@ -14,20 +14,28 @@ public class PagarParcelaCommand implements Command {
 	@Override
 	public void execute(HttpServletRequest request, HttpServletResponse response) {
 		RequestDispatcher rd;
+
 		try {
 			int idParcela = Integer.parseInt(request.getParameter("idParcela"));
 
 			EmprestimoSERVICE service = new EmprestimoSERVICE();
 			service.pagarParcela(idParcela);
+
 			request.getSession().setAttribute("contaLogado", null);
+			request.setAttribute("titulo", "Pagamento Confirmado");
+			request.setAttribute("msg", "A parcela foi paga com sucesso e o saldo atualizado.");
 
-			request.setAttribute("msg", "Parcela paga com sucesso!");
-
-			rd = request.getRequestDispatcher("/app/emprestimo/sucesso.jsp");
+			request.setAttribute("linkDestino", "app?command=dashboardCliente");
+			request.setAttribute("textoBotao", "Voltar para Home");
+			rd = request.getRequestDispatcher("/app/sucesso.jsp");
 
 		} catch (Exception e) {
-			request.setAttribute("erro", "Erro no pagamento: " + e.getMessage());
-			rd = request.getRequestDispatcher("/app/emprestimo/erro.jsp");
+			request.setAttribute("titulo", "Falha no Pagamento");
+			request.setAttribute("erro", "Não foi possível pagar a parcela: " + e.getMessage());
+			request.setAttribute("linkDestino", "app?command=meusEmprestimos");
+			request.setAttribute("textoBotao", "Tentar Novamente");
+
+			rd = request.getRequestDispatcher("/app/erro.jsp");
 		}
 
 		try {

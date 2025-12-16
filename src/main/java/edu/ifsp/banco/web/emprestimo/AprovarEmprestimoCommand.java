@@ -14,18 +14,30 @@ public class AprovarEmprestimoCommand implements Command {
 	@Override
 	public void execute(HttpServletRequest request, HttpServletResponse response) {
 		RequestDispatcher rd;
+
 		try {
 			int idEmprestimo = Integer.parseInt(request.getParameter("idEmprestimo"));
 
 			EmprestimoSERVICE service = new EmprestimoSERVICE();
 			service.aprovarEmprestimo(idEmprestimo);
 
-			request.setAttribute("msg", "Empréstimo ID " + idEmprestimo + " aprovado e parcelas geradas.");
-			rd = request.getRequestDispatcher("/app/emprestimo/sucesso.jsp");
+			request.setAttribute("titulo", "Aprovação Realizada");
+			request.setAttribute("msg", "Empréstimo ID " + idEmprestimo
+					+ " aprovado com sucesso. O valor foi creditado e as parcelas geradas.");
+			request.setAttribute("linkDestino", "app?command=dashboardAdmin");
+			request.setAttribute("textoBotao", "Voltar ao Dashboard");
+
+			rd = request.getRequestDispatcher("/app/sucesso.jsp");
 
 		} catch (Exception e) {
-			request.setAttribute("erro", "Erro na aprovação: " + e.getMessage());
-			rd = request.getRequestDispatcher("/app/emprestimo/erro.jsp");
+			e.printStackTrace();
+
+			request.setAttribute("titulo", "Erro na Aprovação");
+			request.setAttribute("erro", "Não foi possível aprovar o empréstimo: " + e.getMessage());
+			request.setAttribute("linkDestino", "app?command=dashboardAdmin");
+			request.setAttribute("textoBotao", "Voltar");
+
+			rd = request.getRequestDispatcher("/app/erro.jsp");
 		}
 
 		try {

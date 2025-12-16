@@ -2,16 +2,19 @@
 	pageEncoding="UTF-8"%>
 <%@ page import="edu.ifsp.banco.modelo.Usuario"%>
 <%
-	Integer countBloqueados = (Integer) request.getAttribute("countBloqueados");
-	Integer countEmprestimos = (Integer) request.getAttribute("countEmprestimos");
-	Integer countContas = (Integer) request.getAttribute("countContas");
+Integer countBloqueados = (Integer) request.getAttribute("countBloqueados");
+Integer countEmprestimos = (Integer) request.getAttribute("countEmprestimos");
+Integer countContas = (Integer) request.getAttribute("countContas");
 
-	if (countBloqueados == null) countBloqueados = 0;
-	if (countEmprestimos == null) countEmprestimos = 0;
-	if (countContas == null) countContas = 0;
+if (countBloqueados == null)
+	countBloqueados = 0;
+if (countEmprestimos == null)
+	countEmprestimos = 0;
+if (countContas == null)
+	countContas = 0;
 
-	Usuario usuarioLogado = (Usuario) session.getAttribute("usuarioLogado");
-	String nomeUsuario = (usuarioLogado != null) ? usuarioLogado.getNome() : "Administrador";
+Usuario usuarioLogado = (Usuario) session.getAttribute("usuarioLogado");
+String nomeUsuario = (usuarioLogado != null) ? usuarioLogado.getNome() : "Administrador";
 %>
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -124,13 +127,13 @@ body {
 
 			<div class="col">
 				<a
-					href="${pageContext.request.contextPath}/app?command=consultarBloqueados"
+					href="${countBloqueados > 0 ? pageContext.request.contextPath.concat('/app?command=consultarBloqueados') : '#'}"
 					class="text-decoration-none">
 					<div class="card h-100 border-0 shadow-sm admin-card">
 
 						<div
-							class="notification-badge <%= countBloqueados == 0 ? "zero" : "" %>">
-							<%= countBloqueados %>
+							class="notification-badge <%=countBloqueados == 0 ? "zero" : ""%>">
+							<%=countBloqueados%>
 						</div>
 
 						<div class="card-body text-center p-4">
@@ -147,13 +150,13 @@ body {
 
 			<div class="col">
 				<a
-					href="${pageContext.request.contextPath}/app?command=listarEmprestimosGerente"
+					href="${countEmprestimos > 0 ? pageContext.request.contextPath.concat('/app?command=listarEmprestimosGerente') : '#'}"
 					class="text-decoration-none">
 					<div class="card h-100 border-0 shadow-sm admin-card">
 
 						<div
-							class="notification-badge <%= countEmprestimos == 0 ? "zero" : "" %>">
-							<%= countEmprestimos %>
+							class="notification-badge <%=countEmprestimos == 0 ? "zero" : ""%>">
+							<%=countEmprestimos%>
 						</div>
 
 						<div class="card-body text-center p-4">
@@ -170,14 +173,15 @@ body {
 
 			<div class="col">
 				<div class="card h-100 shadow-sm metric-card">
-					<div class="card-body text-center p-4 d-flex flex-column justify-content-center">
-						
+					<div
+						class="card-body text-center p-4 d-flex flex-column justify-content-center">
+
 						<h5 class="card-title text-secondary mb-3">Total de Contas</h5>
-						
+
 						<h2 class="display-3 fw-bold text-primary mb-2">
-							<%= countContas %>
+							<%=countContas%>
 						</h2>
-						
+
 						<p class="card-text text-muted small">
 							<i class="bi bi-database-check"></i> Contas ativas na base
 						</p>
