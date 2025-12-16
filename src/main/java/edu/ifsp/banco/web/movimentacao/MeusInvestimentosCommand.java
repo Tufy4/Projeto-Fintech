@@ -23,7 +23,7 @@ public class MeusInvestimentosCommand implements Command {
 
 		try {
 			HttpSession session = request.getSession();
-			Conta conta = (Conta) session.getAttribute("conta");
+			Conta conta = (Conta) session.getAttribute("contaLogado");
 
 			if (conta == null) {
 

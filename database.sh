@@ -11,8 +11,8 @@ fi
 
 ORACLE_USER=system
 ORACLE_PASS=oracle
-ORACLE_PORT=1529
-ORACLE_SVC=XE   # altere se seu service name for outro
+ORACLE_PORT=1521
+ORACLE_SVC=XEPDB1   # altere se seu service name for outro
 
 # Rodando o script SQL
 echo "Creating database schema..."

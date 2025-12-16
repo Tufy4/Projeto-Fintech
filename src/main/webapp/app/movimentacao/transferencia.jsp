@@ -3,13 +3,14 @@
 <%@ page import="java.text.NumberFormat"%>
 <%@ page import="java.util.Locale"%>
 <%@ page import="java.math.BigDecimal"%>
+<%@ page import="edu.ifsp.banco.modelo.Conta"%>
 
 <%
 Locale localeBR = new Locale("pt", "BR");
 NumberFormat dinheiro = NumberFormat.getCurrencyInstance(localeBR);
-BigDecimal saldo = (BigDecimal) session.getAttribute("saldoConta");
-if (saldo == null)
-	saldo = BigDecimal.ZERO;
+
+Conta conta = (Conta) session.getAttribute("contaLogado");
+BigDecimal saldo = (conta != null) ? conta.getSaldo() : BigDecimal.ZERO;
 %>
 
 <!DOCTYPE html>

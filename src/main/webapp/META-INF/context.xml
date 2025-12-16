@@ -9,5 +9,5 @@
               username="system" 
               password="root"
               driverClassName="oracle.jdbc.OracleDriver"
-              url="jdbc:oracle:thin:@localhost:1521:XE"/>
+              url="jdbc:oracle:thin:@//localhost:1521/XEPDB1"/>
 </Context>

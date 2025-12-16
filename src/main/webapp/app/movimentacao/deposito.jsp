@@ -1,5 +1,11 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
+<%@ page import="edu.ifsp.banco.modelo.Conta"%>
+<%@ page import="java.math.BigDecimal"%>
+<%
+Conta conta = (Conta) session.getAttribute("contaLogado");
+BigDecimal saldo = (conta != null) ? conta.getSaldo() : BigDecimal.ZERO;
+%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -124,7 +130,7 @@ sessionScope.usuarioLogado.getNome() : 'Cliente'}</strong>
 		<h2>
 			Seja Bem-vindo, <strong>${sessionScope.usuarioLogado != null ?
 sessionScope.usuarioLogado.getNome() : 'Cliente'}</strong>
-			<br> Saldo atual: R$ <strong>${sessionScope.saldoConta != null ? sessionScope.saldoConta : '0.00'}</strong>
+			<br> Saldo atual: R$ <strong><%=String.format("%.2f", saldo)%></strong>
 		</h2>
 		<div class="deposit-form">
 			<h2 class="deposit-title">Depósito</h2>
