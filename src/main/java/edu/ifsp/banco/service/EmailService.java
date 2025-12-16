@@ -11,8 +11,8 @@ import jakarta.mail.internet.MimeMessage;
 
 public class EmailService {
 
-    private static final String MEU_EMAIL = "sr.freeza@gmail.com"; 
-    private static final String MINHA_SENHA_APP = "zctv qtlg syfx gzcb"; // senha de apps gerada na config de conta
+    private static final String MEU_EMAIL = "tfzinf@gmail.com"; 
+    private static final String MINHA_SENHA_APP = "bxrt mkax xqfu qjpl"; // senha de apps gerada na config de conta
 //    Passo a Passo para criar senha de app (Google Account)
 //    Acesse myaccount.google.com/security.
 //    Ative a Verificação em duas etapas (2-Step Verification) se ainda não estiver ativa. Sem isso, a opção de senha de app não aparece.
